@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:18.3
+    container_name: library_db
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:
