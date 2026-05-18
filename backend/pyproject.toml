@@ -12,3 +12,52 @@ dependencies = [
     "psycopg2-binary>=2.9.11",
     "python-dotenv>=1.2.2",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.13",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+# Django の自動生成ファイルや環境系は対象外
+extend-exclude = [
+    "migrations",
+    ".venv",
+    "venv",
+    "__pycache__",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle error
+    "F",    # Pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "DJ",   # flake8-django
+    "SIM",  # flake8-simplify
+    "C4",   # flake8-comprehensions
+    "T20",  # print文検出
+    "RUF",  # Ruff固有ルール
+]
+
+ignore = [
+    "E501", # 行長。format側に任せる。長いURLや文字列で邪魔になりやすい
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "accounts",
+    "books",
+    "lending",
+    "reviews",
+    "config",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
