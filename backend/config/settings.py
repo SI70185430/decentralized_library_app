@@ -48,7 +48,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "config",
+    "accounts",
+    "books",
+    "lending",
 ]
+
+AUTH_USER_MODEL = "accounts.AppUser"
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
