@@ -17,15 +17,16 @@ class Genre(models.Model):
     name = models.CharField("ジャンル名", max_length=255, unique=True)
 
     class Meta:
-        db_talble = "genre"
+        db_table = "genre"
 
-        def __str__(self):
-            return self.name
+    def __str__(self):
+        return self.name
 
 class Book(TimeStampedModel):
     id = models.UUIDField("書籍ID", primary_key=True, default=uuid.uuid7, editable=False)
     genre = models.ForeignKey(
         Genre,
+        verbose_name="Cコード内容",
         to_field="c_code_genre",
         db_column="c_code_genre",
         on_delete=models.SET_NULL,
@@ -66,8 +67,9 @@ class BookCopy(TimeStampedModel):
     id = models.UUIDField("蔵書ID", primary_key=True, default=uuid.uuid7, editable=False)
     book = models.ForeignKey(
         Book,
+        verbose_name="書籍ID",
         on_delete=models.CASCADE,
-        related_name="Bookcopy",
+        related_name="Bookcopies",
     )
     status = models.CharField(
         "ステータス",
