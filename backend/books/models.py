@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.db.models import Q
 
+
 class TimeStampedModel(models.Model):
     """作成日時・更新日時を持つモデルの共通基底クラス。"""
 
@@ -11,6 +12,7 @@ class TimeStampedModel(models.Model):
 
     class Meta:
         abstract = True
+
 
 class Genre(models.Model):
     c_code_genre = models.CharField("Cコード内容", max_length=2, primary_key=True)
@@ -21,6 +23,7 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Book(TimeStampedModel):
     id = models.UUIDField("書籍ID", primary_key=True, default=uuid.uuid7, editable=False)
@@ -44,12 +47,11 @@ class Book(TimeStampedModel):
     description = models.TextField("説明", null=True, blank=True)
 
     class Meta:
-        db_table = 'book'
+        db_table = "book"
 
         constraints = [
             models.CheckConstraint(
-                condition=Q(price__isnull=True) | Q(price__gte=0),
-                name="book_price_gte_0_or_null"
+                condition=Q(price__isnull=True) | Q(price__gte=0), name="book_price_gte_0_or_null"
             )
         ]
 
@@ -78,11 +80,11 @@ class BookCopy(TimeStampedModel):
         default=Status.AVAILABLE,
     )
     location = models.CharField("保管場所", max_length=255)
-    purchase_date = models.DateField("購入日", null=True, blank= True)
+    purchase_date = models.DateField("購入日", null=True, blank=True)
     note = models.TextField("備考", null=True, blank=True)
 
     class Meta:
-        db_table = 'book_copy'
+        db_table = "book_copy"
         constraints = [
             models.CheckConstraint(
                 condition=Q(status__in=["available", "on_loan", "reserved", "lost"]),

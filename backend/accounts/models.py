@@ -6,9 +6,7 @@ from django.db.models import Q
 
 
 class AppUser(AbstractUser):
-    id = models.UUIDField(
-        "ユーザーID", primary_key=True, default=uuid.uuid7, editable=False
-    )
+    id = models.UUIDField("ユーザーID", primary_key=True, default=uuid.uuid7, editable=False)
     employee_id = models.IntegerField("社員番号", unique=True)
     updated_at = models.DateTimeField("更新日時", auto_now=True)
 
