@@ -31,17 +31,15 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-select = [
+select = [  # 適宜変更予定
     "E",    # pycodestyle error
     "F",    # Pyflakes
     "I",    # isort
     "B",    # flake8-bugbear
     "UP",   # pyupgrade
-    "DJ",   # flake8-django
     "SIM",  # flake8-simplify
     "C4",   # flake8-comprehensions
     "T20",  # print文検出
-    "RUF",  # Ruff固有ルール
 ]
 
 ignore = [
