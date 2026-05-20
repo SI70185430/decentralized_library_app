@@ -1,5 +1,4 @@
 import uuid
-
 from datetime import date, datetime
 
 from django.db import IntegrityError, models, transaction
@@ -193,6 +192,7 @@ class LendingModelTests(TestCase):
         )
         self.assertIsInstance(lending.created_at, datetime)
         self.assertIsInstance(lending.updated_at, datetime)
+
 
 class ReservationModelTests(TestCase):
     def setUp(self):

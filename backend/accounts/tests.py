@@ -1,6 +1,5 @@
 import uuid
-
-from datetime import date, datetime
+from datetime import datetime
 
 from django.db import IntegrityError
 from django.test import TestCase

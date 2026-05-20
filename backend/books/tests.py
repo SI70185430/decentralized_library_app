@@ -1,5 +1,4 @@
 import uuid
-
 from datetime import date, datetime
 
 from django.db import IntegrityError, models
@@ -184,6 +183,7 @@ class BookModelTests(TestCase):
         )
         self.assertIsInstance(book.created_at, datetime)
         self.assertIsInstance(book.updated_at, datetime)
+
 
 class BookCopyModelTests(TestCase):
     def setUp(self):
