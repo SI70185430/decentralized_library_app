@@ -76,6 +76,10 @@ class Reservation(TimeStampedModel):
     class Meta:
         db_table = "reservation"
         constraints = [
+            models.UniqueConstraint(
+                fields=["book_copy", "user"],
+                name="reservation_book_copy_user_unique",
+            ),
             models.CheckConstraint(
                 condition=Q(expires_date__gte=F("scheduled_date")),
                 name="reservation_expires_date_gte_scheduled_date",
