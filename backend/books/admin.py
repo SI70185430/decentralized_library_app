@@ -2,12 +2,14 @@ from django.contrib import admin
 
 from .models import Book, BookCopy, Genre
 
+
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = (
         "c_code_genre",
         "name",
     )
+
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -25,6 +27,7 @@ class BookAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     )
+
 
 @admin.register(BookCopy)
 class BookCopyAdmin(admin.ModelAdmin):

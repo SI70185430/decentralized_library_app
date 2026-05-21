@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Lending, Reservation
 
+
 @admin.register(Lending)
 class LendingAdmin(admin.ModelAdmin):
     list_display = (
@@ -28,4 +29,3 @@ class ReservationAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     )
-

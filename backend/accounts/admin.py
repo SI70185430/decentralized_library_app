@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import AppUser
 
+
 @admin.register(AppUser)
 class AppUserAdmin(UserAdmin):
     list_display = (
