@@ -62,7 +62,7 @@ class Book(TimeStampedModel):
 class BookCopy(TimeStampedModel):
     class Status(models.TextChoices):
         AVAILABLE = "available", "利用可能"
-        RESERED = "on_loan", "貸出中"
+        ON_LOAN = "on_loan", "貸出中"
         RESERVED = "reserved", "予約中"
         LOST = "lost", "紛失"
 
