@@ -10,18 +10,12 @@ type PageFrameProps = {
 
 export function PageFrame({ title, backHref, breadcrumbs = [], children }: PageFrameProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="space-y-4">
       <PageHeader title={title} backHref={backHref} />
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-4">
-        {breadcrumbs.length > 0 ? (
-          <div className="mb-4">
-            <BreadcrumbNav items={breadcrumbs} />
-          </div>
-        ) : null}
+      {breadcrumbs.length > 0 ? <BreadcrumbNav items={breadcrumbs} /> : null}
 
-        {children}
-      </main>
+      {children}
     </div>
   );
 }
