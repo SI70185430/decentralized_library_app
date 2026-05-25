@@ -8,13 +8,7 @@ import { DatePicker } from "@/components/layout/date-picker";
 import { JapaneseCalendar } from "@/components/layout/japanese-calendar";
 import { PageFrame } from "@/components/layout/page-frame";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 function formatSelectedDate(date: Date | undefined) {
   return date ? format(date, "yyyy年M月d日(E)", { locale: ja }) : "未選択";
@@ -43,11 +37,7 @@ export default function CalendarTestPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <JapaneseCalendar
-              mode="single"
-              selected={calendarDate}
-              onSelect={setCalendarDate}
-            />
+            <JapaneseCalendar mode="single" selected={calendarDate} onSelect={setCalendarDate} />
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="text-muted-foreground">選択中:</span>
               <span className="font-medium">{formatSelectedDate(calendarDate)}</span>
