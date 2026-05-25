@@ -1,19 +1,14 @@
-import { BreadcrumbNav, type BreadcrumbNavItem } from "@/components/layout/breadcrumb-nav"
-import { PageHeader } from "@/components/layout/page-header"
+import { BreadcrumbNav, type BreadcrumbNavItem } from "@/components/layout/breadcrumb-nav";
+import { PageHeader } from "@/components/layout/page-header";
 
 type PageFrameProps = {
-  title: string
-  backHref: string
-  breadcrumbs?: BreadcrumbNavItem[]
-  children: React.ReactNode
-}
+  title: string;
+  backHref: string;
+  breadcrumbs?: BreadcrumbNavItem[];
+  children: React.ReactNode;
+};
 
-export function PageFrame({
-  title,
-  backHref,
-  breadcrumbs = [],
-  children,
-}: PageFrameProps) {
+export function PageFrame({ title, backHref, breadcrumbs = [], children }: PageFrameProps) {
   return (
     <div className="min-h-screen bg-background">
       <PageHeader title={title} backHref={backHref} />
@@ -28,5 +23,5 @@ export function PageFrame({
         {children}
       </main>
     </div>
-  )
+  );
 }

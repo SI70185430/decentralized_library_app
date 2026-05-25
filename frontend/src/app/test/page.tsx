@@ -1,4 +1,4 @@
-import { PageFrame } from "@/components/layout/page-frame"
+import { PageFrame } from "@/components/layout/page-frame";
 
 export default function BooksPage() {
   return (
@@ -7,7 +7,7 @@ export default function BooksPage() {
       backHref="/"
       breadcrumbs={[
         { label: "ホーム", href: "/" },
-        { label: "A" },
+        { type: "ellipsis" },
         { label: "B" },
         { label: "C" },
         { label: "書籍一覧" },
@@ -15,5 +15,5 @@ export default function BooksPage() {
     >
       <div>書籍一覧の中身</div>
     </PageFrame>
-  )
+  );
 }

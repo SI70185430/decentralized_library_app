@@ -1,4 +1,5 @@
-import Link from "next/link"
+import Link from "next/link";
+import { Fragment } from "react";
 
 import {
   Breadcrumb,
@@ -8,70 +9,43 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
 
-export type BreadcrumbNavItem = {
-  label: string
-  href?: string
-}
+export type BreadcrumbNavItem =
+  | {
+      label: string;
+      href?: string;
+    }
+  | {
+      type: "ellipsis";
+    };
 
 type BreadcrumbNavProps = {
-  items: BreadcrumbNavItem[]
-}
-
-type BreadcrumbDisplayItem =
-  | { type: "item"; item: BreadcrumbNavItem; originalIndex: number }
-  | { type: "ellipsis" }
-
-function getDisplayItems(items: BreadcrumbNavItem[]): BreadcrumbDisplayItem[] {
-  if (items.length <= 3) {
-    return items.map((item, index) => ({
-      type: "item",
-      item,
-      originalIndex: index,
-    }))
-  }
-
-  return [
-    { type: "item", item: items[0], originalIndex: 0 },
-    { type: "ellipsis" },
-    { type: "item", item: items[items.length - 2], originalIndex: items.length - 2 },
-    { type: "item", item: items[items.length - 1], originalIndex: items.length - 1 },
-  ]
-}
+  items: BreadcrumbNavItem[];
+};
 
 export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
-  if (items.length === 0) {
-    return null
-  }
-
-  const displayItems = getDisplayItems(items)
-
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {displayItems.map((displayItem, index) => {
-          const isLast = index === displayItems.length - 1
+        {items.map((item, index) => (
+          <Fragment key={"type" in item ? `ellipsis-${index}` : `${item.label}-${index}`}>
+            {index > 0 ? <BreadcrumbSeparator /> : null}
 
-          return (
-            <div key={displayItem.type === "ellipsis" ? "ellipsis" : `${displayItem.item.label}-${displayItem.originalIndex}`} className="contents">
-              {index > 0 ? <BreadcrumbSeparator /> : null}
-
-              <BreadcrumbItem>
-                {displayItem.type === "ellipsis" ? (
-                  <BreadcrumbEllipsis />
-                ) : isLast || !displayItem.item.href ? (
-                  <BreadcrumbPage>{displayItem.item.label}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link href={displayItem.item.href}>{displayItem.item.label}</Link>
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-            </div>
-          )
-        })}
+            <BreadcrumbItem>
+              {"type" in item ? (
+                <BreadcrumbEllipsis />
+              ) : item.href ? (
+                <BreadcrumbLink asChild>
+                  <Link href={item.href}>{item.label}</Link>
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+              )}
+            </BreadcrumbItem>
+          </Fragment>
+        ))}
       </BreadcrumbList>
     </Breadcrumb>
-  )
+  );
 }

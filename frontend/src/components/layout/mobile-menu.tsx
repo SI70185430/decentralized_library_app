@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Menu } from "lucide-react"
+import Link from "next/link";
+import { Menu } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetClose,
@@ -12,7 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 
 const menuItems = [
   {
@@ -20,56 +19,56 @@ const menuItems = [
     href: "/",
   },
   {
-    label: "書籍一覧",
+    label: "書籍検索",
     href: "/books",
   },
   {
-    label: "貸出一覧",
-    href: "/lendings",
+    label: "お気に入りレビュー",
+    href: "/favorit_reviews",
   },
   {
-    label: "予約一覧",
-    href: "/reservations",
+    label: "フォローユーザー",
+    href: "/follow_users",
   },
-]
+  {
+    label: "ログアウト",
+    href: "/logout",
+  },
+];
 
 export function MobileMenu() {
-  const pathname = usePathname()
-
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button type="button" variant="ghost" size="icon" aria-label="メニューを開く">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="メニューを開く"
+        >
           <Menu className="size-5" />
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="w-72">
+      {/*UI設計書だとside="top"の方が近いが、機能的に"right"の方が良いかも*/}
+      <SheetContent side="top" className="w-screen max-w-none sm:max-w-none">
         <SheetHeader>
-          <SheetTitle>メニュー</SheetTitle>
+          <SheetTitle>ナビゲーション</SheetTitle>
         </SheetHeader>
 
         <nav className="mt-6 flex flex-col gap-1">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href
-
-            return (
-              <SheetClose asChild key={item.href}>
-                <Link
-                  href={item.href}
-                  className={
-                    isActive
-                      ? "rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-foreground"
-                      : "rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  }
-                >
-                  {item.label}
-                </Link>
-              </SheetClose>
-            )
-          })}
+          {menuItems.map((item) => (
+            <SheetClose asChild key={item.href}>
+              <Link
+                href={item.href}
+                className="block rounded-none px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              >
+                {item.label}
+              </Link>
+            </SheetClose>
+          ))}
         </nav>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
