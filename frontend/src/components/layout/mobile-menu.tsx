@@ -40,12 +40,7 @@ export function MobileMenu() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="メニューを開く"
-        >
+        <Button type="button" variant="ghost" size="icon" aria-label="メニューを開く">
           <Menu className="size-5" />
         </Button>
       </SheetTrigger>

@@ -1,11 +1,11 @@
-import Link from "next/link"
-import { ChevronLeft } from "lucide-react"
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 type BackButtonProps = {
-  href: string
-}
+  href: string;
+};
 
 export function BackButton({ href }: BackButtonProps) {
   return (
@@ -14,5 +14,5 @@ export function BackButton({ href }: BackButtonProps) {
         <ChevronLeft className="size-4" />
       </Link>
     </Button>
-  )
+  );
 }
