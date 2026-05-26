@@ -56,9 +56,7 @@ export default function CalendarTestPage() {
         <Card>
           <CardHeader>
             <CardTitle>Date Picker</CardTitle>
-            <CardDescription>
-              Popover の開閉、日付選択後の表示更新を確認します。
-            </CardDescription>
+            <CardDescription>Popover の開閉、日付選択後の表示更新を確認します。</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
