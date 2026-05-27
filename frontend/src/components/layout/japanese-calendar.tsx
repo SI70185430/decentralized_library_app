@@ -2,11 +2,12 @@
 
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
+import type { Matcher } from "react-day-picker";
 
 import { Calendar } from "@/components/ui/calendar";
 
 type JapaneseCalendarProps = React.ComponentProps<typeof Calendar> & {
-  disabledDates?: Date[];
+  disabledDates?: Matcher[];
 };
 
 export function JapaneseCalendar({ disabledDates, ...props }: JapaneseCalendarProps) {

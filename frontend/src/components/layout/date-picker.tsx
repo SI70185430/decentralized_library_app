@@ -2,6 +2,7 @@
 
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import type { Matcher } from "react-day-picker";
 
 import { JapaneseCalendar } from "@/components/layout/japanese-calendar";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ type DatePickerProps = {
   value: Date | undefined;
   onChange: (date: Date | undefined) => void;
   placeholder?: string;
-  disabledDates?: Date[];
+  disabledDates?: Matcher[];
 };
 
 export function DatePicker({

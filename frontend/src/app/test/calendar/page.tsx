@@ -20,10 +20,11 @@ function date(year: number, month: number, day: number) {
 
 const disabledDates = [
   // 今日より前の日付は JapaneseCalendar 側で常に選択不可にする
+  date(2026, 5, 27),
   date(2026, 5, 28),
   date(2026, 5, 29),
-  date(2026, 6, 1),
-  date(2026, 5, 27),
+  { from: date(2026, 6, 1), to: date(2026, 6, 5) },
+  { from: date(2026, 6, 15), to: date(2026, 7, 20) },
 ];
 
 export default function CalendarTestPage() {
@@ -45,7 +46,7 @@ export default function CalendarTestPage() {
           <CardHeader>
             <CardTitle>カレンダー単体</CardTitle>
             <CardDescription>
-              年月・曜日の日本語表示、前月/翌月ボタン、過去日・指定日の選択不可を確認します。
+              年月・曜日の日本語表示、前月/翌月ボタン、過去日・指定日・指定期間の選択不可を確認します。
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -76,7 +77,7 @@ export default function CalendarTestPage() {
           <CardHeader>
             <CardTitle>Date Picker</CardTitle>
             <CardDescription>
-              Popover の開閉、日付選択後の表示更新、過去日・指定日の選択不可を確認します。
+              Popover の開閉、日付選択後の表示更新、過去日・指定日・指定期間の選択不可を確認します。
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
