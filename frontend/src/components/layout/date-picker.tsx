@@ -40,10 +40,10 @@ export function DatePicker({
           onSelect={onChange}
           defaultMonth={value} //選択中の日付の月がデフォルトで表示されるように
           disabledDates={disabledDates}
+          fixedWeeks
         />
       </PopoverContent>
     </Popover>
   );
 }
 
-// TODO:月変更時の立幅が変化してUXが損なわれる問題への対処（最終的な時間があったら）

@@ -54,6 +54,7 @@ export default function CalendarTestPage() {
               selected={calendarDate}
               onSelect={setCalendarDate}
               disabledDates={disabledDates}
+              fixedWeeks
             />
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="text-muted-foreground">選択中:</span>
