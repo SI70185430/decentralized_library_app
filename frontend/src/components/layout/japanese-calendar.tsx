@@ -5,12 +5,17 @@ import { ja } from "date-fns/locale";
 
 import { Calendar } from "@/components/ui/calendar";
 
-type JapaneseCalendarProps = React.ComponentProps<typeof Calendar>;
+type JapaneseCalendarProps = React.ComponentProps<typeof Calendar> & {
+  disabledDates?: Date[];
+};
 
-export function JapaneseCalendar(props: JapaneseCalendarProps) {
+export function JapaneseCalendar({ disabledDates, ...props }: JapaneseCalendarProps) {
+  const disabledDays = [{ before: new Date() }, ...(disabledDates ?? [])];
+
   return (
     <Calendar
       {...props}
+      disabled={disabledDays}
       locale={ja}
       className="rounded-xl border bg-card p-3 shadow-sm"
       classNames={{
@@ -19,6 +24,7 @@ export function JapaneseCalendar(props: JapaneseCalendarProps) {
           "data-[selected-single=true]:bg-blue-600 data-[selected-single=true]:text-black",
         weekday: "flex-1 text-[0.8rem] font-normal select-none bg-gray-300",
         weekdays: "flex [&>*:first-child]:text-red-500 [&>*:last-child]:text-blue-500",
+        disabled: "text-muted-foreground opacity-80 bg-gray-300",
       }}
       formatters={{
         formatCaption: (month) => format(month, "yyyy年M月"),

@@ -13,8 +13,21 @@ function formatSelectedDate(date: Date | undefined) {
   return date ? format(date, "yyyy/M/d") : "未選択";
 }
 
+// 月の値が0オリジンであることに由来する表記のズレ解消のため
+function date(year: number, month: number, day: number) {
+  return new Date(year, month - 1, day);
+}
+
+const disabledDates = [
+  // 今日より前の日付は JapaneseCalendar 側で常に選択不可にする
+  date(2026, 5, 28),
+  date(2026, 5, 29),
+  date(2026, 6, 1),
+  date(2026, 5, 27),
+];
+
 export default function CalendarTestPage() {
-  const [calendarDate, setCalendarDate] = useState<Date | undefined>(new Date());
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>();
   const [pickerDate, setPickerDate] = useState<Date | undefined>();
 
   return (
@@ -32,11 +45,16 @@ export default function CalendarTestPage() {
           <CardHeader>
             <CardTitle>カレンダー単体</CardTitle>
             <CardDescription>
-              年月・曜日の日本語表示、前月/翌月ボタン、日付選択を確認します。
+              年月・曜日の日本語表示、前月/翌月ボタン、過去日・指定日の選択不可を確認します。
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <JapaneseCalendar mode="single" selected={calendarDate} onSelect={setCalendarDate} />
+            <JapaneseCalendar
+              mode="single"
+              selected={calendarDate}
+              onSelect={setCalendarDate}
+              disabledDates={disabledDates}
+            />
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="text-muted-foreground">選択中:</span>
               <span className="font-medium">{formatSelectedDate(calendarDate)}</span>
@@ -56,11 +74,13 @@ export default function CalendarTestPage() {
         <Card>
           <CardHeader>
             <CardTitle>Date Picker</CardTitle>
-            <CardDescription>Popover の開閉、日付選択後の表示更新を確認します。</CardDescription>
+            <CardDescription>
+              Popover の開閉、日付選択後の表示更新、過去日・指定日の選択不可を確認します。
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <DatePicker value={pickerDate} onChange={setPickerDate} />
+              <DatePicker value={pickerDate} onChange={setPickerDate} disabledDates={disabledDates} />
             </div>
             {/* 以下のボタン郡はテスト作業円滑化のため実装 */}
             <div className="flex flex-wrap gap-2">

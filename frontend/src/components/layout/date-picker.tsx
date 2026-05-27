@@ -11,9 +11,15 @@ type DatePickerProps = {
   value: Date | undefined;
   onChange: (date: Date | undefined) => void;
   placeholder?: string;
+  disabledDates?: Date[];
 };
 
-export function DatePicker({ value, onChange, placeholder = "日付を選択" }: DatePickerProps) {
+export function DatePicker({
+  value,
+  onChange,
+  placeholder = "日付を選択",
+  disabledDates,
+}: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -33,6 +39,7 @@ export function DatePicker({ value, onChange, placeholder = "日付を選択" }:
           selected={value}
           onSelect={onChange}
           defaultMonth={value} //選択中の日付の月がデフォルトで表示されるように
+          disabledDates={disabledDates}
         />
       </PopoverContent>
     </Popover>
