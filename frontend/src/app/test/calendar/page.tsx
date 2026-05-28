@@ -82,7 +82,11 @@ export default function CalendarTestPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <DatePicker value={pickerDate} onChange={setPickerDate} disabledDates={disabledDates} />
+              <DatePicker
+                value={pickerDate}
+                onChange={setPickerDate}
+                disabledDates={disabledDates}
+              />
             </div>
             {/* 以下のボタン郡はテスト作業円滑化のため実装 */}
             <div className="flex flex-wrap gap-2">
