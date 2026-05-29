@@ -4,13 +4,28 @@ from django.contrib.auth.admin import UserAdmin
 from .models import AppUser
 
 
+EDITABLE_FIELDS = (
+    "username",
+    "employee_id",
+    "is_active",
+)
+
+
 @admin.register(AppUser)
 class AppUserAdmin(UserAdmin):
+    fieldsets = (
+        (
+            "編集可能なユーザー情報",
+            {
+                "fields": EDITABLE_FIELDS,
+            },
+        ),
+    )
+
     list_display = (
         "id",
         "username",
         "employee_id",
-        "password",
         "is_staff",
         "is_active",
         "last_login",
@@ -33,3 +48,4 @@ class AppUserAdmin(UserAdmin):
             },
         ),
     )
+
