@@ -3,7 +3,6 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import AppUser
 
-
 EDITABLE_FIELDS = (
     "username",
     "employee_id",
@@ -48,4 +47,3 @@ class AppUserAdmin(UserAdmin):
             },
         ),
     )
-
