@@ -33,7 +33,7 @@ SECRET_KEY = environ.get("SECRET_KEY", get_random_secret_key())
 DEBUG = environ.get("DEBUG", "") == "True"
 
 # ただの文字列として渡してしまうため、カンマ区切りで分割してリストにしないとエラーを吐く
-ALLOWED_HOSTS = environ.get("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "rest_framework_simplejwt",
-    "corsheaders",
     "config",
     "accounts",
     "books",
@@ -59,7 +58,6 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "accounts.AppUser"
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -147,12 +145,42 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
 
-CORS_ALLOW_CREDENTIALS = True
+# Swagger UI 用設定
+# CSRF保護付きの unsafe method 送信時に、その時点でCookieに保存されているcsrftoken を X-CSRFToken ヘッダーへ付与する。
+SPECTACULAR_SETTINGS = {
+    "SWAGGER_UI_SETTINGS": """
+    {
+      persistAuthorization: false,
+      requestInterceptor: (request) => {
+        request.credentials = "same-origin";
+        request.headers = request.headers || {};
+
+        const method = (request.method || "").toUpperCase();
+        const unsafeMethods = ["POST", "PUT", "PATCH", "DELETE"];
+
+        if (unsafeMethods.includes(method)) {
+          const csrfToken = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("csrftoken="))
+            ?.split("=")[1];
+
+          if (csrfToken) {
+            request.headers["X-CSRFToken"] = decodeURIComponent(csrfToken);
+          }
+        }
+
+        return request;
+      }
+    }
+    """,
+}
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
+    "https://localhost:3000",
 ]
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Strict"
+CSRF_COOKIE_SAMESITE = "Strict"

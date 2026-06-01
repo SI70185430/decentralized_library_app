@@ -54,3 +54,6 @@ Thumbs.db
 
 # VSCode
 .vscode/
+
+# CA
+frontend/certs/
