@@ -8,13 +8,19 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, backHref }: PageHeaderProps) {
   return (
-    <header className="border-b bg-background">
-      <div className="flex h-14 items-center gap-3 px-4">
-        {backHref ? <BackButton href={backHref} /> : null}
+    <header className="bg-[#95c8f3]">
+      <div className="relative flex h-20 items-center px-5">
+        <div className="z-10 flex w-10 items-center">
+          {backHref ? <BackButton href={backHref} /> : null}
+        </div>
 
-        <h1 className="min-w-0 flex-1 truncate text-lg font-semibold">{title}</h1>
+        <h1 className="absolute inset-x-16 truncate text-center text-2xl leading-none font-semibold">
+          {title}
+        </h1>
 
-        <MobileMenu />
+        <div className="z-10 ml-auto">
+          <MobileMenu />
+        </div>
       </div>
     </header>
   );

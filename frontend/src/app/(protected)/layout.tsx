@@ -10,8 +10,8 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="mx-auto w-full max-w-7xl px-4 py-4">{children}</main>
+    <div className="min-h-dvh bg-white">
+      <main className="mx-auto min-h-dvh w-full max-w-[402px] bg-white">{children}</main>
     </div>
   );
 }
