@@ -74,6 +74,14 @@ class AuthApiTests(TestCase):
         self.assertTrue(self.client.cookies["sessionid"]["secure"])
         self.assertEqual(self.client.cookies["sessionid"]["samesite"], "Strict")
 
+    def test_login_accepts_full_width_employee_id(self):
+        response = self.post_login(
+            {"employee_id": "７７７７", "password": LOGIN_PASSWORD},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["user"]["employee_id"], LOGIN_EMPLOYEE_ID)
+
     def test_login_requires_employee_id(self):
         response = self.post_login({"password": LOGIN_PASSWORD})
 

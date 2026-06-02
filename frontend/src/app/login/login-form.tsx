@@ -13,6 +13,31 @@ function fieldError(errors: ApiValidationErrors, field: string) {
   return errors[field]?.[0];
 }
 
+function normalizeEmployeeId(value: string) {
+  return value
+    .trim()
+    .replace(/[０-９]/g, (char) =>
+      String.fromCharCode(char.charCodeAt(0) - 0xfee0),
+    );
+}
+
+function validateLoginForm(employeeId: string, password: string): ApiValidationErrors {
+  const errors: ApiValidationErrors = {};
+  const normalizedEmployeeId = normalizeEmployeeId(employeeId);
+
+  if (!normalizedEmployeeId) {
+    errors.employee_id = ["社員番号は必須です"];
+  } else if (!/^\d+$/.test(normalizedEmployeeId)) {
+    errors.employee_id = ["社員番号は数字のみで入力してください"];
+  }
+
+  if (!password) {
+    errors.password = ["パスワードは必須です"];
+  }
+
+  return errors;
+}
+
 export function LoginForm() {
   const router = useRouter();
   const [errors, setErrors] = useState<ApiValidationErrors>({});
@@ -28,10 +53,18 @@ export function LoginForm() {
 
     setErrors({});
     setFormError(undefined);
+
+    const validationErrors = validateLoginForm(employeeId, password);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      await login(employeeId, password);
+      await login(normalizeEmployeeId(employeeId), password);
       router.replace("/home");
       router.refresh();
     } catch (error) {
