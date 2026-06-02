@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ApiValidationError, type ApiValidationErrors } from "@/lib/auth/types";
 import { login } from "@/lib/auth/client";
@@ -84,69 +83,75 @@ export function LoginForm() {
   const nonFieldErrors = errors.non_field_errors ?? [];
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>ログイン</CardTitle>
-        <CardDescription>社員番号とパスワードを入力してください。</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label htmlFor="employee_id" className="text-sm font-medium">
-              社員番号
-            </label>
-            <Input
-              id="employee_id"
-              name="employee_id"
-              type="text"
-              inputMode="numeric"
-              autoComplete="username"
-              aria-invalid={employeeIdError ? true : undefined}
-            />
-            {employeeIdError ? (
-              <p className="text-sm text-destructive" role="alert">
-                {employeeIdError}
-              </p>
-            ) : null}
-          </div>
+    <div className="mx-auto min-h-dvh w-full max-w-[402px] bg-white px-[clamp(40px,14.9vw,60px)] pt-[clamp(56px,12dvh,88px)] pb-12 text-[#222]">
+      <h1 className="text-center whitespace-nowrap text-[28px] leading-none font-bold tracking-[-0.04em]">
+        分散型図書館アプリ
+      </h1>
 
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              パスワード
-            </label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={passwordError ? true : undefined}
-            />
-            {passwordError ? (
-              <p className="text-sm text-destructive" role="alert">
-                {passwordError}
-              </p>
-            ) : null}
-          </div>
-
-          {nonFieldErrors.length > 0 ? (
-            <div className="space-y-1 text-sm text-destructive" role="alert">
-              {nonFieldErrors.map((message) => (
-                <p key={message}>{message}</p>
-              ))}
-            </div>
-          ) : null}
-
-          {formError ? (
-            <p className="text-sm text-destructive" role="alert">
-              {formError}
+      <form className="mt-[clamp(72px,12dvh,104px)]" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="employee_id" className="text-2xl leading-none font-semibold">
+            社員番号
+          </label>
+          <Input
+            id="employee_id"
+            name="employee_id"
+            type="text"
+            inputMode="numeric"
+            autoComplete="username"
+            className="mt-3 h-11 rounded-none border border-black bg-[#e9e9e9] text-base shadow-none focus-visible:border-black focus-visible:ring-0"
+            aria-invalid={employeeIdError ? true : undefined}
+          />
+          {employeeIdError ? (
+            <p className="mt-2 text-sm text-destructive" role="alert">
+              {employeeIdError}
             </p>
           ) : null}
+        </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <div className="mt-[clamp(40px,7dvh,64px)]">
+          <label htmlFor="password" className="text-2xl leading-none font-semibold">
+            パスワード
+          </label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            className="mt-3 h-11 rounded-none border border-black bg-[#e9e9e9] text-base shadow-none focus-visible:border-black focus-visible:ring-0"
+            aria-invalid={passwordError ? true : undefined}
+          />
+          {passwordError ? (
+            <p className="mt-2 text-sm text-destructive" role="alert">
+              {passwordError}
+            </p>
+          ) : null}
+        </div>
+
+        {nonFieldErrors.length > 0 ? (
+          <div className="mt-6 space-y-1 text-sm text-destructive" role="alert">
+            {nonFieldErrors.map((message) => (
+              <p key={message}>{message}</p>
+            ))}
+          </div>
+        ) : null}
+
+        {formError ? (
+          <p className="mt-6 text-sm text-destructive" role="alert">
+            {formError}
+          </p>
+        ) : null}
+
+        <div className="mt-[clamp(56px,9dvh,83px)] flex justify-center">
+          <Button
+            type="submit"
+            className="h-[43px] w-44 rounded-[8px] border border-black bg-[#eef0ff] text-xl font-normal text-black shadow-none hover:bg-[#e3e6ff]"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "ログイン中..." : "ログイン"}
           </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+      </form>
+    </div>
   );
 }
