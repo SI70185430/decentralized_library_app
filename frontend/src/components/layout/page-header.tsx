@@ -3,14 +3,14 @@ import { MobileMenu } from "@/components/layout/mobile-menu";
 
 type PageHeaderProps = {
   title: string;
-  backHref: string;
+  backHref?: string;
 };
 
 export function PageHeader({ title, backHref }: PageHeaderProps) {
   return (
     <header className="border-b bg-background">
       <div className="flex h-14 items-center gap-3 px-4">
-        <BackButton href={backHref} />
+        {backHref ? <BackButton href={backHref} /> : null}
 
         <h1 className="min-w-0 flex-1 truncate text-lg font-semibold">{title}</h1>
 

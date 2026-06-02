@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/layout/page-header";
 
 type PageFrameProps = {
   title: string;
-  backHref: string;
+  backHref?: string;
   breadcrumbs?: BreadcrumbNavItem[];
   children: React.ReactNode;
 };
