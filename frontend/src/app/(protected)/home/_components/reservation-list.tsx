@@ -4,6 +4,7 @@ export type ReservationItem = {
   id: string;
   title: string;
   reservePeriod: string;
+  coverImageUrl?: string | null;
 };
 
 type ReservationListProps = {
@@ -15,7 +16,17 @@ export function ReservationList({ items }: ReservationListProps) {
     <div className="max-h-[calc(100dvh-260px)] overflow-y-auto px-4 pb-8">
       <div className="space-y-7 pr-3">
         {items.map((item) => (
-          <BookSummaryCard key={item.id} lines={[item.title, item.reservePeriod]} />
+          <BookSummaryCard
+            key={item.id}
+            title={item.title}
+            coverImageUrl={item.coverImageUrl}
+            details={[
+              {
+                label: "予約期間",
+                value: item.reservePeriod,
+              },
+            ]}
+          />
         ))}
       </div>
     </div>

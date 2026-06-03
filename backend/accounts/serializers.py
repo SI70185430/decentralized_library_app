@@ -14,6 +14,7 @@ class LoginSerializer(serializers.Serializer):
     employee_id = serializers.IntegerField(label="社員ID")
     password = serializers.CharField(label="パスワード", write_only=True, trim_whitespace=False)
 
+    # ログイン認証に成功したユーザーをserializer.userで取得できるように
     @property
     def user(self):
         return self._user
@@ -26,7 +27,7 @@ class LoginSerializer(serializers.Serializer):
         try:
             user = User.objects.get(employee_id=employee_id)
         except User.DoesNotExist:
-            raise serializers.ValidationError(INVALID_LOGIN_MESSAGE) from None
+            raise serializers.ValidationError(INVALID_LOGIN_MESSAGE)
 
         if not user.check_password(password) or not user.is_active:
             raise serializers.ValidationError(INVALID_LOGIN_MESSAGE)

@@ -1,37 +1,38 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
-import { PageHeader } from "@/components/layout/page-header";
 import { AppTabs } from "@/components/layout/app-tabs";
+import { PageHeader } from "@/components/layout/page-header";
 import { getCurrentUser } from "@/lib/auth/server";
-import { LoanHistoryList, type LoanHistoryItem } from "./_components/loan-history-list";
-import { LoanList, type LoanItem } from "./_components/loan-list";
-import { ReservationList, type ReservationItem } from "./_components/reservation-list";
+import { type LoanHistoryItem, LoanHistoryList } from "./_components/loan-history-list";
+import { type LoanItem, LoanList } from "./_components/loan-list";
+import { type ReservationItem, ReservationList } from "./_components/reservation-list";
 
 const loanItems: LoanItem[] = [
   {
     id: "loan-1",
-    title: "タイトル",
+    title: "銀河鉄道の夜",
     dueDate: "2026/06/15",
-    location: "保管場所",
+    location: "中央図書館 2階 文学棚",
+    coverImageUrl: "https://covers.openlibrary.org/b/id/10523338-L.jpg",
   },
   {
     id: "loan-2",
-    title: "タイトル",
+    title: "走れメロス",
     dueDate: "2026/06/22",
-    location: "保管場所",
+    location: "駅前分館 1階 資料保管室 一般書棚",
   },
 ];
 
 const reservationItems: ReservationItem[] = [
   {
     id: "reservation-1",
-    title: "タイトル",
+    title: "こころ00000000000000000000",
     reservePeriod: "2026/06/03\n~2026/06/10",
+    coverImageUrl: "https://covers.openlibrary.org/b/id/240726-L.jpg",
   },
   {
     id: "reservation-2",
-    title: "タイトル",
+    title: "注文の多い料理店",
     reservePeriod: "2026/06/05\n~2026/06/12",
   },
 ];
@@ -39,12 +40,13 @@ const reservationItems: ReservationItem[] = [
 const loanHistoryItems: LoanHistoryItem[] = [
   {
     id: "history-1",
-    title: "タイトル",
+    title: "坊っちゃん",
     loanPeriod: "2026/05/01\n~2026/05/14",
+    coverImageUrl: "https://covers.openlibrary.org/b/id/8231856-L.jpg",
   },
   {
     id: "history-2",
-    title: "タイトル",
+    title: "羅生門",
     loanPeriod: "2026/05/10\n~2026/05/24",
   },
 ];

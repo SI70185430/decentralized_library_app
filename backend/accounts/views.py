@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from accounts.serializers import LoginSerializer, UserSerializer
 
 
+# SwaggerUIでのレスポンス表示内容のためのシリアライザー
 OkResponseSerializer = inline_serializer(
     name="OkResponse",
     fields={"detail": serializers.CharField()},
@@ -35,7 +36,7 @@ class LoginView(APIView):
 
     @extend_schema(request=LoginSerializer, responses={200: UserResponseSerializer})
     def post(self, request):
-        serializer = LoginSerializer(data=request.data, many=False)
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         user = serializer.user
