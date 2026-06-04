@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { AppTabs } from "@/components/layout/app-tabs";
 import { PageHeader } from "@/components/layout/page-header";
 import { getCurrentUser } from "@/lib/auth/server";
@@ -53,10 +52,7 @@ const loanHistoryItems: LoanHistoryItem[] = [
 
 export default async function HomePage() {
   const user = await getCurrentUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const username = user?.username ?? "";
 
   return (
     <div className="min-h-dvh bg-white text-black">
@@ -65,11 +61,13 @@ export default async function HomePage() {
       <section className="pt-4">
         <p className="px-8 text-sm text-[#777]">ホーム</p>
 
-        <div className="mt-8 flex items-center justify-between px-8">
-          <Link href="/books" className="text-2xl leading-none font-bold">
+        <div className="mt-8 flex items-start justify-between gap-4 px-8">
+          <Link href="/books" className="shrink-0 text-2xl leading-none font-bold">
             書籍検索
           </Link>
-          <p className="max-w-32 truncate text-xl leading-none font-semibold">{user.username}</p>
+          <p className="min-w-0 flex-1 break-all text-right text-xl leading-snug font-semibold">
+            {username}
+          </p>
         </div>
 
         <AppTabs

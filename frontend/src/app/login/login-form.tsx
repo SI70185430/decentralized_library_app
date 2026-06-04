@@ -12,6 +12,7 @@ function fieldError(errors: ApiValidationErrors, field: string) {
   return errors[field]?.[0];
 }
 
+// 社員番号の入力にて空白を削除して全角数字を半角数字に変換
 function normalizeEmployeeId(value: string) {
   return value
     .trim()
@@ -40,22 +41,23 @@ function validateLoginForm(employeeId: string, password: string): ApiValidationE
 export function LoginForm() {
   const router = useRouter();
   const [errors, setErrors] = useState<ApiValidationErrors>({});
-  const [formError, setFormError] = useState<string>();
+  const [submitError, setSubmitError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
     const employeeId = String(formData.get("employee_id") ?? "");
     const password = String(formData.get("password") ?? "");
 
+    // 再送信時に前回のエラー表示を削除
     setErrors({});
-    setFormError(undefined);
+    setSubmitError(undefined);
 
     const validationErrors = validateLoginForm(employeeId, password);
 
-    if (Object.keys(validationErrors).length > 0) {
+    if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
       return;
     }
@@ -65,14 +67,13 @@ export function LoginForm() {
     try {
       await login(normalizeEmployeeId(employeeId), password);
       router.replace("/home");
-      router.refresh();
     } catch (error) {
       if (error instanceof ApiValidationError) {
         setErrors(error.errors);
         return;
       }
 
-      setFormError(error instanceof Error ? error.message : "ログインに失敗しました");
+      setSubmitError(error instanceof Error ? error.message : "ログインに失敗しました");
     } finally {
       setIsSubmitting(false);
     }
@@ -128,7 +129,7 @@ export function LoginForm() {
           ) : null}
         </div>
 
-        {nonFieldErrors.length > 0 ? (
+        {nonFieldErrors.length ? (
           <div className="mt-6 space-y-1 text-sm text-destructive" role="alert">
             {nonFieldErrors.map((message) => (
               <p key={message}>{message}</p>
@@ -136,9 +137,9 @@ export function LoginForm() {
           </div>
         ) : null}
 
-        {formError ? (
+        {submitError ? (
           <p className="mt-6 text-sm text-destructive" role="alert">
-            {formError}
+            {submitError}
           </p>
         ) : null}
 
