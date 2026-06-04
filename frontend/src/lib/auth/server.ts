@@ -7,6 +7,8 @@ const apiOrigin = "http://127.0.0.1:8000";
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
   const response = await fetch(`${apiOrigin}/api/auth/me/`, {
+    // Next.jsからDjangoへのrequestではcookieは自動的に付与はされない
+    // そのため、明示的にcookie headerを付与している
     headers: {
       cookie: cookieStore.toString(),
     },

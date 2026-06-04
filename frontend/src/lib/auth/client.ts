@@ -5,14 +5,12 @@ import {
   type AuthUserResponse,
 } from "./types";
 
-// 指定した名前のcookieの値を取得
-function getCookie(name: string) {
-  const value = document.cookie
+// CSRFトークン用cookieの値を取得
+function getCsrfCookie() {
+  return document.cookie
     .split("; ")
-    .find((cookie) => cookie.startsWith(`${name}=`))
-    ?.slice(name.length + 1);
-
-  return value ? decodeURIComponent(value) : undefined;
+    .find((cookie) => cookie.startsWith("csrftoken="))
+    ?.slice("csrftoken=".length);
 }
 
 function isValidationErrors(data: unknown): data is ApiValidationErrors {
@@ -27,9 +25,7 @@ function isValidationErrors(data: unknown): data is ApiValidationErrors {
 }
 
 async function requestCsrfToken() {
-  const response = await fetch("/api/auth/csrf/", {
-    credentials: "same-origin",
-  });
+  const response = await fetch("/api/auth/csrf/");
 
   if (!response.ok) {
     throw new Error("CSRFトークンの取得に失敗しました");
@@ -37,11 +33,11 @@ async function requestCsrfToken() {
 }
 
 async function getCsrfToken() {
-  let token = getCookie("csrftoken");
+  let token = getCsrfCookie();
 
   if (!token) {
     await requestCsrfToken();
-    token = getCookie("csrftoken");
+    token = getCsrfCookie();
   }
 
   if (!token) {
@@ -55,22 +51,13 @@ async function readJson(response: Response): Promise<unknown> {
   return response.json().catch(() => null);
 }
 
-function getDetailMessage(data: unknown) {
-  if (
-    data &&
-    typeof data === "object" &&
-    "detail" in data &&
-    typeof data.detail === "string"
-  ) {
-    return data.detail;
-  }
-}
-
-export async function login(employeeId: string | number, password: string) {
+export async function login(
+  employeeId: string,
+  password: string,
+): Promise<AuthUserResponse> {
   const csrfToken = await getCsrfToken();
   const response = await fetch("/api/auth/login/", {
     method: "POST",
-    credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
@@ -85,12 +72,6 @@ export async function login(employeeId: string | number, password: string) {
       throw new ApiValidationError(data);
     }
 
-    const detailMessage = getDetailMessage(data);
-
-    if (detailMessage) {
-      throw new Error(detailMessage);
-    }
-
     throw new Error("ログインに失敗しました");
   }
 
@@ -101,43 +82,24 @@ export async function logout() {
   const csrfToken = await getCsrfToken();
   const response = await fetch("/api/auth/logout/", {
     method: "POST",
-    credentials: "same-origin",
     headers: {
-      "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
     },
-    body: JSON.stringify({}),
   });
 
   if (!response.ok) {
-    const data = await readJson(response);
-    const detailMessage = getDetailMessage(data);
-
-    if (detailMessage) {
-      throw new Error(detailMessage);
-    }
-
     throw new Error("ログアウトに失敗しました");
   }
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
-  const response = await fetch("/api/auth/me/", {
-    credentials: "same-origin",
-  });
+  const response = await fetch("/api/auth/me/");
 
   if (response.status === 401 || response.status === 403) {
     return null;
   }
 
   if (!response.ok) {
-    const data = await readJson(response);
-    const detailMessage = getDetailMessage(data);
-
-    if (detailMessage) {
-      throw new Error(detailMessage);
-    }
-
     throw new Error("ユーザー情報の取得に失敗しました");
   }
 
