@@ -2,10 +2,10 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-LOGIN_USERNAME = "ログイン確認用"
-LOGIN_EMPLOYEE_ID = 7777
+LOGIN_USERNAME = "認証API確認用"
+LOGIN_EMPLOYEE_ID = 888888
 UNKNOWN_EMPLOYEE_ID = 999999
-LOGIN_PASSWORD = "ifhWhjV3"
+LOGIN_PASSWORD = "testloginlogoutme"
 INVALID_LOGIN_MESSAGE = "社員番号またはパスワードが正しくありません"
 FRONTEND_ORIGIN = "https://localhost:3000"
 
@@ -46,6 +46,14 @@ class AuthApiTests(TestCase):
             secure=True,
         )
 
+    def assert_validation_errors_for(self, response, *fields: str):
+        self.assertEqual(response.status_code, 400)
+        errors = response.json()
+        self.assertEqual(set(errors.keys()), set(fields))
+        for field in fields:
+            self.assertTrue(errors[field])
+        self.assertNotIn("sessionid", self.client.cookies)
+
     def test_csrf_endpoint_sets_csrf_cookie(self):
         response = self.get_csrf_response()
 
@@ -76,7 +84,7 @@ class AuthApiTests(TestCase):
 
     def test_login_accepts_full_width_employee_id(self):
         response = self.post_login(
-            {"employee_id": "７７７７", "password": LOGIN_PASSWORD},
+            {"employee_id": "８８８８８８", "password": LOGIN_PASSWORD},
         )
 
         self.assertEqual(response.status_code, 200)
@@ -85,23 +93,22 @@ class AuthApiTests(TestCase):
     def test_login_requires_employee_id(self):
         response = self.post_login({"password": LOGIN_PASSWORD})
 
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"employee_id": ["この項目は必須です。"]})
-        self.assertNotIn("sessionid", self.client.cookies)
+        self.assert_validation_errors_for(response, "employee_id")
 
     def test_login_requires_password(self):
         response = self.post_login({"employee_id": LOGIN_EMPLOYEE_ID})
 
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"password": ["この項目は必須です。"]})
-        self.assertNotIn("sessionid", self.client.cookies)
+        self.assert_validation_errors_for(response, "password")
+
+    def test_login_requires_employee_id_and_password(self):
+        response = self.post_login({})
+
+        self.assert_validation_errors_for(response, "employee_id", "password")
 
     def test_login_rejects_invalid_employee_id_type(self):
         response = self.post_login({"employee_id": "not-number", "password": LOGIN_PASSWORD})
 
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"employee_id": ["有効な整数を入力してください。"]})
-        self.assertNotIn("sessionid", self.client.cookies)
+        self.assert_validation_errors_for(response, "employee_id")
 
     def test_login_rejects_wrong_password(self):
         response = self.post_login(
