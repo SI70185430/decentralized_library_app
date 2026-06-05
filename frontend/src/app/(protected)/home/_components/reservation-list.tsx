@@ -22,7 +22,7 @@ export function ReservationList({ items }: ReservationListProps) {
             coverImageUrl={item.coverImageUrl}
             details={[
               {
-                label: "予約期間",
+                label: "取り置き期間",
                 value: item.reservePeriod,
               },
             ]}

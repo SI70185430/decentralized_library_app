@@ -9,16 +9,18 @@ type PageHeaderProps = {
 export function PageHeader({ title, backHref }: PageHeaderProps) {
   return (
     <header className="bg-[#95c8f3]">
-      <div className="relative flex h-20 items-center px-5">
-        <div className="z-10 flex w-10 items-center">
-          {backHref ? <BackButton href={backHref} /> : null}
+      <div className="flex h-20 items-center px-5">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex w-10 items-center">
+            {backHref ? <BackButton href={backHref} /> : null}
+          </div>
+
+          <h1 className="truncate text-2xl leading-none font-semibold">
+            {title}
+          </h1>
         </div>
 
-        <h1 className="absolute inset-x-16 truncate text-center text-2xl leading-none font-semibold">
-          {title}
-        </h1>
-
-        <div className="z-10 ml-auto">
+        <div className="ml-auto">
           <MobileMenu />
         </div>
       </div>
