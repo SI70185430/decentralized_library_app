@@ -55,6 +55,19 @@ INSTALLED_APPS = [
     "lending",
 ]
 
+JAZZMIN_SETTINGS = {
+    "custom_links": {
+        "書籍管理": [
+            {
+                "name": "書籍登録",
+                "url": "admin_books_register",
+                "icon": "fas fa-book-medical",
+            },
+        ],
+    },
+    "order_with_respect_to": ["書籍管理"],
+}
+
 AUTH_USER_MODEL = "accounts.AppUser"
 
 MIDDLEWARE = [

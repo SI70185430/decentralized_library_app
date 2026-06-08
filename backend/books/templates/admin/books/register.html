@@ -1,0 +1,305 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+  .book-register-shell {
+    width: min(100%, 404px);
+    margin: 0 auto 32px;
+  }
+
+  .book-register-panel {
+    min-height: 720px;
+    padding: 26px 18px 36px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+  }
+
+  .book-register-heading {
+    margin: 0 0 10px;
+    color: #111;
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.25;
+  }
+
+  .book-register-breadcrumb {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 14px;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .book-register-breadcrumb a {
+    color: #0d6efd;
+  }
+
+  .book-register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .book-register-field {
+    min-width: 0;
+  }
+
+  .book-register-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .book-register-form input[type="text"],
+  .book-register-form input[type="url"],
+  .book-register-form input[type="number"],
+  .book-register-form input[type="date"] {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    color: #222;
+    font-size: 20px;
+    line-height: 48px;
+    background: #fff;
+    border: 1px solid #222;
+    border-radius: 12px;
+    box-sizing: border-box;
+  }
+
+  .book-register-form input::placeholder {
+    color: #8e8e8e;
+    opacity: 1;
+  }
+
+  .book-register-form input[type="date"] {
+    color: #8e8e8e;
+  }
+
+  .book-register-form input[type="date"]:valid {
+    color: #222;
+  }
+
+  .book-register-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .book-register-actions button,
+  .book-register-primary-action {
+    height: 43px;
+    padding: 0 12px;
+    color: #111;
+    font-size: 15px;
+    line-height: 43px;
+    text-align: center;
+    white-space: nowrap;
+    background: #f0f1ff;
+    border: 1px solid #222;
+    border-radius: 9px;
+    box-sizing: border-box;
+  }
+
+  .book-register-actions button:disabled {
+    opacity: 0.65;
+  }
+
+  .book-register-submit {
+    margin-top: 18px;
+    text-align: center;
+  }
+
+  .book-register-primary-action {
+    width: 178px;
+  }
+
+  .book-register-error,
+  .book-register-form .errorlist {
+    margin: 0 0 4px;
+    padding: 0;
+    color: var(--danger, #dc3545);
+    list-style: none;
+  }
+
+  .book-register-sr-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  #book_lookup_message {
+    min-height: 1.2em;
+    margin-top: -6px;
+    font-size: 13px;
+  }
+
+  @media (max-width: 480px) {
+    .book-register-shell {
+      width: 100%;
+      margin: 0;
+    }
+
+    .book-register-panel {
+      border-right: 0;
+      border-left: 0;
+    }
+  }
+</style>
+
+<div class="book-register-shell">
+  <div id="content-main" class="book-register-panel">
+    <h1 class="book-register-heading">Dashboard</h1>
+    <nav class="book-register-breadcrumb" aria-label="breadcrumb">
+      <a href="{% url 'admin:index' %}">Home</a>
+      <span>/</span>
+      <span>書籍登録</span>
+    </nav>
+
+    <form method="post" id="book-register-form" class="book-register-form" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="book-register-field">
+        {{ form.isbn.errors }}
+        <label class="book-register-sr-label" for="{{ form.isbn.id_for_label }}">{{ form.isbn.label }}</label>
+        {{ form.isbn }}
+      </div>
+
+      <div class="book-register-actions">
+        <button type="button" id="btn_isbn_scan" disabled>ISBNコードをスキャン</button>
+        <button type="button" id="btn_book_info">書籍情報取得</button>
+      </div>
+      <div id="book_lookup_message" class="help"></div>
+
+      <div class="book-register-field">
+        {{ form.title.errors }}
+        <label class="book-register-sr-label" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+        {{ form.title }}
+      </div>
+
+      <div class="book-register-field">
+        {{ form.author.errors }}
+        <label class="book-register-sr-label" for="{{ form.author.id_for_label }}">{{ form.author.label }}</label>
+        {{ form.author }}
+      </div>
+
+      <div class="book-register-field">
+        {{ form.published_date.errors }}
+        <label class="book-register-sr-label" for="{{ form.published_date.id_for_label }}">{{ form.published_date.label }}</label>
+        {{ form.published_date }}
+      </div>
+
+      <div class="book-register-field">
+        {{ form.publisher.errors }}
+        <label class="book-register-sr-label" for="{{ form.publisher.id_for_label }}">{{ form.publisher.label }}</label>
+        {{ form.publisher }}
+      </div>
+
+      <div class="book-register-field">
+        {{ form.cover_image_url.errors }}
+        <label class="book-register-sr-label" for="{{ form.cover_image_url.id_for_label }}">{{ form.cover_image_url.label }}</label>
+        {{ form.cover_image_url }}
+      </div>
+
+      <div class="book-register-two-column">
+        <div class="book-register-field">
+          {{ form.price.errors }}
+          <label class="book-register-sr-label" for="{{ form.price.id_for_label }}">{{ form.price.label }}</label>
+          {{ form.price }}
+        </div>
+        <div class="book-register-field">
+          {{ form.genre_code.errors }}
+          <label class="book-register-sr-label" for="{{ form.genre_code.id_for_label }}">{{ form.genre_code.label }}</label>
+          {{ form.genre_code }}
+        </div>
+      </div>
+
+      <div class="book-register-two-column">
+        <div class="book-register-field">
+          {{ form.purchase_date.errors }}
+          <label class="book-register-sr-label" for="{{ form.purchase_date.id_for_label }}">{{ form.purchase_date.label }}</label>
+          {{ form.purchase_date }}
+        </div>
+        <div class="book-register-field">
+          {{ form.copy_count.errors }}
+          <label class="book-register-sr-label" for="{{ form.copy_count.id_for_label }}">{{ form.copy_count.label }}</label>
+          {{ form.copy_count }}
+        </div>
+      </div>
+
+      <div class="book-register-field">
+        {{ form.location.errors }}
+        <label class="book-register-sr-label" for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
+        {{ form.location }}
+      </div>
+
+      <div class="book-register-submit">
+        <input type="submit" id="btn_register" value="登録" class="book-register-primary-action" name="_save">
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(() => {
+  const lookupButton = document.getElementById("btn_book_info");
+  const message = document.getElementById("book_lookup_message");
+
+  const fields = {
+    isbn: document.getElementById("input_isbn"),
+    title: document.getElementById("input_title"),
+    author: document.getElementById("input_author"),
+    publisher: document.getElementById("input_publisher"),
+    published_date: document.getElementById("input_publication_date"),
+    cover_image_url: document.getElementById("input_image_url"),
+    price: document.getElementById("input_price"),
+    genre_code: document.getElementById("input_ccode"),
+  };
+
+  const setMessage = (text, isError = false) => {
+    message.textContent = text;
+    message.classList.toggle("book-register-error", isError);
+  };
+
+  lookupButton.addEventListener("click", async () => {
+    const isbn = fields.isbn.value.trim();
+    if (!isbn) {
+      setMessage("ISBNコードを入力してください", true);
+      return;
+    }
+
+    lookupButton.disabled = true;
+    setMessage("書籍情報を取得しています...");
+
+    try {
+      const params = new URLSearchParams({ isbn });
+      const response = await fetch(`{% url "admin_books_isbn_lookup" %}?${params.toString()}`);
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setMessage(payload.error || "書籍情報を取得できませんでした", true);
+        return;
+      }
+
+      Object.entries(payload.book).forEach(([key, value]) => {
+        if (fields[key]) {
+          fields[key].value = value ?? "";
+        }
+      });
+      setMessage("書籍情報を反映しました");
+    } catch (error) {
+      setMessage("書籍情報を取得できませんでした", true);
+    } finally {
+      lookupButton.disabled = false;
+    }
+  });
+})();
+</script>
+{% endblock %}

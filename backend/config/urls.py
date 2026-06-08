@@ -19,7 +19,19 @@ from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+from books import admin_views as book_admin_views
+
 urlpatterns = [
+    path(
+        "admin/books/register/",
+        admin.site.admin_view(book_admin_views.book_register),
+        name="admin_books_register",
+    ),
+    path(
+        "admin/books/isbn-lookup/",
+        admin.site.admin_view(book_admin_views.isbn_lookup),
+        name="admin_books_isbn_lookup",
+    ),
     path("admin/", admin.site.urls),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
