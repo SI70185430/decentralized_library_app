@@ -5,7 +5,9 @@ from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from books.forms import BookRegisterForm
@@ -212,7 +214,7 @@ class BookRegistrationServiceTests(TestCase):
 
         result = register_book_copies(
             {
-                "isbn": "978-4-00-310101-8",
+                "isbn": "9784003101018",
                 "title": "新規書籍",
                 "author": "新規著者",
                 "publisher": "新規出版社",
@@ -255,7 +257,7 @@ class BookRegistrationServiceTests(TestCase):
 
         result = register_book_copies(
             {
-                "isbn": "978-4-00-310101-8",
+                "isbn": "9784003101018",
                 "title": "更新してはいけないタイトル",
                 "author": "更新してはいけない著者",
                 "publisher": "更新してはいけない出版社",
@@ -280,14 +282,42 @@ class BookRegistrationServiceTests(TestCase):
         self.assertEqual(existing_book.author, "既存著者")
         self.assertEqual(existing_book.publisher, None)
 
-    def test_register_book_copies_rejects_non_positive_copy_count(self):
-        with self.assertRaises(ValidationError):
+    def test_register_book_copies_uses_cleaned_genre_code_without_genre_lookup(self):
+        genre = Genre.objects.create(c_code_genre="55", name="電気通信")
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            result = register_book_copies(
+                {
+                    "isbn": "9784003101018",
+                    "title": "新規書籍",
+                    "author": "新規著者",
+                    "publisher": "新規出版社",
+                    "published_date": date(1990, 4, 1),
+                    "price": 1200,
+                    "cover_image_url": "https://example.com/new.jpg",
+                    "genre_code": genre.c_code_genre,
+                    "purchase_date": date(2026, 6, 7),
+                    "location": "1F-A-01",
+                    "copy_count": 1,
+                }
+            )
+
+        genre_select_queries = [
+            query["sql"]
+            for query in captured_queries
+            if 'FROM "genre"' in query["sql"] or 'FROM "books_genre"' in query["sql"]
+        ]
+        self.assertEqual(result.book.genre_id, genre.c_code_genre)
+        self.assertEqual(genre_select_queries, [])
+
+    def test_register_book_copies_requires_cleaned_data_shape(self):
+        with self.assertRaises(KeyError):
             register_book_copies(
                 {
                     "isbn": "9784003101018",
                     "title": "新規書籍",
                     "location": "1F-A-01",
-                    "copy_count": 0,
+                    "copy_count": 1,
                 }
             )
 
@@ -425,7 +455,9 @@ class BookIsbnLookupAdminViewTests(TestCase):
             cover_image_url="https://example.com/existing.jpg",
         )
 
-        response = self.client.get(reverse("admin_books_isbn_lookup"), {"isbn": "978-4-00-310101-8"})
+        response = self.client.get(
+            reverse("admin_books_isbn_lookup"), {"isbn": "978-4-00-310101-8"}
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -456,7 +488,9 @@ class BookIsbnLookupAdminViewTests(TestCase):
         self.client.force_login(self.staff_user)
 
         with patch("books.services.openbd.fetch_openbd_book_data", return_value=None):
-            response = self.client.get(reverse("admin_books_isbn_lookup"), {"isbn": "9784003101018"})
+            response = self.client.get(
+                reverse("admin_books_isbn_lookup"), {"isbn": "9784003101018"}
+            )
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json(), {"error": "書籍情報が見つかりませんでした"})
@@ -464,8 +498,12 @@ class BookIsbnLookupAdminViewTests(TestCase):
     def test_isbn_lookup_returns_502_when_openbd_fails(self):
         self.client.force_login(self.staff_user)
 
-        with patch("books.services.openbd.fetch_openbd_book_data", side_effect=OpenBdError("timeout")):
-            response = self.client.get(reverse("admin_books_isbn_lookup"), {"isbn": "9784003101018"})
+        with patch(
+            "books.services.openbd.fetch_openbd_book_data", side_effect=OpenBdError("timeout")
+        ):
+            response = self.client.get(
+                reverse("admin_books_isbn_lookup"), {"isbn": "9784003101018"}
+            )
 
         self.assertEqual(response.status_code, 502)
         self.assertEqual(response.json(), {"error": "openBDから書籍情報を取得できませんでした"})
@@ -484,15 +522,23 @@ class BookRegisterFormTests(TestCase):
             "cover_image_url": {"id": "input_image_url", "placeholder": "画像用リンク"},
             "price": {"id": "input_price", "placeholder": "価格"},
             "genre_code": {"id": "input_ccode", "placeholder": "Cコード"},
-            "purchase_date": {"id": "input_purchase_date", "placeholder": "購入日"},
+            "purchase_date": {"id": "input_purchase_date"},
             "location": {"id": "input_location", "placeholder": "保管場所"},
-            "copy_count": {"id": "input_num_of_books", "placeholder": "版数", "inputmode": "numeric"},
+            "copy_count": {
+                "id": "input_num_of_books",
+                "placeholder": "版数",
+                "inputmode": "numeric",
+            },
         }
 
         for field_name, attrs in expected_attrs.items():
             with self.subTest(field_name=field_name):
                 for attr_name, expected_value in attrs.items():
-                    self.assertEqual(form.fields[field_name].widget.attrs[attr_name], expected_value)
+                    self.assertEqual(
+                        form.fields[field_name].widget.attrs[attr_name], expected_value
+                    )
+
+        self.assertEqual(form.fields["purchase_date"].widget.input_type, "date")
 
     def test_valid_form_normalizes_isbn_and_cleans_typed_values(self):
         genre = Genre.objects.create(c_code_genre="55", name="電気通信")
@@ -583,6 +629,34 @@ class BookRegisterFormTests(TestCase):
         self.assertEqual(form.is_valid(), False)
         self.assertIn("price", form.errors)
 
+    def test_form_rejects_price_over_max(self):
+        form = BookRegisterForm(
+            data={
+                "isbn": "9784003101018",
+                "title": "吾輩は猫である",
+                "price": "10000000",
+                "location": "1F-A-01",
+                "copy_count": "1",
+            }
+        )
+
+        self.assertEqual(form.is_valid(), False)
+        self.assertIn("price", form.errors)
+
+    def test_form_accepts_max_price(self):
+        form = BookRegisterForm(
+            data={
+                "isbn": "9784003101018",
+                "title": "吾輩は猫である",
+                "price": "9999999",
+                "location": "1F-A-01",
+                "copy_count": "1",
+            }
+        )
+
+        self.assertEqual(form.is_valid(), True, form.errors)
+        self.assertEqual(form.cleaned_data["price"], 9999999)
+
     def test_form_rejects_unknown_genre_code(self):
         form = BookRegisterForm(
             data={
@@ -609,3 +683,29 @@ class BookRegisterFormTests(TestCase):
 
         self.assertEqual(form.is_valid(), False)
         self.assertIn("copy_count", form.errors)
+
+    def test_form_rejects_copy_count_over_max(self):
+        form = BookRegisterForm(
+            data={
+                "isbn": "9784003101018",
+                "title": "吾輩は猫である",
+                "location": "1F-A-01",
+                "copy_count": "101",
+            }
+        )
+
+        self.assertEqual(form.is_valid(), False)
+        self.assertIn("copy_count", form.errors)
+
+    def test_form_accepts_max_copy_count(self):
+        form = BookRegisterForm(
+            data={
+                "isbn": "9784003101018",
+                "title": "吾輩は猫である",
+                "location": "1F-A-01",
+                "copy_count": "100",
+            }
+        )
+
+        self.assertEqual(form.is_valid(), True, form.errors)
+        self.assertEqual(form.cleaned_data["copy_count"], 100)

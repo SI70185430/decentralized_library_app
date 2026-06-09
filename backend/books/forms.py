@@ -5,6 +5,8 @@ from books.models import Genre
 from books.services.openbd import normalize_isbn13
 
 GENRE_CODE_ERROR_MESSAGE = "存在するCコードを入力してください"
+MAX_BOOK_PRICE = 9999999
+MAX_BOOK_COPY_COUNT = 100
 
 
 class BookRegisterForm(forms.Form):
@@ -45,6 +47,7 @@ class BookRegisterForm(forms.Form):
     price = forms.IntegerField(
         label="価格",
         min_value=0,
+        max_value=MAX_BOOK_PRICE,
         required=False,
         widget=forms.NumberInput(attrs={"id": "input_price", "placeholder": "価格"}),
     )
@@ -58,7 +61,10 @@ class BookRegisterForm(forms.Form):
         label="購入日",
         required=False,
         input_formats=["%Y-%m-%d"],
-        widget=forms.TextInput(attrs={"id": "input_purchase_date", "placeholder": "購入日"}),
+        widget=forms.DateInput(
+            format="%Y-%m-%d",
+            attrs={"id": "input_purchase_date", "type": "date"},
+        ),
     )
     location = forms.CharField(
         label="保管場所",
@@ -68,6 +74,7 @@ class BookRegisterForm(forms.Form):
     copy_count = forms.IntegerField(
         label="版数",
         min_value=1,
+        max_value=MAX_BOOK_COPY_COUNT,
         widget=forms.NumberInput(
             attrs={"id": "input_num_of_books", "placeholder": "版数", "inputmode": "numeric"}
         ),
