@@ -414,15 +414,16 @@ class BookRegisterAdminNavigationTests(TestCase):
             is_staff=True,
         )
 
-    def test_admin_dashboard_links_to_book_register_view(self):
+    def test_admin_header_links_to_book_register_view(self):
         self.client.force_login(self.staff_user)
 
         response = self.client.get(reverse("admin:index"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "書籍管理")
-        self.assertContains(response, "書籍登録", count=2)
-        self.assertContains(response, f'href="{reverse("admin_books_register")}"', count=3)
+        self.assertNotContains(response, "書籍管理")
+        self.assertContains(response, "書籍登録", count=1)
+        self.assertContains(response, f'href="{reverse("admin_books_register")}"', count=1)
+        self.assertContains(response, 'href="/static/books/admin/jazzmin.css"')
 
 
 class BookIsbnLookupAdminViewTests(TestCase):

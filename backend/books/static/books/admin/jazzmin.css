@@ -1,0 +1,7 @@
+#jazzy-navbar .navbar-nav:first-child > .nav-item.d-none.d-sm-inline-block {
+  display: inline-block !important;
+}
+
+/* #jazzy-navbar .navbar-nav:first-child a[href$="/admin/books/register/"] {
+  white-space: nowrap;
+} */
