@@ -5,11 +5,12 @@ from django.db import IntegrityError, models
 from django.test import TestCase
 
 from books.models import Book, BookCopy, Genre
+from books.tests.helpers import create_book, create_book_copy, create_genre
 
 
 class GenreModelTests(TestCase):
     def setUp(self):
-        self.instance = Genre.objects.create(c_code_genre="00", name="総記")
+        self.instance = create_genre(code="00", name="総記")
 
     def test_field_attributes(self):
         field = Genre._meta.get_field("c_code_genre")
@@ -26,7 +27,7 @@ class GenreModelTests(TestCase):
         self.assertEqual(Genre._meta.db_table, "genre")
 
     def test_create_data(self):
-        genre = Genre.objects.create(c_code_genre="03", name="test")
+        genre = create_genre(code="03", name="test")
         self.assertIsNotNone(genre.c_code_genre)
 
     def test_retrieve_data(self):
@@ -51,12 +52,9 @@ class GenreModelTests(TestCase):
 
 class BookModelTests(TestCase):
     def setUp(self):
-        self.genre = Genre.objects.create(
-            c_code_genre="55",
-            name="電気通信",
-        )
+        self.genre = create_genre(code="55", name="電気通信")
 
-        self.instance = Book.objects.create(
+        self.instance = create_book(
             genre=self.genre,
             isbn="9784285922871",
             title="foo",
@@ -187,16 +185,13 @@ class BookModelTests(TestCase):
 
 class BookCopyModelTests(TestCase):
     def setUp(self):
-        self.genre = Genre.objects.create(
-            c_code_genre="41",
-            name="数学",
-        )
-        self.book = Book.objects.create(
+        self.genre = create_genre(code="41", name="数学")
+        self.book = create_book(
             genre=self.genre,
             isbn="9784111111111",
             title="book copy test book",
         )
-        self.instance = BookCopy.objects.create(
+        self.instance = create_book_copy(
             book=self.book,
             status=BookCopy.Status.AVAILABLE,
             location="1F-A-01",
@@ -242,7 +237,7 @@ class BookCopyModelTests(TestCase):
         self.assertEqual(BookCopy._meta.db_table, "book_copy")
 
     def test_create_data(self):
-        book_copy = BookCopy.objects.create(
+        book_copy = create_book_copy(
             book=self.book,
             location="2F-B-02",
         )
@@ -284,7 +279,7 @@ class BookCopyModelTests(TestCase):
             )
 
     def test_auto_timestamp_fields(self):
-        book_copy = BookCopy.objects.create(
+        book_copy = create_book_copy(
             book=self.book,
             location="timestamp test",
         )
