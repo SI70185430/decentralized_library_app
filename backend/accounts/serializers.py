@@ -27,7 +27,7 @@ class LoginSerializer(serializers.Serializer):
         try:
             user = User.objects.get(employee_id=employee_id)
         except User.DoesNotExist:
-            raise serializers.ValidationError(INVALID_LOGIN_MESSAGE)
+            raise serializers.ValidationError(INVALID_LOGIN_MESSAGE) from None
 
         if not user.check_password(password) or not user.is_active:
             raise serializers.ValidationError(INVALID_LOGIN_MESSAGE)

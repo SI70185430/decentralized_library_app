@@ -32,12 +32,12 @@ def book_register(request: HttpRequest) -> HttpResponse:
         form = BookRegisterForm()
 
     return render(
-        request, # ログインユーザー情報、CSRF情報等を利用
+        request,  # ログインユーザー情報、CSRF情報等を利用
         "admin/books/register.html",
         {
             "form": form,
             "title": "書籍登録",
-            "opts": Book._meta, # admin テンプレート用のデータ、構造的互換性のために記述
+            "opts": Book._meta,  # admin テンプレート用のデータ、構造的互換性のために記述
         },
     )
 

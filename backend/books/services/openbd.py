@@ -94,7 +94,7 @@ def map_openbd_book_data(openbd_data: dict[str, Any], normalized_isbn: str) -> d
         "published_date": parse_openbd_pubdate(summary.get("pubdate")),
         "cover_image_url": summary.get("cover") or "",
         "price": extract_openbd_price(openbd_data),
-        "genre_code": "", # フォームを更新時にクリアするときにこの空文字を利用
+        "genre_code": "",  # フォームを更新時にクリアするときにこの空文字を利用
     }
 
 
@@ -117,7 +117,6 @@ def extract_openbd_price(openbd_data: dict[str, Any]) -> int | None:
     return _normalize_openbd_price(prices[0].get("PriceAmount"))
 
 
-
 def _normalize_openbd_price(value: Any) -> int | None:
     digits = re.sub(r"\D", "", str(value or ""))
     if not digits:
@@ -125,7 +124,6 @@ def _normalize_openbd_price(value: Any) -> int | None:
 
     # アプリ内データの型をDBモデルに合わせるためのint()
     return int(digits)
-
 
 
 def book_to_lookup_data(book: Book) -> dict[str, Any]:

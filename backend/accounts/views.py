@@ -9,7 +9,6 @@ from rest_framework.views import APIView
 
 from accounts.serializers import LoginSerializer, UserSerializer
 
-
 # SwaggerUIでのレスポンス表示内容のためのシリアライザー
 OkResponseSerializer = inline_serializer(
     name="OkResponse",
