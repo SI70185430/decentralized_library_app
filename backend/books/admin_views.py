@@ -32,12 +32,12 @@ def book_register(request: HttpRequest) -> HttpResponse:
         form = BookRegisterForm()
 
     return render(
-        request,
+        request, # ログインユーザー情報、CSRF情報等を利用
         "admin/books/register.html",
         {
             "form": form,
             "title": "書籍登録",
-            "opts": Book._meta,
+            "opts": Book._meta, # admin テンプレート用のデータ、構造的互換性のために記述
         },
     )
 
@@ -46,8 +46,6 @@ def book_register(request: HttpRequest) -> HttpResponse:
 def isbn_lookup(request: HttpRequest) -> JsonResponse:
     """Return book registration form values by ISBN for the admin screen."""
     isbn = request.GET.get("isbn", "")
-    if isinstance(isbn, list):
-        isbn = isbn[0] if isbn else ""
 
     try:
         book_data = lookup_book_info_by_isbn(isbn)
