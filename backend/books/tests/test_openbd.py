@@ -22,6 +22,7 @@ from books.tests.helpers import (
     DEFAULT_TITLE,
     INVALID_ISBN,
     INVALID_ISBN10_CHECK_DIGIT,
+    INVALID_ISBN13_CHECK_DIGIT,
     VALID_ISBN,
     VALID_ISBN10,
     VALID_ISBN10_WITH_HYPHENS,
@@ -57,6 +58,7 @@ class IsbnHelperTests(TestCase):
             "abcdefghij",
             "123456789Z",
             INVALID_ISBN10_CHECK_DIGIT,
+            INVALID_ISBN13_CHECK_DIGIT,
         ]
 
         for value in invalid_values:

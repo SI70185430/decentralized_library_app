@@ -8,6 +8,7 @@ from books.services.openbd import OpenBdError
 from books.tests.helpers import (
     INVALID_ISBN,
     INVALID_ISBN10_CHECK_DIGIT,
+    INVALID_ISBN13_CHECK_DIGIT,
     VALID_ISBN,
     VALID_ISBN10,
     VALID_ISBN_WITH_HYPHENS,
@@ -78,7 +79,7 @@ class BookIsbnLookupAdminViewTests(TestCase):
         response = self.client.get(reverse("admin_books_isbn_lookup"), {"isbn": INVALID_ISBN})
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"error": "10桁または13桁のISBNを入力してください"})
+        self.assertEqual(response.json(), {"error": "10桁または13桁で正当なISBNを入力してください"})
 
     def test_isbn_lookup_returns_400_for_isbn10_with_invalid_check_digit(self):
         self.client.force_login(self.staff_user)
@@ -88,7 +89,17 @@ class BookIsbnLookupAdminViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"error": "10桁または13桁のISBNを入力してください"})
+        self.assertEqual(response.json(), {"error": "10桁または13桁で正当なISBNを入力してください"})
+
+    def test_isbn_lookup_returns_400_for_isbn13_with_invalid_check_digit(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(
+            reverse("admin_books_isbn_lookup"), {"isbn": INVALID_ISBN13_CHECK_DIGIT}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {"error": "10桁または13桁で正当なISBNを入力してください"})
 
     def test_isbn_lookup_returns_404_when_book_is_not_found(self):
         self.client.force_login(self.staff_user)

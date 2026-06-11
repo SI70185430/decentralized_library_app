@@ -25,6 +25,8 @@ def normalize_isbn(value: str) -> str:
     normalized = re.sub(r"[-\s]", "", value or "").upper()
 
     if re.fullmatch(r"\d{13}", normalized):
+        if not is_valid_isbn13(normalized):
+            raise ValidationError(ISBN_ERROR_MESSAGE)
         return normalized
 
     if re.fullmatch(r"\d{9}[\dX]", normalized):
@@ -43,6 +45,11 @@ def is_valid_isbn10(value: str) -> bool:
         total += digit * (10 - index)
 
     return total % 11 == 0
+
+
+def is_valid_isbn13(value: str) -> bool:
+    """Return whether a normalized ISBN-13 has a valid check digit."""
+    return calculate_isbn13_check_digit(value[:12]) == int(value[12])
 
 
 def convert_isbn10_to_isbn13(value: str) -> str:

@@ -7,6 +7,7 @@ from books.tests.helpers import (
     DEFAULT_LOCATION,
     DEFAULT_TITLE,
     INVALID_ISBN,
+    INVALID_ISBN13_CHECK_DIGIT,
     VALID_ISBN,
     VALID_ISBN10,
     book_register_form_data,
@@ -94,7 +95,21 @@ class BookRegisterAdminViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "admin/books/register.html")
-        self.assertContains(response, "10桁または13桁のISBNを入力してください")
+        self.assertContains(response, "10桁または13桁で正当なISBNを入力してください")
+        self.assertEqual(Book.objects.count(), 0)
+        self.assertEqual(BookCopy.objects.count(), 0)
+
+    def test_register_view_rejects_isbn13_with_invalid_check_digit(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.post(
+            reverse("admin_books_register"),
+            data=book_register_form_data(isbn=INVALID_ISBN13_CHECK_DIGIT),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "admin/books/register.html")
+        self.assertContains(response, "10桁または13桁で正当なISBNを入力してください")
         self.assertEqual(Book.objects.count(), 0)
         self.assertEqual(BookCopy.objects.count(), 0)
 
