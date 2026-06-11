@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 
 from books.models import Book
 
-ISBN13_ERROR_MESSAGE = "ISBNは13桁で入力してください"
+ISBN13_ERROR_MESSAGE = "13桁の数字を入力してください"
 OPENBD_ENDPOINT = "https://api.openbd.jp/v1/get"
 OPENBD_TIMEOUT_SECONDS = 10
 

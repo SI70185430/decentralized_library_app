@@ -97,18 +97,21 @@ class BookRegisterFormTests(TestCase):
 
         self.assertEqual(form.is_valid(), False)
         self.assertIn("isbn", form.errors)
+        self.assertIn("13桁の数字を入力してください", form.errors["isbn"])
 
     def test_form_rejects_negative_price(self):
         form = BookRegisterForm(data=book_register_form_data(isbn=VALID_ISBN, price="-1"))
 
         self.assertEqual(form.is_valid(), False)
         self.assertIn("price", form.errors)
+        self.assertIn("0以上を入力して下さい", form.errors["price"])
 
     def test_form_rejects_price_over_max(self):
         form = BookRegisterForm(data=book_register_form_data(isbn=VALID_ISBN, price="10000000"))
 
         self.assertEqual(form.is_valid(), False)
         self.assertIn("price", form.errors)
+        self.assertIn("9,999,999以下を入力してください", form.errors["price"])
 
     def test_form_accepts_max_price(self):
         form = BookRegisterForm(data=book_register_form_data(isbn=VALID_ISBN, price="9999999"))
@@ -127,12 +130,14 @@ class BookRegisterFormTests(TestCase):
 
         self.assertEqual(form.is_valid(), False)
         self.assertIn("copy_count", form.errors)
+        self.assertIn("1以上を入力して下さい", form.errors["copy_count"])
 
     def test_form_rejects_copy_count_over_max(self):
         form = BookRegisterForm(data=book_register_form_data(isbn=VALID_ISBN, copy_count="101"))
 
         self.assertEqual(form.is_valid(), False)
         self.assertIn("copy_count", form.errors)
+        self.assertIn("100以下を入力してください", form.errors["copy_count"])
 
     def test_form_accepts_max_copy_count(self):
         form = BookRegisterForm(data=book_register_form_data(isbn=VALID_ISBN, copy_count="100"))

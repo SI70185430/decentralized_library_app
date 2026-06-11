@@ -23,7 +23,11 @@ DEFAULT_PASSWORD = "password123"
 
 
 def create_genre(code=DEFAULT_GENRE_CODE, name=DEFAULT_GENRE_NAME) -> Genre:
-    return Genre.objects.create(c_code_genre=code, name=name)
+    genre, _ = Genre.objects.update_or_create(
+        c_code_genre=code,
+        defaults={"name": name},
+    )
+    return genre
 
 
 def create_book(

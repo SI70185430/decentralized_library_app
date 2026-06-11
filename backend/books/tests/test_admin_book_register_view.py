@@ -80,7 +80,7 @@ class BookRegisterAdminViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "admin/books/register.html")
-        self.assertContains(response, "ISBNは13桁で入力してください")
+        self.assertContains(response, "13桁の数字を入力してください")
         self.assertEqual(Book.objects.count(), 0)
         self.assertEqual(BookCopy.objects.count(), 0)
 

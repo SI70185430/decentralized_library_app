@@ -65,7 +65,7 @@ class BookIsbnLookupAdminViewTests(TestCase):
         response = self.client.get(reverse("admin_books_isbn_lookup"), {"isbn": INVALID_ISBN})
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"error": "ISBNは13桁で入力してください"})
+        self.assertEqual(response.json(), {"error": "13桁の数字を入力してください"})
 
     def test_isbn_lookup_returns_404_when_book_is_not_found(self):
         self.client.force_login(self.staff_user)
