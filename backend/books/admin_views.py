@@ -15,6 +15,13 @@ from books.services.openbd import OpenBdError, lookup_book_info_by_isbn
 LOOKUP_NOT_FOUND_MESSAGE = "書籍情報が見つかりませんでした"
 OPENBD_LOOKUP_ERROR_MESSAGE = "openBDから書籍情報を取得できませんでした"
 REGISTER_SUCCESS_MESSAGE = "蔵書を登録しました"
+REGISTER_PAGE_TITLE = "書籍登録"
+REGISTER_TEMPLATE_NAME = "admin/books/register.html"
+ADMIN_BOOK_REGISTER_ROUTE_NAME = "admin_books_register"
+VALIDATION_DEFAULT_ERROR_MESSAGE = "入力内容を確認してください"
+ISBN_QUERY_PARAM = "isbn"
+JSON_ERROR_KEY = "error"
+JSON_BOOK_KEY = "book"
 
 
 def book_register(request: HttpRequest) -> HttpResponse:
@@ -27,16 +34,16 @@ def book_register(request: HttpRequest) -> HttpResponse:
                 request,
                 f"{REGISTER_SUCCESS_MESSAGE}（{result.book.title} / {len(result.copies)}冊）",
             )
-            return redirect("admin_books_register")
+            return redirect(ADMIN_BOOK_REGISTER_ROUTE_NAME)
     else:
         form = BookRegisterForm()
 
     return render(
         request,  # ログインユーザー情報、CSRF情報等を利用
-        "admin/books/register.html",
+        REGISTER_TEMPLATE_NAME,
         {
             "form": form,
-            "title": "書籍登録",
+            "title": REGISTER_PAGE_TITLE,
             "opts": Book._meta,  # admin テンプレート用のデータ、構造的互換性のために記述
         },
     )
@@ -45,19 +52,19 @@ def book_register(request: HttpRequest) -> HttpResponse:
 @require_GET
 def isbn_lookup(request: HttpRequest) -> JsonResponse:
     """Return book registration form values by ISBN for the admin screen."""
-    isbn = request.GET.get("isbn", "")
+    isbn = request.GET.get(ISBN_QUERY_PARAM, "")
 
     try:
         book_data = lookup_book_info_by_isbn(isbn)
     except ValidationError as error:
-        return JsonResponse({"error": _validation_error_message(error)}, status=400)
+        return JsonResponse({JSON_ERROR_KEY: _validation_error_message(error)}, status=400)
     except OpenBdError:
-        return JsonResponse({"error": OPENBD_LOOKUP_ERROR_MESSAGE}, status=502)
+        return JsonResponse({JSON_ERROR_KEY: OPENBD_LOOKUP_ERROR_MESSAGE}, status=502)
 
     if book_data is None:
-        return JsonResponse({"error": LOOKUP_NOT_FOUND_MESSAGE}, status=404)
+        return JsonResponse({JSON_ERROR_KEY: LOOKUP_NOT_FOUND_MESSAGE}, status=404)
 
-    return JsonResponse({"book": _serialize_lookup_data(book_data)})
+    return JsonResponse({JSON_BOOK_KEY: _serialize_lookup_data(book_data)})
 
 
 def _serialize_lookup_data(data: dict[str, Any]) -> dict[str, Any]:
@@ -84,4 +91,4 @@ def _validation_error_message(error: ValidationError) -> str:
     if error.messages:
         return str(error.messages[0])
 
-    return "入力内容を確認してください"
+    return VALIDATION_DEFAULT_ERROR_MESSAGE
