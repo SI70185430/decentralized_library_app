@@ -11,7 +11,7 @@ from books.services.openbd import (
     fetch_openbd_book_data,
     lookup_book_info_by_isbn,
     map_openbd_book_data,
-    normalize_isbn13,
+    normalize_isbn,
     parse_openbd_pubdate,
 )
 from books.tests.helpers import (
@@ -21,7 +21,12 @@ from books.tests.helpers import (
     DEFAULT_PUBLISHER,
     DEFAULT_TITLE,
     INVALID_ISBN,
+    INVALID_ISBN10_CHECK_DIGIT,
     VALID_ISBN,
+    VALID_ISBN10,
+    VALID_ISBN10_WITH_HYPHENS,
+    VALID_ISBN10_WITH_X,
+    VALID_ISBN13_FROM_X_ISBN10,
     VALID_ISBN_WITH_HYPHENS,
     create_book,
     create_genre,
@@ -31,15 +36,32 @@ from books.tests.helpers import (
 
 
 class IsbnHelperTests(TestCase):
-    def test_normalize_isbn13_removes_hyphens_and_spaces(self):
-        self.assertEqual(normalize_isbn13(f" {VALID_ISBN_WITH_HYPHENS} "), VALID_ISBN)
+    def test_normalize_isbn_removes_hyphens_and_spaces_from_isbn13(self):
+        self.assertEqual(normalize_isbn(f" {VALID_ISBN_WITH_HYPHENS} "), VALID_ISBN)
 
-    def test_normalize_isbn13_rejects_non_13_digits(self):
-        invalid_values = ["", "978400310101", "97840031010180", "978400310101X", INVALID_ISBN]
+    def test_normalize_isbn_converts_isbn10_to_isbn13(self):
+        self.assertEqual(normalize_isbn(VALID_ISBN10), VALID_ISBN)
+        self.assertEqual(normalize_isbn(VALID_ISBN10_WITH_HYPHENS), VALID_ISBN)
+
+    def test_normalize_isbn_converts_isbn10_with_x_to_isbn13(self):
+        self.assertEqual(normalize_isbn(VALID_ISBN10_WITH_X), VALID_ISBN13_FROM_X_ISBN10)
+        self.assertEqual(normalize_isbn(VALID_ISBN10_WITH_X.lower()), VALID_ISBN13_FROM_X_ISBN10)
+
+    def test_normalize_isbn_rejects_invalid_values(self):
+        invalid_values = [
+            "",
+            "978400310101",
+            "97840031010180",
+            "978400310101X",
+            INVALID_ISBN,
+            "abcdefghij",
+            "123456789Z",
+            INVALID_ISBN10_CHECK_DIGIT,
+        ]
 
         for value in invalid_values:
             with self.subTest(value=value), self.assertRaises(ValidationError):
-                normalize_isbn13(value)
+                normalize_isbn(value)
 
 
 class OpenBdPubdateHelperTests(TestCase):
@@ -157,12 +179,35 @@ class BookInfoLookupTests(TestCase):
         self.assertEqual(result["title"], "既存書籍")
         self.assertEqual(result["author"], "既存著者")
 
+    def test_lookup_book_info_by_isbn_returns_existing_book_from_isbn10(self):
+        create_book(title="既存書籍", author="既存著者")
+
+        with patch("books.services.openbd.fetch_openbd_book_data") as fetch_openbd_book_data_mock:
+            result = lookup_book_info_by_isbn(VALID_ISBN10)
+
+        fetch_openbd_book_data_mock.assert_not_called()
+        self.assertEqual(result["isbn"], VALID_ISBN)
+        self.assertEqual(result["title"], "既存書籍")
+        self.assertEqual(result["author"], "既存著者")
+
     def test_lookup_book_info_by_isbn_fetches_openbd_when_book_does_not_exist(self):
         with patch(
             "books.services.openbd.fetch_openbd_book_data",
             return_value=openbd_book_payload(pubdate="19900410"),
         ) as fetch_openbd_book_data_mock:
             result = lookup_book_info_by_isbn(VALID_ISBN_WITH_HYPHENS)
+
+        fetch_openbd_book_data_mock.assert_called_once_with(VALID_ISBN)
+        self.assertEqual(result["isbn"], VALID_ISBN)
+        self.assertEqual(result["title"], DEFAULT_TITLE)
+        self.assertEqual(result["published_date"], date(1990, 4, 10))
+
+    def test_lookup_book_info_by_isbn_fetches_openbd_with_isbn13_converted_from_isbn10(self):
+        with patch(
+            "books.services.openbd.fetch_openbd_book_data",
+            return_value=openbd_book_payload(pubdate="19900410"),
+        ) as fetch_openbd_book_data_mock:
+            result = lookup_book_info_by_isbn(VALID_ISBN10)
 
         fetch_openbd_book_data_mock.assert_called_once_with(VALID_ISBN)
         self.assertEqual(result["isbn"], VALID_ISBN)

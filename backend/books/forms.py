@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from books.models import Genre
-from books.services.openbd import normalize_isbn13
+from books.services.openbd import normalize_isbn
 
 GENRE_CODE_ERROR_MESSAGE = "存在するCコードを入力してください"
 PRICE_MIN_ERROR_MESSAGE = "0以上を入力して下さい"
@@ -130,7 +130,7 @@ class BookRegisterForm(forms.Form):
     )
 
     def clean_isbn(self) -> str:
-        return normalize_isbn13(self.cleaned_data["isbn"])
+        return normalize_isbn(self.cleaned_data["isbn"])
 
     def clean_genre_code(self) -> str:
         genre_code = self.cleaned_data["genre_code"]

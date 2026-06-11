@@ -8,6 +8,7 @@ from books.tests.helpers import (
     DEFAULT_TITLE,
     INVALID_ISBN,
     VALID_ISBN,
+    VALID_ISBN10,
     book_register_form_data,
     create_genre,
     create_staff_user,
@@ -61,6 +62,19 @@ class BookRegisterAdminViewTests(TestCase):
         self.assertEqual(book.title, DEFAULT_TITLE)
         self.assertEqual(BookCopy.objects.filter(book=book, location=DEFAULT_LOCATION).count(), 2)
 
+    def test_register_view_posts_isbn10_and_saves_isbn13(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.post(
+            reverse("admin_books_register"),
+            data=book_register_form_data(isbn=VALID_ISBN10),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        book = Book.objects.get(isbn=VALID_ISBN)
+        self.assertEqual(book.title, DEFAULT_TITLE)
+        self.assertEqual(BookCopy.objects.filter(book=book, location=DEFAULT_LOCATION).count(), 1)
+
     def test_register_view_keeps_form_errors_without_creating_rows(self):
         self.client.force_login(self.staff_user)
 
@@ -80,7 +94,7 @@ class BookRegisterAdminViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "admin/books/register.html")
-        self.assertContains(response, "13桁の数字を入力してください")
+        self.assertContains(response, "10桁または13桁のISBNを入力してください")
         self.assertEqual(Book.objects.count(), 0)
         self.assertEqual(BookCopy.objects.count(), 0)
 

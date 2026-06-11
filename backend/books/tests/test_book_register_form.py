@@ -5,7 +5,10 @@ from django.test import TestCase
 from books.forms import BookRegisterForm
 from books.tests.helpers import (
     INVALID_ISBN,
+    INVALID_ISBN10_CHECK_DIGIT,
     VALID_ISBN,
+    VALID_ISBN10,
+    VALID_ISBN10_WITH_HYPHENS,
     book_register_form_data,
     create_genre,
 )
@@ -92,12 +95,31 @@ class BookRegisterFormTests(TestCase):
         self.assertIn("location", form.errors)
         self.assertIn("copy_count", form.errors)
 
+    def test_form_accepts_isbn10_and_normalizes_to_isbn13(self):
+        form = BookRegisterForm(data=book_register_form_data(isbn=VALID_ISBN10))
+
+        self.assertEqual(form.is_valid(), True, form.errors)
+        self.assertEqual(form.cleaned_data["isbn"], VALID_ISBN)
+
+    def test_form_accepts_hyphenated_isbn10_and_normalizes_to_isbn13(self):
+        form = BookRegisterForm(data=book_register_form_data(isbn=VALID_ISBN10_WITH_HYPHENS))
+
+        self.assertEqual(form.is_valid(), True, form.errors)
+        self.assertEqual(form.cleaned_data["isbn"], VALID_ISBN)
+
     def test_form_rejects_invalid_isbn(self):
         form = BookRegisterForm(data=book_register_form_data(isbn=INVALID_ISBN))
 
         self.assertEqual(form.is_valid(), False)
         self.assertIn("isbn", form.errors)
-        self.assertIn("13桁の数字を入力してください", form.errors["isbn"])
+        self.assertIn("10桁または13桁のISBNを入力してください", form.errors["isbn"])
+
+    def test_form_rejects_isbn10_with_invalid_check_digit(self):
+        form = BookRegisterForm(data=book_register_form_data(isbn=INVALID_ISBN10_CHECK_DIGIT))
+
+        self.assertEqual(form.is_valid(), False)
+        self.assertIn("isbn", form.errors)
+        self.assertIn("10桁または13桁のISBNを入力してください", form.errors["isbn"])
 
     def test_form_rejects_negative_price(self):
         form = BookRegisterForm(data=book_register_form_data(isbn=VALID_ISBN, price="-1"))
