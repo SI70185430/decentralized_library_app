@@ -11,17 +11,20 @@
 <script src="{% static 'books/admin/register.js' %}" defer></script>
 {% endblock %}
 
-{% block content %}
-<div class="book-register-shell">
-  <div id="content-main" class="book-register-panel">
-    <h1 class="book-register-heading">書籍登録</h1>
-    <nav class="book-register-breadcrumb" aria-label="breadcrumb">
-      <a href="{% url 'admin:index' %}">Home</a>
-      <span>/</span>
-      <span>書籍登録</span>
-    </nav>
+{% block content_title %}書籍登録{% endblock %}
 
-    <form method="post" id="book-register-form" class="book-register-form" data-isbn-lookup-url="{% url 'admin_books_isbn_lookup' %}" novalidate>
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">Home</a></li>
+  <li class="breadcrumb-item active">書籍登録</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="col-12">
+  <div class="card book-register-card">
+    <div class="card-body">
+      <form method="post" id="book-register-form" class="book-register-form" data-isbn-lookup-url="{% url 'admin_books_isbn_lookup' %}" novalidate>
       {% csrf_token %}
       {{ form.non_field_errors }}
 
@@ -110,7 +113,8 @@
       <div class="book-register-submit">
         <input type="submit" id="btn_register" value="登録" class="book-register-primary-action" name="_save">
       </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
 

@@ -27,7 +27,7 @@ class BookRegisterFormTests(TestCase):
             "publisher": {"id": "input_publisher", "placeholder": "出版社"},
             "cover_image_url": {"id": "input_image_url", "placeholder": "画像用リンク"},
             "price": {"id": "input_price", "placeholder": "価格"},
-            "genre_code": {"id": "input_ccode", "placeholder": "Cコード"},
+            "genre_code": {"id": "input_ccode", "placeholder": "Cコード(下2桁)"},
             "purchase_date": {"id": "input_purchase_date"},
             "location": {"id": "input_location", "placeholder": "保管場所"},
             "copy_count": {
