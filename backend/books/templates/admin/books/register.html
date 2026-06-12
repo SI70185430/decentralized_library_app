@@ -81,16 +81,18 @@
       </div>
 
       <div class="book-register-two-column">
-        <div class="book-register-field book-register-date-field" data-date-placeholder-field>
+        <div class="book-register-field book-register-date-field">
           {{ form.purchase_date.errors }}
           <label class="book-register-sr-label" for="{{ form.purchase_date.id_for_label }}">{{ form.purchase_date.label }}</label>
-          <span class="book-register-date-placeholder" aria-hidden="true">{{ form.purchase_date.label }}</span>
-          {{ form.purchase_date }}
-          <button type="button" id="btn_calendar" class="book-register-calendar-button" aria-label="購入日のカレンダーを開く">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 8h-15v8.5a.5.5 0 0 0 .5.5h14.5a.5.5 0 0 0 .5-.5V10ZM5 6a.5.5 0 0 0-.5.5V8h15V6.5A.5.5 0 0 0 19 6H5Z" />
-            </svg>
-          </button>
+          <div class="book-register-date-control" data-date-placeholder-field>
+            <span class="book-register-date-placeholder" aria-hidden="true">{{ form.purchase_date.label }}</span>
+            {{ form.purchase_date }}
+            <button type="button" id="btn_calendar" class="book-register-calendar-button" aria-label="購入日のカレンダーを開く">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm12.5 8h-15v8.5a.5.5 0 0 0 .5.5h14.5a.5.5 0 0 0 .5-.5V10ZM5 6a.5.5 0 0 0-.5.5V8h15V6.5A.5.5 0 0 0 19 6H5Z" />
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="book-register-field">
           {{ form.copy_count.errors }}

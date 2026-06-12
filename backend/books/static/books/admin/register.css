@@ -76,7 +76,7 @@
   color: #222;
 }
 
-.book-register-date-field {
+.book-register-date-control {
   position: relative;
 }
 
@@ -89,12 +89,12 @@
   opacity: 0;
 }
 
-.book-register-date-field:not(.has-value) input[type="date"] {
+.book-register-date-control:not(.has-value) input[type="date"] {
   color: transparent;
 }
 
-.book-register-date-field:focus-within input[type="date"],
-.book-register-date-field.has-value input[type="date"] {
+.book-register-date-control:focus-within input[type="date"],
+.book-register-date-control.has-value input[type="date"] {
   color: #222;
 }
 
@@ -110,8 +110,8 @@
   transform: translateY(-50%);
 }
 
-.book-register-date-field:focus-within .book-register-date-placeholder,
-.book-register-date-field.has-value .book-register-date-placeholder {
+.book-register-date-control:focus-within .book-register-date-placeholder,
+.book-register-date-control.has-value .book-register-date-placeholder {
   display: none;
 }
 

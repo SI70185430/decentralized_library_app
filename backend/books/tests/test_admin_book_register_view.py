@@ -41,9 +41,41 @@ class BookRegisterAdminViewTests(TestCase):
         self.assertContains(response, 'class="book-register-shell"')
         self.assertContains(response, 'class="book-register-panel"')
         self.assertContains(response, 'class="book-register-two-column"')
+        self.assertContains(response, 'class="book-register-date-control"')
+        self.assertContains(response, "data-date-placeholder-field")
+        self.assertContains(response, 'id="btn_calendar"')
         self.assertContains(response, 'class="book-register-primary-action"')
         self.assertContains(response, 'class="book-register-sr-label"')
         self.assertIsInstance(response.context["form"], BookRegisterForm)
+
+    def test_purchase_date_overlay_elements_are_wrapped_inside_date_control(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.post(
+            reverse("admin_books_register"),
+            data=book_register_form_data(purchase_date="invalid-date"),
+        )
+
+        html = response.content.decode()
+        date_field_start = html.index('class="book-register-field book-register-date-field"')
+        error_start = html.index('class="errorlist"', date_field_start)
+        date_control_start = html.index(
+            'class="book-register-date-control" data-date-placeholder-field',
+            date_field_start,
+        )
+        placeholder_start = html.index('class="book-register-date-placeholder"', date_control_start)
+        input_start = html.index('id="input_purchase_date"', date_control_start)
+        button_start = html.index('id="btn_calendar"', date_control_start)
+
+        self.assertNotIn(
+            'class="book-register-field book-register-date-field" data-date-placeholder-field',
+            html,
+        )
+        self.assertLess(date_field_start, error_start)
+        self.assertLess(error_start, date_control_start)
+        self.assertLess(date_control_start, placeholder_start)
+        self.assertLess(placeholder_start, input_start)
+        self.assertLess(input_start, button_start)
 
     def test_register_view_posts_valid_data_and_creates_copies(self):
         self.client.force_login(self.staff_user)
@@ -110,6 +142,23 @@ class BookRegisterAdminViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "admin/books/register.html")
         self.assertContains(response, "10桁または13桁で正当なISBNを入力してください")
+        self.assertEqual(Book.objects.count(), 0)
+        self.assertEqual(BookCopy.objects.count(), 0)
+
+    def test_register_view_keeps_purchase_date_control_when_purchase_date_has_error(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.post(
+            reverse("admin_books_register"),
+            data=book_register_form_data(purchase_date="invalid-date"),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "admin/books/register.html")
+        self.assertContains(response, 'class="book-register-date-control"')
+        self.assertContains(response, "data-date-placeholder-field")
+        self.assertContains(response, 'id="btn_calendar"')
+        self.assertIn("purchase_date", response.context["form"].errors)
         self.assertEqual(Book.objects.count(), 0)
         self.assertEqual(BookCopy.objects.count(), 0)
 

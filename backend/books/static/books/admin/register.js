@@ -36,12 +36,12 @@
     genre_code: document.getElementById(GENRE_CODE_INPUT_ID),
   };
 
-  const purchaseDateField = document.querySelector(PURCHASE_DATE_FIELD_SELECTOR);
-  if (purchaseDateField) {
-    const purchaseDateInput = purchaseDateField.querySelector(DATE_INPUT_SELECTOR);
+  const purchaseDateControl = document.querySelector(PURCHASE_DATE_FIELD_SELECTOR);
+  if (purchaseDateControl) {
+    const purchaseDateInput = purchaseDateControl.querySelector(DATE_INPUT_SELECTOR);
     const calendarButton = document.getElementById(CALENDAR_BUTTON_ID);
     const syncPurchaseDatePlaceholder = () => {
-      purchaseDateField.classList.toggle(HAS_VALUE_CLASS_NAME, Boolean(purchaseDateInput.value));
+      purchaseDateControl.classList.toggle(HAS_VALUE_CLASS_NAME, Boolean(purchaseDateInput.value));
     };
 
     syncPurchaseDatePlaceholder();
