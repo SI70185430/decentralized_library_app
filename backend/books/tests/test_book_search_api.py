@@ -1,5 +1,5 @@
 from datetime import date
-from uuid import uuid4
+from uuid import uuid7
 
 from django.test import TestCase
 from django.urls import reverse
@@ -152,7 +152,7 @@ class BookSearchApiTests(TestCase):
         self.assertEqual(data["genre"]["c_code_genre"], "55")
 
     def test_book_detail_returns_404_for_unknown_book(self):
-        response = self.client.get(reverse("books:book-detail", kwargs={"pk": uuid4()}))
+        response = self.client.get(reverse("books:book-detail", kwargs={"pk": uuid7()}))
 
         self.assertEqual(response.status_code, 404)
 

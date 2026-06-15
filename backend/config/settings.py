@@ -61,6 +61,11 @@ JAZZMIN_SETTINGS = {
             "name": "書籍登録",
             "url": "admin_books_register",
         },
+        # TODO: 書籍検索の機能確認用リンク。Next.js 側の正式 UI 実装へ移る段階でコメントアウトする。
+        {
+            "name": "書籍検索",
+            "url": "admin_books_search",
+        },
     ],
     "custom_css": "books/admin/jazzmin.css",
 }

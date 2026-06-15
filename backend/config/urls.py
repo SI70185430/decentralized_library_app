@@ -30,6 +30,16 @@ urlpatterns = [
         name="admin_books_register",
     ),
     path(
+        "admin/books/search/",
+        admin.site.admin_view(book_admin_views.book_search),
+        name="admin_books_search",
+    ),
+    path(
+        "admin/books/search/results/",
+        admin.site.admin_view(book_admin_views.book_search_results),
+        name="admin_books_search_results",
+    ),
+    path(
         "admin/books/isbn-lookup/",
         admin.site.admin_view(book_admin_views.isbn_lookup),
         name="admin_books_isbn_lookup",

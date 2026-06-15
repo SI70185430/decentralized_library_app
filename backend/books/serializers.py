@@ -1,22 +1,11 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
+from books.genre_categories import GENRE_CATEGORY_NAMES
 from books.models import Book, Genre
 from books.services.book_search import BookSearchParams
-from books.services.openbd import normalize_isbn
+from books.services.isbn import normalize_isbn
 
-GENRE_CATEGORY_NAMES = {
-    "0": "総記",
-    "1": "哲学",
-    "2": "歴史",
-    "3": "社会科学",
-    "4": "自然科学",
-    "5": "技術・工学",
-    "6": "産業",
-    "7": "芸術",
-    "8": "言語",
-    "9": "文学",
-}
 GENRE_ERROR_MESSAGE = "存在するジャンルを指定してください"
 SEARCH_PARAM_FIELDS = ("keyword", "title", "author", "publisher", "isbn", "genre")
 

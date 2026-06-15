@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from books.models import Genre
-from books.services.openbd import normalize_isbn
+from books.services.isbn import normalize_isbn
 
 GENRE_CODE_ERROR_MESSAGE = "存在するCコードを入力してください"
 PRICE_MIN_ERROR_MESSAGE = "0以上を入力して下さい"

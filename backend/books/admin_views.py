@@ -3,13 +3,16 @@ from typing import Any
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET
 
-from books.forms import BookRegisterForm
+from books.forms import BookRegisterForm, BookSearchForm
 from books.models import Book
+from books.serializers import BookSearchQuerySerializer
 from books.services.book_registration import register_book_copies
+from books.services.book_search import search_books
 from books.services.openbd import OpenBdError, lookup_book_info_by_isbn
 
 LOOKUP_NOT_FOUND_MESSAGE = "書籍情報が見つかりませんでした"
@@ -18,6 +21,13 @@ REGISTER_SUCCESS_MESSAGE = "蔵書を登録しました"
 REGISTER_PAGE_TITLE = "書籍登録"
 REGISTER_TEMPLATE_NAME = "admin/books/register.html"
 ADMIN_BOOK_REGISTER_ROUTE_NAME = "admin_books_register"
+BOOK_SEARCH_PAGE_SIZE = 10
+SEARCH_PAGE_TITLE = "書籍検索"
+SEARCH_RESULTS_PAGE_TITLE = "書籍検索結果"
+SEARCH_TEMPLATE_NAME = "admin/books/search.html"
+SEARCH_RESULTS_TEMPLATE_NAME = "admin/books/search_results.html"
+ADMIN_BOOK_SEARCH_ROUTE_NAME = "admin_books_search"
+ADMIN_BOOK_SEARCH_RESULTS_ROUTE_NAME = "admin_books_search_results"
 VALIDATION_DEFAULT_ERROR_MESSAGE = "入力内容を確認してください"
 ISBN_QUERY_PARAM = "isbn"
 JSON_ERROR_KEY = "error"
@@ -49,6 +59,50 @@ def book_register(request: HttpRequest) -> HttpResponse:
     )
 
 
+def book_search(request: HttpRequest) -> HttpResponse:
+    """Render the dedicated admin book search form screen."""
+    return render(
+        request,
+        SEARCH_TEMPLATE_NAME,
+        {
+            "form": BookSearchForm(),
+            "title": SEARCH_PAGE_TITLE,
+            "opts": Book._meta,
+        },
+    )
+
+
+def book_search_results(request: HttpRequest) -> HttpResponse:
+    """Render paginated admin book search results."""
+    form = BookSearchForm(data=request.GET)
+    queryset = Book.objects.none()
+
+    if form.is_valid():
+        query_serializer = BookSearchQuerySerializer(data=form.search_query_data)
+        if query_serializer.is_valid():
+            queryset = search_books(query_serializer.to_params())
+        else:
+            form.add_serializer_errors(query_serializer.errors)
+
+    paginator = Paginator(queryset, BOOK_SEARCH_PAGE_SIZE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    querystring_without_page = _querystring_without_page(request)
+
+    return render(
+        request,
+        SEARCH_RESULTS_TEMPLATE_NAME,
+        {
+            "form": form,
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "querystring_without_page": querystring_without_page,
+            "pagination_query_prefix": _pagination_query_prefix(querystring_without_page),
+            "title": SEARCH_RESULTS_PAGE_TITLE,
+            "opts": Book._meta,
+        },
+    )
+
+
 @require_GET
 def isbn_lookup(request: HttpRequest) -> JsonResponse:
     """Return book registration form values by ISBN for the admin screen."""
@@ -65,6 +119,19 @@ def isbn_lookup(request: HttpRequest) -> JsonResponse:
         return JsonResponse({JSON_ERROR_KEY: LOOKUP_NOT_FOUND_MESSAGE}, status=404)
 
     return JsonResponse({JSON_BOOK_KEY: _serialize_lookup_data(book_data)})
+
+
+def _querystring_without_page(request: HttpRequest) -> str:
+    query_params = request.GET.copy()
+    query_params.pop("page", None)
+    return query_params.urlencode()
+
+
+def _pagination_query_prefix(querystring_without_page: str) -> str:
+    if not querystring_without_page:
+        return ""
+
+    return f"{querystring_without_page}&"
 
 
 def _serialize_lookup_data(data: dict[str, Any]) -> dict[str, Any]:
