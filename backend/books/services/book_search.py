@@ -5,7 +5,7 @@ from django.db.models import Q, QuerySet
 from books.models import Book
 
 DEFAULT_BOOK_SEARCH_ORDERING = ("title", "id")
-BOOK_SEARCH_TEXT_FIELDS = ("title", "author", "publisher", "isbn", "description")
+BOOK_SEARCH_TEXT_FIELDS = ("title", "author", "publisher", "isbn")
 
 
 @dataclass(frozen=True)
@@ -19,7 +19,7 @@ class BookSearchParams:
 
 
 def build_keyword_query(keyword: str) -> Q:
-    """keyword を title / author / publisher / isbn / description の OR 条件にする。"""
+    """keyword を title / author / publisher / isbn の OR 条件にする。"""
     query = Q()
     for field in BOOK_SEARCH_TEXT_FIELDS:
         query |= Q(**{f"{field}__icontains": keyword})

@@ -61,8 +61,8 @@ class BookSearchServiceTests(TestCase):
             [self.beta_book],
         )
 
-    def test_keyword_matches_description(self):
-        self.assertEqual(list(search_books(BookSearchParams(keyword="networks"))), [self.alpha_book])
+    def test_keyword_does_not_match_description(self):
+        self.assertEqual(list(search_books(BookSearchParams(keyword="networks"))), [])
 
     def test_title_filter_uses_partial_match(self):
         self.assertEqual(list(search_books(BookSearchParams(title="Library"))), [self.beta_book])
