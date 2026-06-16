@@ -16,10 +16,7 @@ class LendingModelTests(TestCase):
             employee_id=3001,
             password="password123",
         )
-        self.genre = Genre.objects.create(
-            c_code_genre="10",
-            name="哲学",
-        )
+        self.genre = Genre.objects.get(c_code_genre="10")
         self.book = Book.objects.create(
             genre=self.genre,
             isbn="9784222222222",
@@ -201,10 +198,7 @@ class ReservationModelTests(TestCase):
             employee_id=3001,
             password="password123",
         )
-        self.genre = Genre.objects.create(
-            c_code_genre="82",
-            name="英米語",
-        )
+        self.genre = Genre.objects.get(c_code_genre="82")
         self.book = Book.objects.create(
             genre=self.genre,
             isbn="9784333333333",

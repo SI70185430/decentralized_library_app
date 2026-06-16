@@ -97,7 +97,7 @@ class BookSearchQuerySerializerTests(TestCase):
         )
 
     def test_existing_genre_is_valid(self):
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
         serializer = BookSearchQuerySerializer(data={"genre": "55"})
 
         self.assertEqual(serializer.is_valid(), True, serializer.errors)
@@ -119,20 +119,20 @@ class BookSearchQuerySerializerTests(TestCase):
 
 class BookResponseSerializerTests(TestCase):
     def test_genre_serializer_returns_category_code_and_name(self):
-        genre = create_genre(code="55", name="電気通信")
+        genre = create_genre(code="55", name="電子通信")
 
         self.assertEqual(
             GenreSerializer(genre).data,
             {
                 "category_code": "5",
-                "category_name": "技術・工学",
+                "category_name": "工学・工業",
                 "c_code_genre": "55",
-                "name": "電気通信",
+                "name": "電子通信",
             },
         )
 
     def test_book_list_serializer_returns_expected_fields(self):
-        genre = create_genre(code="55", name="電気通信")
+        genre = create_genre(code="55", name="電子通信")
         book = create_book(
             genre=genre,
             isbn=VALID_ISBN,
@@ -157,9 +157,9 @@ class BookResponseSerializerTests(TestCase):
         self.assertEqual(data["cover_image_url"], DEFAULT_COVER_IMAGE_URL)
         self.assertEqual(data["description"], "猫の小説")
         self.assertEqual(data["genre"]["category_code"], "5")
-        self.assertEqual(data["genre"]["category_name"], "技術・工学")
+        self.assertEqual(data["genre"]["category_name"], "工学・工業")
         self.assertEqual(data["genre"]["c_code_genre"], "55")
-        self.assertEqual(data["genre"]["name"], "電気通信")
+        self.assertEqual(data["genre"]["name"], "電子通信")
 
     def test_book_detail_serializer_returns_same_basic_fields(self):
         genre = create_genre(code="90", name="文学")

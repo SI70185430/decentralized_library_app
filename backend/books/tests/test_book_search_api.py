@@ -16,7 +16,7 @@ from books.tests.helpers import (
 
 class BookSearchApiTests(TestCase):
     def setUp(self):
-        self.tech_genre = create_genre(code="55", name="電気通信")
+        self.tech_genre = create_genre(code="55", name="電子通信")
         self.literature_genre = create_genre(code="90", name="文学")
         self.alpha_book = create_book(
             genre=self.tech_genre,

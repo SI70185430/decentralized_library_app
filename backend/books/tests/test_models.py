@@ -52,7 +52,7 @@ class GenreModelTests(TestCase):
 
 class BookModelTests(TestCase):
     def setUp(self):
-        self.genre = create_genre(code="55", name="電気通信")
+        self.genre = create_genre(code="55", name="電子通信")
 
         self.instance = create_book(
             genre=self.genre,
@@ -139,7 +139,7 @@ class BookModelTests(TestCase):
         book = Book.objects.get(id=self.instance.id)
 
         self.assertEqual(book.genre_id, "55")
-        self.assertEqual(book.genre.name, "電気通信")
+        self.assertEqual(book.genre.name, "電子通信")
         self.assertEqual(book.isbn, "9784285922871")
         self.assertEqual(book.title, "foo")
         self.assertEqual(book.author, "bar")

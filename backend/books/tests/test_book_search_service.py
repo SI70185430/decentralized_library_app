@@ -8,7 +8,7 @@ from books.tests.helpers import create_book, create_genre
 
 class BookSearchServiceTests(TestCase):
     def setUp(self):
-        self.tech_genre = create_genre(code="55", name="電気通信")
+        self.tech_genre = create_genre(code="55", name="電子通信")
         self.literature_genre = create_genre(code="90", name="文学")
 
         self.alpha_book = create_book(
@@ -133,5 +133,5 @@ class BookSearchServiceTests(TestCase):
             books = list(search_books(BookSearchParams(genre="55")))
             genre_names = [book.genre.name for book in books]
 
-        self.assertEqual(genre_names, ["電気通信"])
+        self.assertEqual(genre_names, ["電子通信"])
         self.assertEqual(len(captured_queries), 1)

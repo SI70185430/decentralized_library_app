@@ -19,7 +19,7 @@ class GenreApiTests(TestCase):
         self.assertEqual(response.json(), [])
 
     def test_genre_list_returns_genres(self):
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
 
         response = self.get_genre_list()
 
@@ -29,9 +29,9 @@ class GenreApiTests(TestCase):
             [
                 {
                     "category_code": "5",
-                    "category_name": "技術・工学",
+                    "category_name": "工学・工業",
                     "c_code_genre": "55",
-                    "name": "電気通信",
+                    "name": "電子通信",
                 }
             ],
         )
@@ -39,7 +39,7 @@ class GenreApiTests(TestCase):
     def test_genre_list_orders_by_c_code_genre(self):
         create_genre(code="90", name="文学")
         create_genre(code="00", name="総記")
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
 
         response = self.get_genre_list()
 
@@ -49,7 +49,7 @@ class GenreApiTests(TestCase):
         )
 
     def test_genre_list_returns_category_code_from_first_digit(self):
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
         create_genre(code="90", name="文学")
 
         response = self.get_genre_list()
@@ -60,7 +60,7 @@ class GenreApiTests(TestCase):
         )
 
     def test_genre_list_returns_category_name_from_constant_map(self):
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
         create_genre(code="90", name="文学ジャンル名")
 
         response = self.get_genre_list()
@@ -68,7 +68,7 @@ class GenreApiTests(TestCase):
         self.assertEqual(
             [(genre["c_code_genre"], genre["category_name"], genre["name"]) for genre in response.json()],
             [
-                ("55", "技術・工学", "電気通信"),
+                ("55", "工学・工業", "電子通信"),
                 ("90", "文学", "文学ジャンル名"),
             ],
         )

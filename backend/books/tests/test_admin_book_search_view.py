@@ -52,21 +52,21 @@ class BookSearchFormTests(TestCase):
             [
                 ("", "すべて"),
                 ("0", "総記"),
-                ("1", "哲学"),
-                ("2", "歴史"),
+                ("1", "哲学・心理学・宗教"),
+                ("2", "歴史・地理"),
                 ("3", "社会科学"),
                 ("4", "自然科学"),
-                ("5", "技術・工学"),
+                ("5", "工学・工業"),
                 ("6", "産業"),
-                ("7", "芸術"),
-                ("8", "言語"),
+                ("7", "芸術・生活"),
+                ("8", "語学"),
                 ("9", "文学"),
             ],
         )
 
     def test_genre_choices_are_built_from_genres_ordered_by_code(self):
         create_genre(code="90", name="文学")
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
         create_genre(code="00", name="総記")
 
         form = BookSearchForm()
@@ -76,13 +76,13 @@ class BookSearchFormTests(TestCase):
             [
                 ("", "すべて"),
                 ("00", "総記"),
-                ("55", "電気通信"),
+                ("55", "電子通信"),
                 ("90", "文学"),
             ],
         )
 
     def test_genre_choices_are_filtered_when_category_is_selected(self):
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
         create_genre(code="59", name="家政学")
         create_genre(code="90", name="文学")
 
@@ -92,13 +92,13 @@ class BookSearchFormTests(TestCase):
             form.fields["genre"].choices,
             [
                 ("", "すべて"),
-                ("55", "電気通信"),
+                ("55", "電子通信"),
                 ("59", "家政学"),
             ],
         )
 
     def test_initial_category_filters_genre_choices_for_unbound_form(self):
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
         create_genre(code="90", name="文学")
 
         form = BookSearchForm(initial={"category": "9"})
@@ -106,7 +106,7 @@ class BookSearchFormTests(TestCase):
         self.assertEqual(form.fields["genre"].choices, [("", "すべて"), ("90", "文学")])
 
     def test_search_query_data_excludes_category(self):
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
 
         form = BookSearchForm(
             data={
@@ -223,7 +223,7 @@ class BookSearchAdminViewTests(TestCase):
 
     def test_search_results_view_displays_matching_books(self):
         self.client.force_login(self.staff_user)
-        tech_genre = create_genre(code="55", name="電気通信")
+        tech_genre = create_genre(code="55", name="電子通信")
         literature_genre = create_genre(code="90", name="文学")
         create_book(
             genre=tech_genre,
@@ -273,7 +273,7 @@ class BookSearchAdminViewTests(TestCase):
 
     def test_search_results_view_does_not_filter_by_category_only(self):
         self.client.force_login(self.staff_user)
-        tech_genre = create_genre(code="55", name="電気通信")
+        tech_genre = create_genre(code="55", name="電子通信")
         literature_genre = create_genre(code="90", name="文学")
         create_book(genre=tech_genre, isbn="9784003101018", title="Tech Book")
         create_book(genre=literature_genre, isbn="9780975229804", title="Literature Book")
@@ -287,14 +287,14 @@ class BookSearchAdminViewTests(TestCase):
 
     def test_search_results_view_filters_genre_choices_by_selected_category(self):
         self.client.force_login(self.staff_user)
-        create_genre(code="55", name="電気通信")
+        create_genre(code="55", name="電子通信")
         create_genre(code="59", name="家政学")
         create_genre(code="90", name="文学")
 
         response = self.client.get(reverse("admin_books_search_results"), {"category": "5"})
 
         choices = response.context["form"].fields["genre"].choices
-        self.assertEqual(choices, [("", "すべて"), ("55", "電気通信"), ("59", "家政学")])
+        self.assertEqual(choices, [("", "すべて"), ("55", "電子通信"), ("59", "家政学")])
 
     def test_search_results_view_uses_ten_items_per_page(self):
         self.client.force_login(self.staff_user)
