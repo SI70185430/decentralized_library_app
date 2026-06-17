@@ -122,7 +122,9 @@ class BookSearchServiceTests(TestCase):
             genre="",
         )
 
-        self.assertEqual(list(search_books(params)), [self.alpha_book, self.beta_book, self.gamma_book])
+        self.assertEqual(
+            list(search_books(params)), [self.alpha_book, self.beta_book, self.gamma_book]
+        )
 
     def test_book_search_params_does_not_accept_category(self):
         with self.assertRaises(TypeError):

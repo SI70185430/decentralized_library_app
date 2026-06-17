@@ -56,25 +56,33 @@ class BookSearchApiTests(TestCase):
         response = self.get_book_list({"keyword": "Library"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([book["title"] for book in response.json()["results"]], ["Beta Library Design"])
+        self.assertEqual(
+            [book["title"] for book in response.json()["results"]], ["Beta Library Design"]
+        )
 
     def test_book_list_searches_by_title(self):
         response = self.get_book_list({"title": "Cat"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([book["title"] for book in response.json()["results"]], ["Alpha Cat Network"])
+        self.assertEqual(
+            [book["title"] for book in response.json()["results"]], ["Alpha Cat Network"]
+        )
 
     def test_book_list_searches_by_author(self):
         response = self.get_book_list({"author": "Design"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([book["title"] for book in response.json()["results"]], ["Beta Library Design"])
+        self.assertEqual(
+            [book["title"] for book in response.json()["results"]], ["Beta Library Design"]
+        )
 
     def test_book_list_searches_by_publisher(self):
         response = self.get_book_list({"publisher": "Iwanami"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([book["title"] for book in response.json()["results"]], ["Alpha Cat Network"])
+        self.assertEqual(
+            [book["title"] for book in response.json()["results"]], ["Alpha Cat Network"]
+        )
 
     def test_book_list_searches_by_normalized_isbn(self):
         response = self.get_book_list({"isbn": VALID_ISBN_WITH_HYPHENS})

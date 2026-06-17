@@ -66,7 +66,10 @@ class GenreApiTests(TestCase):
         response = self.get_genre_list()
 
         self.assertEqual(
-            [(genre["c_code_genre"], genre["category_name"], genre["name"]) for genre in response.json()],
+            [
+                (genre["c_code_genre"], genre["category_name"], genre["name"])
+                for genre in response.json()
+            ],
             [
                 ("55", "工学・工業", "電子通信"),
                 ("90", "文学", "文学ジャンル名"),
