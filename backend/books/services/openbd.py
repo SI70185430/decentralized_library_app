@@ -14,11 +14,11 @@ OPENBD_TIMEOUT_SECONDS = 10
 
 
 class OpenBdError(Exception):
-    """openBD lookup failed due to network or response errors."""
+    """ネットワークまたはレスポンスのエラー用のクラス"""
 
 
 def parse_openbd_pubdate(value: str | None) -> date | None:
-    """Convert openBD summary.pubdate into a date for Book.published_date."""
+    """openBDのsummary.pubdateをBook.published_date用の日付へ変換する。"""
     if not value:
         return None
 
@@ -44,7 +44,7 @@ def parse_openbd_pubdate(value: str | None) -> date | None:
 
 
 def fetch_openbd_book_data(isbn: str) -> dict[str, Any] | None:
-    """Fetch an openBD book data object by normalized ISBN-13."""
+    """正規化済みISBN-13からopenBDの書籍データオブジェクトを取得する。"""
     query = urllib.parse.urlencode({"isbn": isbn})
     url = f"{OPENBD_ENDPOINT}?{query}"
 
@@ -71,7 +71,7 @@ def fetch_openbd_book_data(isbn: str) -> dict[str, Any] | None:
 
 
 def map_openbd_book_data(openbd_data: dict[str, Any], normalized_isbn: str) -> dict[str, Any]:
-    """Map openBD book data into book registration lookup data."""
+    """openBDの書籍データを書籍登録の検索結果データへ変換する。"""
     summary = openbd_data["summary"]
     return {
         "isbn": normalized_isbn,
@@ -86,7 +86,7 @@ def map_openbd_book_data(openbd_data: dict[str, Any], normalized_isbn: str) -> d
 
 
 def extract_openbd_price(openbd_data: dict[str, Any]) -> int | None:
-    """Extract a price amount from openBD ONIX data."""
+    """openBDのONIXデータから価格を抽出する。"""
     prices = (
         (openbd_data.get("onix") or {})
         .get("ProductSupply", {})
@@ -114,7 +114,7 @@ def _normalize_openbd_price(value: Any) -> int | None:
 
 
 def book_to_lookup_data(book: Book) -> dict[str, Any]:
-    """Map an existing Book into the same shape as openBD lookup data."""
+    """既存のBookをopenBD検索結果データと同じ形に変換する。"""
     return {
         "isbn": book.isbn,
         "title": book.title,
@@ -128,7 +128,7 @@ def book_to_lookup_data(book: Book) -> dict[str, Any]:
 
 
 def lookup_book_info_by_isbn(isbn: str) -> dict[str, Any] | None:
-    """Look up book registration data by ISBN, preferring existing DB records."""
+    """既存DBレコードを優先してISBNから書籍登録データを検索する。"""
     normalized_isbn = normalize_isbn(isbn)
 
     # .first()によって見つからなかった場合にNoneを返すようになる（例外処理が不要）

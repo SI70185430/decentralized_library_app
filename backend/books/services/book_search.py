@@ -45,5 +45,6 @@ def apply_book_search_filters(queryset: QuerySet[Book], params: BookSearchParams
 
 def search_books(params: BookSearchParams) -> QuerySet[Book]:
     """検索条件に一致する Book QuerySet を返す。"""
+    # ジャンルが外部キー参照であること由来のN+1問題回避のためのselect_related("genre")
     queryset = Book.objects.select_related("genre")
     return apply_book_search_filters(queryset, params).order_by(*DEFAULT_BOOK_SEARCH_ORDERING)

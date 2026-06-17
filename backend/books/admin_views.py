@@ -35,7 +35,7 @@ JSON_BOOK_KEY = "book"
 
 
 def book_register(request: HttpRequest) -> HttpResponse:
-    """Render and process the dedicated admin book registration screen."""
+    """管理画面の書籍登録専用画面を表示し、登録処理を行う。"""
     if request.method == "POST":
         form = BookRegisterForm(request.POST)
         if form.is_valid():
@@ -60,7 +60,7 @@ def book_register(request: HttpRequest) -> HttpResponse:
 
 
 def book_search(request: HttpRequest) -> HttpResponse:
-    """Render the dedicated admin book search form screen."""
+    """管理画面の書籍検索専用フォーム画面を表示する。"""
     return render(
         request,
         SEARCH_TEMPLATE_NAME,
@@ -73,7 +73,7 @@ def book_search(request: HttpRequest) -> HttpResponse:
 
 
 def book_search_results(request: HttpRequest) -> HttpResponse:
-    """Render paginated admin book search results."""
+    """管理画面の書籍検索結果をページネーション付きで表示する。"""
     form = BookSearchForm(data=request.GET)
     queryset = Book.objects.none()
 
@@ -105,7 +105,7 @@ def book_search_results(request: HttpRequest) -> HttpResponse:
 
 @require_GET
 def isbn_lookup(request: HttpRequest) -> JsonResponse:
-    """Return book registration form values by ISBN for the admin screen."""
+    """管理画面向けにISBNから書籍登録フォームの値を返す。"""
     isbn = request.GET.get(ISBN_QUERY_PARAM, "")
 
     try:

@@ -15,7 +15,7 @@ class BookRegistrationResult:
 
 
 def register_book_copies(cleaned_data: Mapping[str, Any]) -> BookRegistrationResult:
-    """Create a Book and BookCopy rows from BookRegisterForm.cleaned_data."""
+    """BookRegisterForm.cleaned_dataからBookとBookCopy行を作成する。"""
     isbn = cleaned_data["isbn"]
     title = cleaned_data["title"]
     author = cleaned_data["author"]

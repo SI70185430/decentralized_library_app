@@ -31,6 +31,7 @@ class BookSearchQuerySerializer(serializers.Serializer):
         if not value:
             return ""
 
+        # htmlのみで仮UIを作成した都合で生じたエラーチェック
         if not Genre.objects.filter(c_code_genre=value).exists():
             raise serializers.ValidationError(GENRE_ERROR_MESSAGE)
 
