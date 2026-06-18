@@ -30,7 +30,6 @@ export function normalizeSearchParams(searchParams: RawBookSearchParams): BookSe
     author: normalizeText(searchParams.author),
     publisher: normalizeText(searchParams.publisher),
     isbn: normalizeText(searchParams.isbn),
-    category: normalizeText(searchParams.category),
     genre: normalizeText(searchParams.genre),
     page: normalizePage(searchParams.page),
   };

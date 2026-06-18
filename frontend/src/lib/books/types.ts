@@ -31,7 +31,6 @@ export type BookSearchParams = {
   author: string;
   publisher: string;
   isbn: string;
-  category: string;
   genre: string;
   page: number;
 };

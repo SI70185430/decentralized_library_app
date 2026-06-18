@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
 import type { BookGenre, BookSearchParams } from "@/lib/books/types";
 
 const ALL_SELECT_VALUE = "__all__";
+const SEARCH_TEXT_KEYS = ["keyword", "title", "author", "publisher", "isbn"] as const;
 
 type BookSearchFormProps = {
   genres: BookGenre[];
@@ -25,17 +26,18 @@ type CategoryOption = {
   name: string;
 };
 
-function buildCategoryOptions(genres: BookGenre[]): CategoryOption[] {
-  const categories = new Map<string, string>();
-
-  for (const genre of genres) {
-    if (!categories.has(genre.category_code)) {
-      categories.set(genre.category_code, genre.category_name);
-    }
-  }
-
-  return Array.from(categories, ([code, name]) => ({ code, name }));
-}
+const CATEGORY_OPTIONS: CategoryOption[] = [
+  { code: "0", name: "総記" },
+  { code: "1", name: "哲学・心理学・宗教" },
+  { code: "2", name: "歴史・地理" },
+  { code: "3", name: "社会科学" },
+  { code: "4", name: "自然科学" },
+  { code: "5", name: "工学・工業" },
+  { code: "6", name: "産業" },
+  { code: "7", name: "芸術・生活" },
+  { code: "8", name: "語学" },
+  { code: "9", name: "文学" },
+];
 
 function setQueryIfPresent(query: URLSearchParams, key: string, value: FormDataEntryValue | null): void {
   if (typeof value !== "string") {
@@ -50,18 +52,12 @@ function setQueryIfPresent(query: URLSearchParams, key: string, value: FormDataE
 
 export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
   const router = useRouter();
-  const initialCategory = initialValues.category || initialValues.genre.slice(0, 1);
-  const [category, setCategory] = useState(initialCategory);
+  const [category, setCategory] = useState(initialValues.genre.slice(0, 1));
   const [genre, setGenre] = useState(initialValues.genre);
 
-  const categoryOptions = useMemo(() => buildCategoryOptions(genres), [genres]);
-  const genreOptions = useMemo(() => {
-    if (!category) {
-      return genres;
-    }
-
-    return genres.filter((genreOption) => genreOption.category_code === category);
-  }, [category, genres]);
+  const genreOptions = category
+    ? genres.filter((genreOption) => genreOption.c_code_genre.startsWith(category))
+    : genres;
 
   function handleCategoryChange(value: string): void {
     setCategory(value === ALL_SELECT_VALUE ? "" : value);
@@ -72,17 +68,15 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
     setGenre(value === ALL_SELECT_VALUE ? "" : value);
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>): void {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
     const query = new URLSearchParams();
 
-    setQueryIfPresent(query, "keyword", formData.get("keyword"));
-    setQueryIfPresent(query, "title", formData.get("title"));
-    setQueryIfPresent(query, "author", formData.get("author"));
-    setQueryIfPresent(query, "publisher", formData.get("publisher"));
-    setQueryIfPresent(query, "isbn", formData.get("isbn"));
+    for (const key of SEARCH_TEXT_KEYS) {
+      setQueryIfPresent(query, key, formData.get(key));
+    }
     if (genre) {
       query.set("genre", genre);
     }
@@ -113,7 +107,7 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
         <span className="shrink-0 text-lg font-semibold">ジャンル：</span>
 
         <div className="flex min-w-0 gap-2">
-          <Select value={category || ALL_SELECT_VALUE} onValueChange={handleCategoryChange} name="category">
+          <Select value={category || ALL_SELECT_VALUE} onValueChange={handleCategoryChange}>
             <SelectTrigger
               id="input_category"
               className="h-12 w-[112px] rounded-none border-black bg-white px-2 text-base text-[#888]"
@@ -122,7 +116,7 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={ALL_SELECT_VALUE}>フィルタ</SelectItem>
-              {categoryOptions.map((categoryOption) => (
+              {CATEGORY_OPTIONS.map((categoryOption) => (
                 <SelectItem key={categoryOption.code} value={categoryOption.code}>
                   {categoryOption.name}
                 </SelectItem>
@@ -130,7 +124,7 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
             </SelectContent>
           </Select>
 
-          <Select value={genre || ALL_SELECT_VALUE} onValueChange={handleGenreChange} name="genre">
+          <Select value={genre || ALL_SELECT_VALUE} onValueChange={handleGenreChange}>
             <SelectTrigger
               id="input_genre"
               className="h-12 w-[112px] rounded-none border-black bg-white px-2 text-base text-[#888]"
