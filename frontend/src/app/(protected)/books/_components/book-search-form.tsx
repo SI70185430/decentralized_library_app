@@ -109,35 +109,52 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
       />
       <Input id="input_isbn" name="isbn" placeholder="ISBN" defaultValue={initialValues.isbn} />
 
-      <Select value={category || ALL_SELECT_VALUE} onValueChange={handleCategoryChange} name="category">
-        <SelectTrigger id="input_category" className="w-full bg-white">
-          <SelectValue placeholder="フィルタ" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_SELECT_VALUE}>フィルタ</SelectItem>
-          {categoryOptions.map((categoryOption) => (
-            <SelectItem key={categoryOption.code} value={categoryOption.code}>
-              {categoryOption.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2">
+        <span className="shrink-0 text-lg font-semibold">ジャンル：</span>
 
-      <Select value={genre || ALL_SELECT_VALUE} onValueChange={handleGenreChange} name="genre">
-        <SelectTrigger id="input_genre" className="w-full bg-white">
-          <SelectValue placeholder="ジャンル" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_SELECT_VALUE}>ジャンル</SelectItem>
-          {genreOptions.map((genreOption) => (
-            <SelectItem key={genreOption.c_code_genre} value={genreOption.c_code_genre}>
-              {genreOption.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        <div className="flex min-w-0 gap-2">
+          <Select value={category || ALL_SELECT_VALUE} onValueChange={handleCategoryChange} name="category">
+            <SelectTrigger
+              id="input_category"
+              className="h-12 w-[112px] rounded-none border-black bg-white px-2 text-base text-[#888]"
+            >
+              <SelectValue placeholder="フィルタ" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_SELECT_VALUE}>フィルタ</SelectItem>
+              {categoryOptions.map((categoryOption) => (
+                <SelectItem key={categoryOption.code} value={categoryOption.code}>
+                  {categoryOption.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-      <Button id="btn_book_search" type="submit" className="w-full">
+          <Select value={genre || ALL_SELECT_VALUE} onValueChange={handleGenreChange} name="genre">
+            <SelectTrigger
+              id="input_genre"
+              className="h-12 w-[112px] rounded-none border-black bg-white px-2 text-base text-[#888]"
+            >
+              <SelectValue placeholder="ジャンル" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_SELECT_VALUE}>ジャンル</SelectItem>
+              {genreOptions.map((genreOption) => (
+                <SelectItem key={genreOption.c_code_genre} value={genreOption.c_code_genre}>
+                  {genreOption.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <Button
+        id="btn_book_search"
+        type="submit"
+        variant="outline"
+        className="mx-auto mt-8 flex h-11 w-[176px] rounded-lg border-black bg-[#eeeeff] text-base font-medium text-black hover:bg-[#e4e4ff]"
+      >
         検索
       </Button>
     </form>
