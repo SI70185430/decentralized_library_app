@@ -28,20 +28,20 @@ export function BookResultCard({ book }: BookResultCardProps) {
         )}
       </div>
 
-      <dl className="ml-4 min-w-0 flex-1 space-y-1 text-sm leading-snug font-semibold break-words">
+      <dl className="ml-4 min-w-0 flex-1 space-y-1 text-sm leading-snug font-semibold">
         <div className="min-w-0">
           <dt>タイトル</dt>
-          <dd className="min-w-0 break-words">{book.title}</dd>
+          <dd className="min-w-0 truncate">{book.title}</dd>
         </div>
 
         <div className="min-w-0">
           <dt>著者</dt>
-          <dd className="min-w-0 break-words">{displayText(book.author)}</dd>
+          <dd className="min-w-0 truncate">{displayText(book.author)}</dd>
         </div>
 
         <div className="min-w-0">
           <dt>出版社</dt>
-          <dd className="min-w-0 break-words">{displayText(book.publisher)}</dd>
+          <dd className="min-w-0 truncate">{displayText(book.publisher)}</dd>
         </div>
       </dl>
     </article>
