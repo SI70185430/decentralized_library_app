@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { buildBookResultsHref } from "@/lib/books/search-params";
 import type { BookSearchParams } from "@/lib/books/types";
-import { cn } from "@/lib/utils";
 
 type BookResultPaginationProps = {
   currentPage: number;
@@ -34,19 +33,17 @@ function getPageItems(currentPage: number, totalPages: number): PageItem[] {
 
   const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
 
-  if (currentPage <= 3) {
-    pages.add(2);
+  if (currentPage === 1) {
     pages.add(3);
   }
 
-  if (currentPage >= totalPages - 2) {
+  if (currentPage === totalPages) {
     pages.add(totalPages - 2);
-    pages.add(totalPages - 1);
   }
 
   const sortedPages = Array.from(pages)
     .filter((page) => page >= 1 && page <= totalPages)
-    .sort((firstPage, secondPage) => firstPage - secondPage);
+    .sort((firstPage, secondPage) => firstPage - secondPage); //比較関数を用いることで1,10,2,...といったソートにならない
 
   const items: PageItem[] = [];
   for (const page of sortedPages) {
@@ -132,7 +129,7 @@ export function BookResultPagination({ currentPage, totalPages, params }: BookRe
                 </Link>
               )
             ) : item.page === safeCurrentPage ? (
-              <span aria-current="page" className={cn("px-1 text-black underline")}>{item.page}</span>
+              <span aria-current="page" className="px-1 text-black underline">{item.page}</span>
             ) : (
               <Link
                 href={buildBookResultsHref(params, item.page)}
