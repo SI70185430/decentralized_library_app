@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { BookGenre, BookSearchParams } from "@/lib/books/types";
+import { cn } from "@/lib/utils";
 
 const ALL_SELECT_VALUE = "__all__";
 const SEARCH_TEXT_KEYS = ["keyword", "title", "author", "publisher", "isbn"] as const;
@@ -110,7 +111,10 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
           <Select value={category || ALL_SELECT_VALUE} onValueChange={handleCategoryChange}>
             <SelectTrigger
               id="input_category"
-              className="h-12 w-[112px] rounded-none border-black bg-white px-2 text-base text-[#888]"
+              className={cn(
+                "h-12 w-[112px] rounded-none border-black bg-white px-2 text-base",
+                category ? "text-black" : "text-[#888]",
+              )}
             >
               <SelectValue placeholder="フィルタ" />
             </SelectTrigger>
@@ -127,7 +131,10 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
           <Select value={genre || ALL_SELECT_VALUE} onValueChange={handleGenreChange}>
             <SelectTrigger
               id="input_genre"
-              className="h-12 w-[112px] rounded-none border-black bg-white px-2 text-base text-[#888]"
+              className={cn(
+                "h-12 w-[112px] rounded-none border-black bg-white px-2 text-base",
+                genre ? "text-black" : "text-[#888]",
+              )}
             >
               <SelectValue placeholder="ジャンル" />
             </SelectTrigger>
