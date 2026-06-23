@@ -35,8 +35,9 @@ class Lending(TimeStampedModel):
         db_table = "lending"
         constraints = [
             models.UniqueConstraint(
-                fields=["book_copy", "user"],
-                name="lending_book_copy_user_unique",
+                fields=["book_copy"],
+                condition=Q(returned_date__isnull=True),
+                name="lending_active_book_copy_unique",
             ),
             models.CheckConstraint(
                 condition=Q(due_date__gte=F("borrowed_date")),

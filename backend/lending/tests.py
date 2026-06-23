@@ -169,13 +169,37 @@ class LendingModelTests(TestCase):
             ):
                 Lending.objects.create(user=self.user, **data)
 
-    def test_unique_constraint_book_copy_user(self):
-        with self.assertRaises(IntegrityError):
+    def test_returned_lending_history_allows_same_book_copy_and_user(self):
+        lending = Lending.objects.create(
+            book_copy=self.book_copy,
+            user=self.user,
+            borrowed_date=date(2026, 7, 1),
+            due_date=date(2026, 7, 30),
+            extension_count=0,
+        )
+
+        self.assertIsNotNone(lending.id)
+
+    def test_unique_constraint_active_lending_per_book_copy(self):
+        active_lending = Lending.objects.create(
+            book_copy=self.create_book_copy("active lending copy"),
+            user=self.user,
+            borrowed_date=date(2026, 7, 1),
+            due_date=date(2026, 7, 30),
+            extension_count=0,
+        )
+        another_user = AppUser.objects.create_user(
+            username="another_lending_user",
+            employee_id=3002,
+            password="password123",
+        )
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
             Lending.objects.create(
-                book_copy=self.book_copy,
-                user=self.user,
-                borrowed_date=date(2026, 7, 1),
-                due_date=date(2026, 7, 30),
+                book_copy=active_lending.book_copy,
+                user=another_user,
+                borrowed_date=date(2026, 7, 2),
+                due_date=date(2026, 7, 31),
                 extension_count=0,
             )
 
