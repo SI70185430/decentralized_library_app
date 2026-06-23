@@ -1,8 +1,12 @@
+from dataclasses import asdict
+
 from django.core.exceptions import ValidationError as DjangoValidationError
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from books.genre_categories import GENRE_CATEGORY_NAMES
 from books.models import Book, Genre
+from books.services.book_detail import build_book_detail_state
 from books.services.book_search import BookSearchParams
 from books.services.isbn import normalize_isbn
 
@@ -77,5 +81,51 @@ class BookListSerializer(serializers.ModelSerializer):
         ]
 
 
+class BookAvailabilitySerializer(serializers.Serializer):
+    status_code = serializers.CharField()
+    status_label = serializers.CharField()
+    available_copy_count = serializers.IntegerField()
+    current_lending_id = serializers.UUIDField(allow_null=True)
+
+
+class BookActionSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    label = serializers.CharField()
+    method = serializers.CharField()
+    endpoint = serializers.CharField()
+    request_body = serializers.DictField(child=serializers.CharField(), allow_empty=True)
+    enabled = serializers.BooleanField()
+
+
+class BookActionsSerializer(serializers.Serializer):
+    primary = BookActionSerializer(allow_null=True)
+    secondary = BookActionSerializer(allow_null=True)
+
+
 class BookDetailSerializer(BookListSerializer):
-    pass
+    availability = serializers.SerializerMethodField()
+    actions = serializers.SerializerMethodField()
+
+    class Meta(BookListSerializer.Meta):
+        fields = [*BookListSerializer.Meta.fields, "availability", "actions"]
+
+    @extend_schema_field(BookAvailabilitySerializer)
+    def get_availability(self, obj: Book) -> dict:
+        return asdict(self._get_detail_state(obj).availability)
+
+    @extend_schema_field(BookActionsSerializer)
+    def get_actions(self, obj: Book) -> dict:
+        state = self._get_detail_state(obj)
+        return {
+            "primary": asdict(state.primary_action) if state.primary_action is not None else None,
+            "secondary": asdict(state.secondary_action)
+            if state.secondary_action is not None
+            else None,
+        }
+
+    def _get_detail_state(self, obj: Book):
+        if not hasattr(self, "_book_detail_state"):
+            request = self.context["request"]
+            self._book_detail_state = build_book_detail_state(obj, request.user)
+
+        return self._book_detail_state
