@@ -1,20 +1,29 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 from uuid import UUID
 
-from books.models import BookCopy
+from django.db import models
+
+from accounts.models import AppUser
+from books.models import Book, BookCopy
 from lending.models import Lending
 
-if TYPE_CHECKING:
-    from accounts.models import AppUser
-    from books.models import Book
+
+class BookAvailabilityStatus(models.TextChoices):
+    USING = "using", "利用中"
+    AVAILABLE = "available", "貸出可"
+    ON_LOAN = "on_loan", "貸出中"
+    UNAVAILABLE = "unavailable", "貸出不可"
+
+
+class BookActionType(models.TextChoices):
+    BORROW = "borrow", "この本を借りる"
+    RETURN = "return", "この本を返却する"
+    EXTEND = "extend", "期限延長"
 
 
 @dataclass(frozen=True)
 class BookAvailability:
-    status_code: str
+    status_code: BookAvailabilityStatus
     status_label: str
     available_copy_count: int
     current_lending_id: UUID | None
@@ -22,7 +31,7 @@ class BookAvailability:
 
 @dataclass(frozen=True)
 class BookAction:
-    type: str
+    type: BookActionType
     label: str
     method: str
     endpoint: str
@@ -38,11 +47,11 @@ class BookDetailState:
 
 
 def build_book_detail_state(book: Book, user: AppUser) -> BookDetailState:
-    current_lending = (
-        Lending.objects.select_related("book_copy")
-        .filter(user=user, book_copy__book=book, returned_date__isnull=True)
-        .first()
-    )
+    current_lending = Lending.objects.filter(
+        user=user,
+        book_copy__book=book,
+        returned_date__isnull=True,
+    ).first()
     available_copy_count = BookCopy.objects.filter(
         book=book,
         status=BookCopy.Status.AVAILABLE,
@@ -57,8 +66,8 @@ def build_book_detail_state(book: Book, user: AppUser) -> BookDetailState:
     if BookCopy.objects.filter(book=book, status=BookCopy.Status.ON_LOAN).exists():
         return BookDetailState(
             availability=BookAvailability(
-                status_code="on_loan",
-                status_label="貸出中",
+                status_code=BookAvailabilityStatus.ON_LOAN,
+                status_label=BookAvailabilityStatus.ON_LOAN.label,
                 available_copy_count=0,
                 current_lending_id=None,
             ),
@@ -68,8 +77,8 @@ def build_book_detail_state(book: Book, user: AppUser) -> BookDetailState:
 
     return BookDetailState(
         availability=BookAvailability(
-            status_code="unavailable",
-            status_label="貸出不可",
+            status_code=BookAvailabilityStatus.UNAVAILABLE,
+            status_label=BookAvailabilityStatus.UNAVAILABLE.label,
             available_copy_count=0,
             current_lending_id=None,
         ),
@@ -84,22 +93,22 @@ def _build_using_state(
 ) -> BookDetailState:
     return BookDetailState(
         availability=BookAvailability(
-            status_code="using",
-            status_label="利用中",
+            status_code=BookAvailabilityStatus.USING,
+            status_label=BookAvailabilityStatus.USING.label,
             available_copy_count=available_copy_count,
             current_lending_id=lending_id,
         ),
         primary_action=BookAction(
-            type="return",
-            label="この本を返却する",
+            type=BookActionType.RETURN,
+            label=BookActionType.RETURN.label,
             method="POST",
             endpoint="/api/lendings/{lending_id}/return/",
             request_body={},
             enabled=True,
         ),
         secondary_action=BookAction(
-            type="extend",
-            label="期限延長",
+            type=BookActionType.EXTEND,
+            label=BookActionType.EXTEND.label,
             method="POST",
             endpoint="/api/lendings/{lending_id}/extend/",
             request_body={},
@@ -114,14 +123,14 @@ def _build_available_state(
 ) -> BookDetailState:
     return BookDetailState(
         availability=BookAvailability(
-            status_code="available",
-            status_label="貸出可",
+            status_code=BookAvailabilityStatus.AVAILABLE,
+            status_label=BookAvailabilityStatus.AVAILABLE.label,
             available_copy_count=available_copy_count,
             current_lending_id=None,
         ),
         primary_action=BookAction(
-            type="borrow",
-            label="この本を借りる",
+            type=BookActionType.BORROW,
+            label=BookActionType.BORROW.label,
             method="POST",
             endpoint="/api/lendings/",
             request_body={"book_id": str(book_id)},
