@@ -19,6 +19,27 @@ ConflictResponseSerializer = inline_serializer(
     name="LendingConflictResponse",
     fields={"detail": serializers.CharField()},
 )
+ForbiddenResponseSerializer = inline_serializer(
+    name="LendingForbiddenResponse",
+    fields={"detail": serializers.CharField()},
+)
+NotFoundResponseSerializer = inline_serializer(
+    name="LendingNotFoundResponse",
+    fields={"detail": serializers.CharField()},
+)
+ValidationErrorResponseSerializer = inline_serializer(
+    name="LendingValidationErrorResponse",
+    fields={
+        "book_id": serializers.ListField(
+            child=serializers.CharField(),
+            required=False,
+        ),
+        "non_field_errors": serializers.ListField(
+            child=serializers.CharField(),
+            required=False,
+        ),
+    },
+)
 
 
 def not_implemented_response():
@@ -40,6 +61,9 @@ class LendingCreateView(APIView):
         request=BorrowBookSerializer,
         responses={
             201: LendingActionResponseSerializer,
+            400: ValidationErrorResponseSerializer,
+            403: ForbiddenResponseSerializer,
+            404: NotFoundResponseSerializer,
             409: ConflictResponseSerializer,
         },
     )
@@ -70,6 +94,8 @@ class LendingExtendView(APIView):
         request=None,
         responses={
             200: LendingActionResponseSerializer,
+            403: ForbiddenResponseSerializer,
+            404: NotFoundResponseSerializer,
             409: ConflictResponseSerializer,
         },
     )
@@ -88,6 +114,8 @@ class LendingReturnView(APIView):
         request=None,
         responses={
             200: LendingActionResponseSerializer,
+            403: ForbiddenResponseSerializer,
+            404: NotFoundResponseSerializer,
             409: ConflictResponseSerializer,
         },
     )
