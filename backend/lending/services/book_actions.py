@@ -1,35 +1,36 @@
-from __future__ import annotations
-
 from datetime import timedelta
-from typing import TYPE_CHECKING
 from uuid import UUID
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404
 from django.utils import timezone
 
+from accounts.models import AppUser
 from books.models import Book, BookCopy
-from lending.models import Lending
-
-if TYPE_CHECKING:
-    from accounts.models import AppUser
+from lending.models import Lending, MAX_EXTENSION_COUNT
 
 DEFAULT_LENDING_DAYS = 30
 DEFAULT_EXTENSION_DAYS = 10
-MAX_EXTENSION_COUNT = 3
 
 
 class ActionConflictError(Exception):
     """業務状態により lending action を実行できない場合の例外。"""
 
 
-def borrow_book(*, user: AppUser, book_id: UUID) -> Lending:
+class BookNotFoundError(Exception):
+    """指定された書籍が見つからない場合の例外。"""
+
+
+class LendingNotFoundError(Exception):
+    """指定された貸出が見つからない場合の例外。"""
+
+
+def borrow_book(user: AppUser, book_id: UUID) -> Lending:
     with transaction.atomic():
         try:
             Book.objects.select_for_update().get(pk=book_id)
         except Book.DoesNotExist as error:
-            raise Http404("書籍が見つかりません") from error
+            raise BookNotFoundError("書籍が見つかりません") from error
 
         if (
             Lending.objects.select_for_update()
@@ -56,7 +57,7 @@ def borrow_book(*, user: AppUser, book_id: UUID) -> Lending:
             book_copy=book_copy,
             user=user,
             borrowed_date=borrowed_date,
-            due_date=borrowed_date + timedelta(days=DEFAULT_LENDING_DAYS),
+            due_date=borrowed_date + timedelta(days=DEFAULT_LENDING_DAYS - 1), # 当日も含めた30日にするための-1
         )
         book_copy.status = BookCopy.Status.ON_LOAN
         book_copy.save(update_fields=["status", "updated_at"])
@@ -64,7 +65,7 @@ def borrow_book(*, user: AppUser, book_id: UUID) -> Lending:
     return lending
 
 
-def return_lending(*, user: AppUser, lending_id: UUID) -> Lending:
+def return_lending(user: AppUser, lending_id: UUID) -> Lending:
     with transaction.atomic():
         lending = _get_locked_lending(lending_id)
         _ensure_lending_owner(lending, user)
@@ -80,7 +81,7 @@ def return_lending(*, user: AppUser, lending_id: UUID) -> Lending:
     return lending
 
 
-def extend_lending(*, user: AppUser, lending_id: UUID) -> Lending:
+def extend_lending(user: AppUser, lending_id: UUID) -> Lending:
     with transaction.atomic():
         lending = _get_locked_lending(lending_id)
         _ensure_lending_owner(lending, user)
@@ -98,9 +99,9 @@ def extend_lending(*, user: AppUser, lending_id: UUID) -> Lending:
 
 def _get_locked_lending(lending_id: UUID) -> Lending:
     try:
-        return Lending.objects.select_for_update().select_related("book_copy").get(pk=lending_id)
+        return Lending.objects.select_for_update().get(pk=lending_id)
     except Lending.DoesNotExist as error:
-        raise Http404("貸出が見つかりません") from error
+        raise LendingNotFoundError("貸出が見つかりません") from error
 
 
 def _ensure_lending_owner(lending: Lending, user: AppUser) -> None:

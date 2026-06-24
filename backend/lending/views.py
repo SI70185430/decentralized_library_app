@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from lending.serializers import BorrowBookSerializer, LendingActionResponseSerializer
 from lending.services.book_actions import (
     ActionConflictError,
+    BookNotFoundError,
+    LendingNotFoundError,
     borrow_book,
     extend_lending,
     return_lending,
@@ -56,6 +58,13 @@ def conflict_response(error: ActionConflictError) -> Response:
     )
 
 
+def not_found_response(error: Exception) -> Response:
+    return Response(
+        {"detail": str(error)},
+        status=status.HTTP_404_NOT_FOUND,
+    )
+
+
 class LendingCreateView(APIView):
     @extend_schema(
         request=BorrowBookSerializer,
@@ -76,6 +85,8 @@ class LendingCreateView(APIView):
                 user=request.user,
                 book_id=serializer.validated_data["book_id"],
             )
+        except BookNotFoundError as error:
+            return not_found_response(error)
         except ActionConflictError as error:
             return conflict_response(error)
 
@@ -102,6 +113,8 @@ class LendingExtendView(APIView):
     def post(self, request, lending_id):
         try:
             lending = extend_lending(user=request.user, lending_id=lending_id)
+        except LendingNotFoundError as error:
+            return not_found_response(error)
         except ActionConflictError as error:
             return conflict_response(error)
 
@@ -122,6 +135,8 @@ class LendingReturnView(APIView):
     def post(self, request, lending_id):
         try:
             lending = return_lending(user=request.user, lending_id=lending_id)
+        except LendingNotFoundError as error:
+            return not_found_response(error)
         except ActionConflictError as error:
             return conflict_response(error)
 

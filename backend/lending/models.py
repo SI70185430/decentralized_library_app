@@ -4,6 +4,9 @@ from django.db import models
 from django.db.models import F, Q
 
 
+MAX_EXTENSION_COUNT = 3
+
+
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField("作成日時", auto_now_add=True)
     updated_at = models.DateTimeField("更新日時", auto_now=True)
@@ -48,7 +51,7 @@ class Lending(TimeStampedModel):
                 name="lending_returned_date_gte_borrowed_date",
             ),
             models.CheckConstraint(
-                condition=Q(extension_count__gte=0) & Q(extension_count__lte=3),
+                condition=Q(extension_count__gte=0) & Q(extension_count__lte=MAX_EXTENSION_COUNT),
                 name="lending_extension_count_between_0_3",
             ),
         ]
