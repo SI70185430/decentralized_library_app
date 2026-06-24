@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -33,8 +32,6 @@ PaginatedBookListResponseSerializer = inline_serializer(
 
 
 class BookListView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @extend_schema(
         operation_id="books_list",
         parameters=[BookSearchQuerySerializer],
@@ -52,8 +49,6 @@ class BookListView(APIView):
 
 
 class GenreListView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @extend_schema(operation_id="book_genres_list", responses={200: GenreSerializer(many=True)})
     def get(self, request):
         queryset = Genre.objects.order_by("c_code_genre")
@@ -62,8 +57,6 @@ class GenreListView(APIView):
 
 
 class BookDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @extend_schema(operation_id="books_retrieve", responses={200: BookDetailSerializer})
     def get(self, request, pk):
         book = get_object_or_404(Book.objects.select_related("genre"), pk=pk)

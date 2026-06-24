@@ -1,6 +1,5 @@
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,20 +11,20 @@ from lending.services.book_actions import (
     return_lending,
 )
 
-OkResponseSerializer = inline_serializer(
-    name="LendingOkResponse",
+NotImplementedResponseSerializer = inline_serializer(
+    name="LendingNotImplementedResponse",
     fields={"detail": serializers.CharField()},
 )
-ErrorResponseSerializer = inline_serializer(
-    name="LendingErrorResponse",
+ConflictResponseSerializer = inline_serializer(
+    name="LendingConflictResponse",
     fields={"detail": serializers.CharField()},
 )
 
 
-def success_response():
+def not_implemented_response():
     return Response(
-        {"detail": "OK"},
-        status=status.HTTP_200_OK,
+        {"detail": "Not implemented"},
+        status=status.HTTP_501_NOT_IMPLEMENTED,
     )
 
 
@@ -37,13 +36,11 @@ def conflict_response(error: ActionConflictError) -> Response:
 
 
 class LendingCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @extend_schema(
         request=BorrowBookSerializer,
         responses={
             201: LendingActionResponseSerializer,
-            409: ErrorResponseSerializer,
+            409: ConflictResponseSerializer,
         },
     )
     def post(self, request):
@@ -63,19 +60,17 @@ class LendingCreateView(APIView):
 
 
 class LendingDetailView(APIView):
-    @extend_schema(responses={200: OkResponseSerializer})
+    @extend_schema(responses={501: NotImplementedResponseSerializer})
     def get(self, request, lending_id):
-        return success_response()
+        return not_implemented_response()
 
 
 class LendingExtendView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @extend_schema(
         request=None,
         responses={
             200: LendingActionResponseSerializer,
-            409: ErrorResponseSerializer,
+            409: ConflictResponseSerializer,
         },
     )
     def post(self, request, lending_id):
@@ -89,13 +84,11 @@ class LendingExtendView(APIView):
 
 
 class LendingReturnView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @extend_schema(
         request=None,
         responses={
             200: LendingActionResponseSerializer,
-            409: ErrorResponseSerializer,
+            409: ConflictResponseSerializer,
         },
     )
     def post(self, request, lending_id):
@@ -109,42 +102,42 @@ class LendingReturnView(APIView):
 
 
 class MyCurrentLendingListView(APIView):
-    @extend_schema(responses={200: OkResponseSerializer})
+    @extend_schema(responses={501: NotImplementedResponseSerializer})
     def get(self, request):
-        return success_response()
+        return not_implemented_response()
 
 
 class MyLendingHistoryListView(APIView):
-    @extend_schema(responses={200: OkResponseSerializer})
+    @extend_schema(responses={501: NotImplementedResponseSerializer})
     def get(self, request):
-        return success_response()
+        return not_implemented_response()
 
 
 class ReservationCreateView(APIView):
-    @extend_schema(request=None, responses={200: OkResponseSerializer})
+    @extend_schema(request=None, responses={501: NotImplementedResponseSerializer})
     def post(self, request):
-        return success_response()
+        return not_implemented_response()
 
 
 class ReservationDetailView(APIView):
-    @extend_schema(responses={200: OkResponseSerializer})
+    @extend_schema(responses={501: NotImplementedResponseSerializer})
     def get(self, request, reservation_id):
-        return success_response()
+        return not_implemented_response()
 
 
 class ReservationCancelView(APIView):
-    @extend_schema(request=None, responses={200: OkResponseSerializer})
+    @extend_schema(request=None, responses={501: NotImplementedResponseSerializer})
     def post(self, request, reservation_id):
-        return success_response()
+        return not_implemented_response()
 
 
 class ReservationConvertToLendingView(APIView):
-    @extend_schema(request=None, responses={200: OkResponseSerializer})
+    @extend_schema(request=None, responses={501: NotImplementedResponseSerializer})
     def post(self, request, reservation_id):
-        return success_response()
+        return not_implemented_response()
 
 
 class MyCurrentReservationListView(APIView):
-    @extend_schema(responses={200: OkResponseSerializer})
+    @extend_schema(responses={501: NotImplementedResponseSerializer})
     def get(self, request):
-        return success_response()
+        return not_implemented_response()
