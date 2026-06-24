@@ -20,6 +20,7 @@ class BookPagination(PageNumberPagination):
     page_size = 10
 
 
+# OpenAPI / Swagger 用に「ページネーション付き書籍一覧レスポンス」の形を定義
 PaginatedBookListResponseSerializer = inline_serializer(
     name="PaginatedBookListResponse",
     fields={
