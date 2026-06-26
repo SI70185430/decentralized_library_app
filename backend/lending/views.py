@@ -15,6 +15,7 @@ from lending.services.book_actions import (
     LendingNotFoundError,
     borrow_book,
     extend_lending,
+    list_current_lendings,
     return_lending,
 )
 from lending.services.reservation_actions import (
@@ -161,9 +162,14 @@ class LendingReturnView(APIView):
 
 
 class MyCurrentLendingListView(APIView):
-    @extend_schema(responses={501: NotImplementedResponseSerializer})
+    @extend_schema(
+        request=None,
+        responses={200: LendingActionResponseSerializer(many=True)},
+    )
     def get(self, request):
-        return not_implemented_response()
+        lendings = list_current_lendings(user=request.user)
+        response_serializer = LendingActionResponseSerializer(lendings, many=True)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class MyLendingHistoryListView(APIView):

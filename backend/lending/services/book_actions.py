@@ -65,6 +65,17 @@ def borrow_book(user: AppUser, book_id: UUID) -> Lending:
     return lending
 
 
+def list_current_lendings(user: AppUser):
+    return (
+        Lending.objects.select_related("book_copy", "book_copy__book")
+        .filter(
+            user=user,
+            returned_date__isnull=True,
+        )
+        .order_by("due_date", "created_at")
+    )
+
+
 def return_lending(user: AppUser, lending_id: UUID) -> Lending:
     with transaction.atomic():
         lending = _get_locked_lending(lending_id)
