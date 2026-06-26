@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from accounts.models import AppUser
 from books.models import Book, BookCopy
-from lending.models import Lending, MAX_EXTENSION_COUNT
+from lending.models import MAX_EXTENSION_COUNT, Lending
 
 DEFAULT_LENDING_DAYS = 30
 DEFAULT_EXTENSION_DAYS = 10

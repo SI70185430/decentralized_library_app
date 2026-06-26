@@ -3,7 +3,12 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lending.serializers import BorrowBookSerializer, LendingActionResponseSerializer
+from lending.serializers import (
+    BorrowBookSerializer,
+    LendingActionResponseSerializer,
+    ReservationActionResponseSerializer,
+    ReservationCreateSerializer,
+)
 from lending.services.book_actions import (
     ActionConflictError,
     BookNotFoundError,
@@ -11,6 +16,13 @@ from lending.services.book_actions import (
     borrow_book,
     extend_lending,
     return_lending,
+)
+from lending.services.reservation_actions import (
+    ReservationNotFoundError,
+    cancel_reservation,
+    convert_reservation_to_lending,
+    create_reservation,
+    list_current_reservations,
 )
 
 NotImplementedResponseSerializer = inline_serializer(
@@ -33,6 +45,10 @@ ValidationErrorResponseSerializer = inline_serializer(
     name="LendingValidationErrorResponse",
     fields={
         "book_id": serializers.ListField(
+            child=serializers.CharField(),
+            required=False,
+        ),
+        "scheduled_date": serializers.ListField(
             child=serializers.CharField(),
             required=False,
         ),
@@ -157,9 +173,33 @@ class MyLendingHistoryListView(APIView):
 
 
 class ReservationCreateView(APIView):
-    @extend_schema(request=None, responses={501: NotImplementedResponseSerializer})
+    @extend_schema(
+        request=ReservationCreateSerializer,
+        responses={
+            201: ReservationActionResponseSerializer,
+            400: ValidationErrorResponseSerializer,
+            403: ForbiddenResponseSerializer,
+            404: NotFoundResponseSerializer,
+            409: ConflictResponseSerializer,
+        },
+    )
     def post(self, request):
-        return not_implemented_response()
+        serializer = ReservationCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            reservation = create_reservation(
+                user=request.user,
+                book_id=serializer.validated_data["book_id"],
+                scheduled_date=serializer.validated_data["scheduled_date"],
+            )
+        except BookNotFoundError as error:
+            return not_found_response(error)
+        except ActionConflictError as error:
+            return conflict_response(error)
+
+        response_serializer = ReservationActionResponseSerializer(reservation)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ReservationDetailView(APIView):
@@ -169,18 +209,52 @@ class ReservationDetailView(APIView):
 
 
 class ReservationCancelView(APIView):
-    @extend_schema(request=None, responses={501: NotImplementedResponseSerializer})
+    @extend_schema(
+        request=None,
+        responses={
+            200: ReservationActionResponseSerializer,
+            403: ForbiddenResponseSerializer,
+            404: NotFoundResponseSerializer,
+        },
+    )
     def post(self, request, reservation_id):
-        return not_implemented_response()
+        try:
+            reservation = cancel_reservation(user=request.user, reservation_id=reservation_id)
+        except ReservationNotFoundError as error:
+            return not_found_response(error)
+
+        response_serializer = ReservationActionResponseSerializer(reservation)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class ReservationConvertToLendingView(APIView):
-    @extend_schema(request=None, responses={501: NotImplementedResponseSerializer})
+    @extend_schema(
+        request=None,
+        responses={
+            200: LendingActionResponseSerializer,
+            403: ForbiddenResponseSerializer,
+            404: NotFoundResponseSerializer,
+            409: ConflictResponseSerializer,
+        },
+    )
     def post(self, request, reservation_id):
-        return not_implemented_response()
+        try:
+            lending = convert_reservation_to_lending(user=request.user, reservation_id=reservation_id)
+        except ReservationNotFoundError as error:
+            return not_found_response(error)
+        except ActionConflictError as error:
+            return conflict_response(error)
+
+        response_serializer = LendingActionResponseSerializer(lending)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class MyCurrentReservationListView(APIView):
-    @extend_schema(responses={501: NotImplementedResponseSerializer})
+    @extend_schema(
+        request=None,
+        responses={200: ReservationActionResponseSerializer(many=True)},
+    )
     def get(self, request):
-        return not_implemented_response()
+        reservations = list_current_reservations(user=request.user)
+        response_serializer = ReservationActionResponseSerializer(reservations, many=True)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)

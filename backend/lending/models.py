@@ -3,7 +3,6 @@ import uuid
 from django.db import models
 from django.db.models import F, Q
 
-
 MAX_EXTENSION_COUNT = 3
 
 
@@ -81,8 +80,8 @@ class Reservation(TimeStampedModel):
         db_table = "reservation"
         constraints = [
             models.UniqueConstraint(
-                fields=["book_copy", "user"],
-                name="reservation_book_copy_user_unique",
+                fields=["book_copy"],
+                name="reservation_book_copy_unique",
             ),
             models.CheckConstraint(
                 condition=Q(expires_date__gte=F("scheduled_date")),
