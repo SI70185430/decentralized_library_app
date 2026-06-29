@@ -118,7 +118,7 @@ class BookDetailSerializer(BookListSerializer):
         }
 
     def _get_detail_state(self, obj: Book):
-        if not hasattr(self, "_book_detail_state"):
+        if not hasattr(self, "_book_detail_state"): #get_availability()とget_actions()でDBの読み込みが重複しないようにするための一時キャッシュ
             request = self.context["request"]
             self._book_detail_state = build_book_detail_state(obj, request.user)
 
