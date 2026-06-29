@@ -119,8 +119,7 @@ class BookDetailSerializer(BookListSerializer):
 
     def _get_detail_state(self, obj: Book):
         if not hasattr(self, "_book_detail_state"):
-            request = self.context.get("request")
-            user = request.user if request is not None else None
-            self._book_detail_state = build_book_detail_state(obj, user)
+            request = self.context["request"]
+            self._book_detail_state = build_book_detail_state(obj, request.user)
 
         return self._book_detail_state

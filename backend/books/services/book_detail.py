@@ -43,19 +43,16 @@ class BookDetailState:
     secondary_action: BookAction | None
 
 
-def build_book_detail_state(book: Book, user: AppUser | None = None) -> BookDetailState:
-    current_lending = None
-    current_reservation = None
-    if user is not None and user.is_authenticated:
-        current_lending = Lending.objects.filter(
-            user=user,
-            book_copy__book=book,
-            returned_date__isnull=True,
-        ).first()
-        current_reservation = Reservation.objects.filter(
-            user=user,
-            book_copy__book=book,
-        ).first()
+def build_book_detail_state(book: Book, user: AppUser) -> BookDetailState:
+    current_lending = Lending.objects.filter(
+        user=user,
+        book_copy__book=book,
+        returned_date__isnull=True,
+    ).first()
+    current_reservation = Reservation.objects.filter(
+        user=user,
+        book_copy__book=book,
+    ).first()
 
     if current_lending is not None:
         return _build_using_state(current_lending.id)
