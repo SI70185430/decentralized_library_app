@@ -27,10 +27,8 @@ class LendingNotFoundError(Exception):
 
 def borrow_book(user: AppUser, book_id: UUID) -> Lending:
     with transaction.atomic():
-        try:
-            Book.objects.select_for_update().get(pk=book_id)
-        except Book.DoesNotExist as error:
-            raise BookNotFoundError("書籍が見つかりません") from error
+        if not Book.objects.filter(pk=book_id).exists():
+            raise BookNotFoundError("書籍が見つかりません")
 
         if (
             Lending.objects.select_for_update()

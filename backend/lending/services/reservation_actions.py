@@ -25,10 +25,8 @@ class ReservationNotFoundError(Exception):
 def create_reservation(user: AppUser, book_id: UUID, scheduled_date) -> Reservation:
     try:
         with transaction.atomic():
-            try:
-                Book.objects.get(pk=book_id)
-            except Book.DoesNotExist as error:
-                raise BookNotFoundError("書籍が見つかりません") from error
+            if not Book.objects.filter(pk=book_id).exists():
+                raise BookNotFoundError("書籍が見つかりません")
 
             if (
                 Lending.objects.select_for_update()
