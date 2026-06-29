@@ -86,6 +86,7 @@ class BookAvailabilitySerializer(serializers.Serializer):
     status_label = serializers.CharField()
     available_copy_count = serializers.IntegerField()
     current_lending_id = serializers.UUIDField(allow_null=True)
+    current_reservation_id = serializers.UUIDField(allow_null=True)
 
 
 class BookActionSerializer(serializers.Serializer):
@@ -125,7 +126,8 @@ class BookDetailSerializer(BookListSerializer):
 
     def _get_detail_state(self, obj: Book):
         if not hasattr(self, "_book_detail_state"):
-            request = self.context["request"]
-            self._book_detail_state = build_book_detail_state(obj, request.user)
+            request = self.context.get("request")
+            user = request.user if request is not None else None
+            self._book_detail_state = build_book_detail_state(obj, user)
 
         return self._book_detail_state
