@@ -83,19 +83,12 @@ class BookListSerializer(serializers.ModelSerializer):
 
 class BookAvailabilitySerializer(serializers.Serializer):
     status_code = serializers.CharField()
-    status_label = serializers.CharField()
-    available_copy_count = serializers.IntegerField()
     current_lending_id = serializers.UUIDField(allow_null=True)
     current_reservation_id = serializers.UUIDField(allow_null=True)
 
 
 class BookActionSerializer(serializers.Serializer):
     type = serializers.CharField()
-    label = serializers.CharField()
-    method = serializers.CharField()
-    endpoint = serializers.CharField()
-    request_body = serializers.DictField(child=serializers.CharField(), allow_empty=True)
-    enabled = serializers.BooleanField()
 
 
 class BookActionsSerializer(serializers.Serializer):
