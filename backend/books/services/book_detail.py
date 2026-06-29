@@ -1,27 +1,25 @@
 from dataclasses import dataclass
+from enum import StrEnum
 from uuid import UUID
-
-from django.db import models
 
 from accounts.models import AppUser
 from books.models import Book, BookCopy
 from lending.models import Lending, Reservation
 
 
-class BookAvailabilityStatus(models.TextChoices):
-    USING = "using", "利用中"
-    AVAILABLE = "available", "貸出可"
-    HOLD = "hold", "取り置き中"
-    ON_LOAN = "on_loan", "貸出中"
-    UNAVAILABLE = "unavailable", "貸出不可"
+class BookAvailabilityStatus(StrEnum):
+    USING = "using"
+    AVAILABLE = "available"
+    HOLD = "hold"
+    ON_LOAN = "on_loan"
 
 
-class BookActionType(models.TextChoices):
-    BORROW = "borrow", "この本を借りる"
-    RETURN = "return", "この本を返却する"
-    EXTEND = "extend", "期限延長"
-    CHANGE_HOLD = "change_hold", "予約変更"
-    CANCEL_HOLD = "cancel_hold", "キャンセル"
+class BookActionType(StrEnum):
+    BORROW = "borrow"
+    RETURN = "return"
+    EXTEND = "extend"
+    CHANGE_HOLD = "change_hold"
+    CANCEL_HOLD = "cancel_hold"
 
 
 @dataclass(frozen=True)
