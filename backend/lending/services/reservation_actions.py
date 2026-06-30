@@ -1,5 +1,4 @@
 from datetime import timedelta
-from types import SimpleNamespace
 from uuid import UUID
 
 from django.core.exceptions import PermissionDenied
@@ -62,7 +61,7 @@ def create_reservation(user: AppUser, book_id: UUID, scheduled_date) -> Reservat
                 book_copy=book_copy,
                 user=user,
                 scheduled_date=scheduled_date,
-                expires_date=scheduled_date + timedelta(days=DEFAULT_RESERVATION_HOLD_DAYS),
+                expires_date=scheduled_date + timedelta(days=DEFAULT_RESERVATION_HOLD_DAYS - 1),
             )
             book_copy.status = BookCopy.Status.RESERVED
             book_copy.save(update_fields=["status", "updated_at"])
@@ -72,25 +71,18 @@ def create_reservation(user: AppUser, book_id: UUID, scheduled_date) -> Reservat
     return reservation
 
 
-def cancel_reservation(user: AppUser, reservation_id: UUID):
+def cancel_reservation(user: AppUser, reservation_id: UUID) -> None:
     with transaction.atomic():
         reservation = _get_locked_reservation(reservation_id)
         _ensure_reservation_owner(reservation, user)
 
         book_copy = BookCopy.objects.select_for_update().get(pk=reservation.book_copy_id)
-        response_reservation = _reservation_response_snapshot(reservation, book_copy)
 
         reservation.delete()
 
-        has_active_lending = Lending.objects.select_for_update().filter(
-            book_copy=book_copy,
-            returned_date__isnull=True,
-        ).exists()
-        if not has_active_lending:
+        if book_copy.status == BookCopy.Status.RESERVED:
             book_copy.status = BookCopy.Status.AVAILABLE
             book_copy.save(update_fields=["status", "updated_at"])
-
-    return response_reservation
 
 
 def convert_reservation_to_lending(user: AppUser, reservation_id: UUID) -> Lending:
@@ -105,7 +97,7 @@ def convert_reservation_to_lending(user: AppUser, reservation_id: UUID) -> Lendi
             if today > reservation.expires_date:
                 raise ActionConflictError("取り置き期限を過ぎています")
 
-            book_copy = BookCopy.objects.select_for_update().get(pk=reservation.book_copy_id)
+            book_copy = reservation.book_copy
             if book_copy.status != BookCopy.Status.RESERVED:
                 raise ActionConflictError("予約中の蔵書ではありません")
 
@@ -120,7 +112,7 @@ def convert_reservation_to_lending(user: AppUser, reservation_id: UUID) -> Lendi
             ):
                 raise ActionConflictError("すでにこの本を利用中です")
 
-            borrowed_date = timezone.localdate()
+            borrowed_date = today
             lending = Lending.objects.create(
                 book_copy=book_copy,
                 user=user,
@@ -154,13 +146,3 @@ def _get_locked_reservation(reservation_id: UUID) -> Reservation:
 def _ensure_reservation_owner(reservation: Reservation, user: AppUser) -> None:
     if reservation.user_id != user.id:
         raise PermissionDenied("この予約を操作する権限がありません")
-
-
-def _reservation_response_snapshot(reservation: Reservation, book_copy: BookCopy):
-    return SimpleNamespace(
-        id=reservation.id,
-        book_copy_id=book_copy.id,
-        book_copy=SimpleNamespace(book_id=book_copy.book_id),
-        scheduled_date=reservation.scheduled_date,
-        expires_date=reservation.expires_date,
-    )

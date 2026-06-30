@@ -218,19 +218,18 @@ class ReservationCancelView(APIView):
     @extend_schema(
         request=None,
         responses={
-            200: ReservationActionResponseSerializer,
+            204: None,
             403: ForbiddenResponseSerializer,
             404: NotFoundResponseSerializer,
         },
     )
     def post(self, request, reservation_id):
         try:
-            reservation = cancel_reservation(user=request.user, reservation_id=reservation_id)
+            cancel_reservation(user=request.user, reservation_id=reservation_id)
         except ReservationNotFoundError as error:
             return not_found_response(error)
 
-        response_serializer = ReservationActionResponseSerializer(reservation)
-        return Response(response_serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ReservationConvertToLendingView(APIView):
