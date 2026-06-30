@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from accounts.models import AppUser
 from books.models import Book, BookCopy
-from lending.models import MAX_EXTENSION_COUNT, Lending
+from lending.models import MAX_EXTENSION_COUNT, Lending, Reservation
 
 DEFAULT_LENDING_DAYS = 30
 DEFAULT_EXTENSION_DAYS = 10
@@ -40,6 +40,16 @@ def borrow_book(user: AppUser, book_id: UUID) -> Lending:
             .exists()
         ):
             raise ActionConflictError("すでにこの本を利用中です")
+
+        if (
+            Reservation.objects.select_for_update()
+            .filter(
+                user=user,
+                book_copy__book_id=book_id,
+            )
+            .exists()
+        ):
+            raise ActionConflictError("すでにこの本を予約中です")
 
         book_copy = (
             BookCopy.objects.select_for_update()
