@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import login, logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
@@ -8,6 +10,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.serializers import LoginSerializer, UserSerializer
+from lending.services.reservation_actions import release_expired_reservations
+
+logger = logging.getLogger(__name__)
 
 # SwaggerUIでのレスポンス表示内容のためのシリアライザー
 OkResponseSerializer = inline_serializer(
@@ -40,6 +45,10 @@ class LoginView(APIView):
 
         user = serializer.user
         login(request, user)
+        try:
+            release_expired_reservations()
+        except Exception:
+            logger.exception("ログイン後の期限切れ予約解放に失敗しました")
         return Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
 
 

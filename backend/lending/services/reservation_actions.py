@@ -21,6 +21,27 @@ class ReservationNotFoundError(Exception):
     """指定された予約が見つからない場合の例外。"""
 
 
+# 「基準日」を外から渡せる余地があると保守性・確認容易性が向上するため、引数として渡せるように記述
+def release_expired_reservations(reference_date=None) -> int:
+    """基準日より前に期限切れとなった予約を削除し、予約中の蔵書を利用可能に戻す。"""
+    if reference_date is None:
+        reference_date = timezone.localdate()
+
+    released_count = 0
+    with transaction.atomic():
+        reservations = Reservation.objects.select_for_update().filter(expires_date__lt=reference_date)
+        for reservation in reservations:
+            book_copy = BookCopy.objects.select_for_update().get(pk=reservation.book_copy_id)
+            reservation.delete()
+            released_count += 1
+
+            if book_copy.status == BookCopy.Status.RESERVED:
+                book_copy.status = BookCopy.Status.AVAILABLE
+                book_copy.save(update_fields=["status", "updated_at"])
+
+    return released_count
+
+
 def create_reservation(user: AppUser, book_id: UUID, scheduled_date) -> Reservation:
     try:
         with transaction.atomic():
