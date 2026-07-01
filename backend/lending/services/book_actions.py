@@ -91,6 +91,8 @@ def return_lending(user: AppUser, lending_id: UUID) -> Lending:
         _ensure_active_lending(lending)
 
         book_copy = BookCopy.objects.select_for_update().get(pk=lending.book_copy_id)
+        _ensure_book_copy_on_loan(book_copy)
+
         lending.returned_date = timezone.localdate()
         lending.save(update_fields=["returned_date", "updated_at"])
 
@@ -105,6 +107,9 @@ def extend_lending(user: AppUser, lending_id: UUID) -> Lending:
         lending = _get_locked_lending(lending_id)
         _ensure_lending_owner(lending, user)
         _ensure_active_lending(lending)
+
+        book_copy = BookCopy.objects.select_for_update().get(pk=lending.book_copy_id)
+        _ensure_book_copy_on_loan(book_copy)
 
         if lending.extension_count >= MAX_EXTENSION_COUNT:
             raise ActionConflictError("延長回数の上限に達しています")
@@ -131,3 +136,8 @@ def _ensure_lending_owner(lending: Lending, user: AppUser) -> None:
 def _ensure_active_lending(lending: Lending) -> None:
     if lending.returned_date is not None:
         raise ActionConflictError("返却済みの貸出です")
+
+
+def _ensure_book_copy_on_loan(book_copy: BookCopy) -> None:
+    if book_copy.status != BookCopy.Status.ON_LOAN:
+        raise ActionConflictError("貸出中の蔵書ではありません")
