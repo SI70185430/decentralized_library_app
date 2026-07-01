@@ -32,12 +32,14 @@ def release_expired_reservations(reference_date=None) -> int:
         reservations = Reservation.objects.select_for_update().filter(expires_date__lt=reference_date)
         for reservation in reservations:
             book_copy = BookCopy.objects.select_for_update().get(pk=reservation.book_copy_id)
+            if book_copy.status != BookCopy.Status.RESERVED:
+                continue
+
             reservation.delete()
             released_count += 1
 
-            if book_copy.status == BookCopy.Status.RESERVED:
-                book_copy.status = BookCopy.Status.AVAILABLE
-                book_copy.save(update_fields=["status", "updated_at"])
+            book_copy.status = BookCopy.Status.AVAILABLE
+            book_copy.save(update_fields=["status", "updated_at"])
 
     return released_count
 
