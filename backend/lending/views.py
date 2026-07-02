@@ -5,9 +5,12 @@ from rest_framework.views import APIView
 
 from lending.serializers import (
     BorrowBookSerializer,
+    CurrentLendingListResponseSerializer,
     LendingActionResponseSerializer,
+    LendingHistoryListResponseSerializer,
     ReservationActionResponseSerializer,
     ReservationCreateSerializer,
+    ReservationListResponseSerializer,
 )
 from lending.services.book_actions import (
     ActionConflictError,
@@ -165,22 +168,22 @@ class LendingReturnView(APIView):
 class MyCurrentLendingListView(APIView):
     @extend_schema(
         request=None,
-        responses={200: LendingActionResponseSerializer(many=True)},
+        responses={200: CurrentLendingListResponseSerializer(many=True)},
     )
     def get(self, request):
         lendings = list_current_lendings(user=request.user)
-        response_serializer = LendingActionResponseSerializer(lendings, many=True)
+        response_serializer = CurrentLendingListResponseSerializer(lendings, many=True)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class MyLendingHistoryListView(APIView):
     @extend_schema(
         request=None,
-        responses={200: LendingActionResponseSerializer(many=True)},
+        responses={200: LendingHistoryListResponseSerializer(many=True)},
     )
     def get(self, request):
         lendings = list_lending_history(user=request.user)
-        response_serializer = LendingActionResponseSerializer(lendings, many=True)
+        response_serializer = LendingHistoryListResponseSerializer(lendings, many=True)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
@@ -263,9 +266,9 @@ class ReservationConvertToLendingView(APIView):
 class MyCurrentReservationListView(APIView):
     @extend_schema(
         request=None,
-        responses={200: ReservationActionResponseSerializer(many=True)},
+        responses={200: ReservationListResponseSerializer(many=True)},
     )
     def get(self, request):
         reservations = list_current_reservations(user=request.user)
-        response_serializer = ReservationActionResponseSerializer(reservations, many=True)
+        response_serializer = ReservationListResponseSerializer(reservations, many=True)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
