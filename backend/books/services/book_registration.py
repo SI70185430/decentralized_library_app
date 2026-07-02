@@ -18,11 +18,11 @@ def register_book_copies(cleaned_data: Mapping[str, Any]) -> BookRegistrationRes
     """BookRegisterForm.cleaned_dataからBookとBookCopy行を作成する。"""
     isbn = cleaned_data["isbn"]
     title = cleaned_data["title"]
-    author = cleaned_data["author"]
-    publisher = cleaned_data["publisher"]
+    author = cleaned_data["author"] or None
+    publisher = cleaned_data["publisher"] or None
     published_date = cleaned_data["published_date"]
     price = cleaned_data["price"]
-    cover_image_url = cleaned_data["cover_image_url"]
+    cover_image_url = cleaned_data["cover_image_url"] or None
     genre_id = cleaned_data["genre_code"] or None
     purchase_date = cleaned_data["purchase_date"]
     location = cleaned_data["location"]
