@@ -33,22 +33,18 @@ class LendingActionResponseSerializer(serializers.Serializer):
 
 
 class BaseLendingListResponseSerializer(serializers.Serializer):
-    id = serializers.UUIDField(read_only=True)
-    book_copy_id = serializers.UUIDField(read_only=True)
-    book_id = serializers.UUIDField(read_only=True, source="book_copy.book_id")
     book = BookSummarySerializer(source="book_copy.book", read_only=True)
-    borrowed_date = serializers.DateField(read_only=True)
-    due_date = serializers.DateField(read_only=True)
-    returned_date = serializers.DateField(read_only=True, allow_null=True)
-    extension_count = serializers.IntegerField(read_only=True)
 
 
 class CurrentLendingListResponseSerializer(BaseLendingListResponseSerializer):
+    due_date = serializers.DateField(read_only=True)
     book_copy_location = serializers.CharField(source="book_copy.location", read_only=True)
 
 
 class LendingHistoryListResponseSerializer(BaseLendingListResponseSerializer):
-    pass
+    lending_id = serializers.UUIDField(source="id", read_only=True)
+    borrowed_date = serializers.DateField(read_only=True)
+    returned_date = serializers.DateField(read_only=True, allow_null=True)
 
 
 class ReservationActionResponseSerializer(serializers.Serializer):
@@ -60,9 +56,6 @@ class ReservationActionResponseSerializer(serializers.Serializer):
 
 
 class ReservationListResponseSerializer(serializers.Serializer):
-    id = serializers.UUIDField(read_only=True)
-    book_copy_id = serializers.UUIDField(read_only=True)
-    book_id = serializers.UUIDField(read_only=True, source="book_copy.book_id")
     book = BookSummarySerializer(source="book_copy.book", read_only=True)
     scheduled_date = serializers.DateField(read_only=True)
     expires_date = serializers.DateField(read_only=True)
