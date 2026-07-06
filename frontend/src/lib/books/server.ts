@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 import { buildBookSearchApiQuery } from "@/lib/books/search-params";
 import type { BookGenre, BookSearchParams, PaginatedBookResponse } from "@/lib/books/types";
 
@@ -23,8 +25,16 @@ export type FetchBooksResult =
       message: string;
     };
 
+async function getCookieHeader(): Promise<string> {
+  const cookieStore = await cookies();
+  return cookieStore.toString();
+}
+
 export async function fetchBookGenres(): Promise<BookGenre[]> {
   const response = await fetch(`${apiOrigin}/api/books/genres/`, {
+    headers: {
+      cookie: await getCookieHeader(),
+    },
     cache: "no-store",
   });
 
@@ -39,6 +49,9 @@ export async function fetchBooks(params: BookSearchParams): Promise<FetchBooksRe
   try {
     const query = buildBookSearchApiQuery(params);
     const response = await fetch(`${apiOrigin}/api/books/?${query.toString()}`, {
+      headers: {
+        cookie: await getCookieHeader(),
+      },
       cache: "no-store",
     });
 
