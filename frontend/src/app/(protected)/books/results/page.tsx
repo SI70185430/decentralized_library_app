@@ -1,6 +1,7 @@
 import { BreadcrumbNav } from "@/components/layout/breadcrumb-nav";
 import { PageHeader } from "@/components/layout/page-header";
 import {
+  buildBookResultsHref,
   getTotalBookPages,
   normalizeSearchParams,
   type RawBookSearchParams,
@@ -39,6 +40,7 @@ function buildSearchBackHref(params: BookSearchParams): string {
 export default async function BookResultsPage({ searchParams }: BookResultsPageProps) {
   const params = normalizeSearchParams((await searchParams) ?? {});
   const result = await fetchBooks(params);
+  const currentResultsHref = buildBookResultsHref(params);
 
   return (
     <div className="min-h-dvh bg-white text-black">
@@ -75,7 +77,11 @@ export default async function BookResultsPage({ searchParams }: BookResultsPageP
                 className="mt-4 max-h-[calc(100dvh-190px)] space-y-4 overflow-y-auto pb-6"
               >
                 {result.data.results.map((book) => (
-                  <BookResultCard key={book.id} book={book} />
+                  <BookResultCard
+                    key={book.id}
+                    book={book}
+                    href={`/books/${book.id}?returnTo=${encodeURIComponent(currentResultsHref)}`}
+                  />
                 ))}
               </div>
             </div>

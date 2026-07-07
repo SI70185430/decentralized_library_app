@@ -18,6 +18,30 @@ export type BookListItem = {
   genre: BookGenre | null;
 };
 
+export type BookAvailabilityStatusCode = "using" | "available" | "hold" | "on_loan";
+
+export type BookAvailability = {
+  status_code: BookAvailabilityStatusCode;
+  current_lending_id: string | null;
+  current_reservation_id: string | null;
+};
+
+export type BookActionType = "borrow" | "return" | "extend" | "change_hold" | "cancel_hold";
+
+export type BookAction = {
+  type: BookActionType;
+};
+
+export type BookActions = {
+  primary: BookAction | null;
+  secondary: BookAction | null;
+};
+
+export type BookDetail = BookListItem & {
+  availability: BookAvailability;
+  actions: BookActions;
+};
+
 export type PaginatedBookResponse = {
   count: number;
   next: string | null;

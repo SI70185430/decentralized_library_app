@@ -1,11 +1,17 @@
 import { cookies } from "next/headers";
 
 import { buildBookSearchApiQuery } from "@/lib/books/search-params";
-import type { BookGenre, BookSearchParams, PaginatedBookResponse } from "@/lib/books/types";
+import type {
+  BookDetail,
+  BookGenre,
+  BookSearchParams,
+  PaginatedBookResponse,
+} from "@/lib/books/types";
 
 const apiOrigin = "http://127.0.0.1:8000";
 const BOOK_GENRES_FETCH_ERROR_MESSAGE = "ジャンル一覧の取得に失敗しました";
 const BOOK_SEARCH_FATAL_MESSAGE = "検索結果の取得に失敗しました";
+const BOOK_DETAIL_FETCH_ERROR_MESSAGE = "書籍詳細の取得に失敗しました";
 
 export type BookSearchValidationErrors = Record<string, string[]>;
 
@@ -82,4 +88,23 @@ export async function fetchBooks(params: BookSearchParams): Promise<FetchBooksRe
       message: BOOK_SEARCH_FATAL_MESSAGE,
     };
   }
+}
+
+export async function fetchBookDetail(bookId: string): Promise<BookDetail | null> {
+  const response = await fetch(`${apiOrigin}/api/books/${bookId}/`, {
+    headers: {
+      cookie: await getCookieHeader(),
+    },
+    cache: "no-store",
+  });
+
+  if (response.ok) {
+    return (await response.json()) as BookDetail;
+  }
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  throw new Error(BOOK_DETAIL_FETCH_ERROR_MESSAGE);
 }
