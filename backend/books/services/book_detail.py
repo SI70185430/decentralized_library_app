@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from uuid import UUID
 
+from django.utils.timezone import localdate
+
 from accounts.models import AppUser
 from books.models import Book, BookCopy
 from lending.models import Lending, Reservation
@@ -56,7 +58,7 @@ def build_book_detail_state(book: Book, user: AppUser) -> BookDetailState:
         return _build_using_state(current_lending.id)
 
     if current_reservation is not None:
-        return _build_my_hold_state(current_reservation.id)
+        return _build_my_hold_state(current_reservation)
 
     available_copy_count = BookCopy.objects.filter(
         book=book,
@@ -92,14 +94,17 @@ def _build_available_state() -> BookDetailState:
     )
 
 
-def _build_my_hold_state(reservation_id: UUID) -> BookDetailState:
+def _build_my_hold_state(reservation: Reservation) -> BookDetailState:
+    today = localdate()
+    is_hold_period = reservation.scheduled_date <= today <= reservation.expires_date
+
     return BookDetailState(
         availability=BookAvailability(
             status_code=BookAvailabilityStatus.HOLD,
             current_lending_id=None,
-            current_reservation_id=reservation_id,
+            current_reservation_id=reservation.id,
         ),
-        primary_action=BookAction(type=BookActionType.CHANGE_HOLD),
+        primary_action=BookAction(type=BookActionType.CHANGE_HOLD) if is_hold_period else None,
         secondary_action=BookAction(type=BookActionType.CANCEL_HOLD),
     )
 

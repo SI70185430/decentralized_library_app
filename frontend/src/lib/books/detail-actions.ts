@@ -29,7 +29,7 @@ export function getBookActionLabel(actionType: BookActionType): string | null {
     case "cancel_hold":
       return "予約取消";
     case "change_hold":
-      return null;
+      return "この本を借りる";
   }
 }
 
@@ -54,7 +54,9 @@ export function buildBookActionHref(action: BookAction, book: BookDetail): strin
       const reservationId = book.availability.current_reservation_id;
       return reservationId ? withBookId(`/reservations/${reservationId}/cancel`, book.id) : null;
     }
-    case "change_hold":
-      return null;
+    case "change_hold": {
+      const reservationId = book.availability.current_reservation_id;
+      return reservationId ? withBookId(`/reservations/${reservationId}/borrow`, book.id) : null;
+    }
   }
 }
