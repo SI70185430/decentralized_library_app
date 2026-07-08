@@ -4,7 +4,7 @@ import type { BookListItem } from "@/lib/books/types";
 
 type BookResultCardProps = {
   book: BookListItem;
-  href?: string;
+  href: string;
 };
 
 function displayText(value: string | null): string {
@@ -20,6 +20,7 @@ export function BookResultCard({ book, href }: BookResultCardProps) {
           <img
             src={book.cover_image_url}
             alt={`${book.title}の書影`}
+            referrerPolicy="no-referrer"
             className="h-full w-full object-cover"
           />
         ) : (
@@ -48,17 +49,9 @@ export function BookResultCard({ book, href }: BookResultCardProps) {
 
   const className = "flex min-h-[132px] rounded-[16px] border border-black bg-white p-4 text-black";
 
-  if (href) {
-    return (
-      <Link id={`card_book_${book.id}`} data-ui-id="card_book" href={href} className={className}>
-        {content}
-      </Link>
-    );
-  }
-
   return (
-    <article id={`card_book_${book.id}`} data-ui-id="card_book" className={className}>
+    <Link href={href} className={className}>
       {content}
-    </article>
+    </Link>
   );
 }
