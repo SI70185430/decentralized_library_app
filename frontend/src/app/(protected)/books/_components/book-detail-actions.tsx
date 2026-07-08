@@ -14,15 +14,17 @@ type BookActionLinkProps = {
   uiId: "btn_primary" | "btn_secondary";
 };
 
+const actionLabelPrefix = "この本を";
+
 function renderActionLabel(label: string, uiId: BookActionLinkProps["uiId"]) {
-  if (uiId !== "btn_primary" || !label.startsWith("この本を")) {
+  if (uiId !== "btn_primary" || !label.startsWith(actionLabelPrefix)) {
     return label;
   }
 
   return (
     <span className="flex flex-col items-center leading-tight">
-      <span>この本を</span>
-      <span>{label.slice(4)}</span>
+      <span>{actionLabelPrefix}</span>
+      <span>{label.slice(actionLabelPrefix.length)}</span>
     </span>
   );
 }
