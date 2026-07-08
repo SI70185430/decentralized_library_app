@@ -16,22 +16,16 @@ type BookDetailPageProps = {
   }>;
 };
 
-function getFirstParam(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
-
 function getSafeReturnTo(value: string | string[] | undefined): string | null {
-  const returnTo = getFirstParam(value);
-
-  if (!returnTo) {
+  if (!value || Array.isArray(value)) {
     return null;
   }
 
-  if (!returnTo.startsWith("/") || returnTo.startsWith("//")) {
+  if (!value.startsWith("/") || value.startsWith("//")) {
     return null;
   }
 
-  return returnTo;
+  return value;
 }
 
 export default async function BookDetailPage({ params, searchParams }: BookDetailPageProps) {
