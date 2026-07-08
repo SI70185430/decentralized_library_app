@@ -18,7 +18,7 @@ export function getBookStatusLabel(statusCode: BookAvailabilityStatusCode): stri
   }
 }
 
-export function getBookActionLabel(actionType: BookActionType): string | null {
+export function getBookActionLabel(actionType: BookActionType): string {
   switch (actionType) {
     case "borrow":
       return "この本を借りる";
