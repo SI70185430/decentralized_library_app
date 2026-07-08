@@ -7,7 +7,7 @@ type BookDetailStatusProps = {
 
 export function BookDetailStatus({ statusCode }: BookDetailStatusProps) {
   return (
-    <p data-ui-id="lbl_book_status" className="w-full text-center text-4xl leading-tight font-bold text-black">
+    <p className="w-full text-center text-4xl leading-tight font-bold text-black">
       {getBookStatusLabel(statusCode)}
     </p>
   );
