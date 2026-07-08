@@ -8,9 +8,13 @@ type BookDetailActionsProps = {
   book: BookDetail;
 };
 
+type RenderableBookAction = {
+  href: string;
+  label: string;
+};
+
 type BookActionLinkProps = {
-  action: BookAction | null;
-  book: BookDetail;
+  action: RenderableBookAction;
   uiId: "btn_primary" | "btn_secondary";
 };
 
@@ -29,7 +33,7 @@ function renderActionLabel(label: string, uiId: BookActionLinkProps["uiId"]) {
   );
 }
 
-function getRenderableAction(action: BookAction | null, book: BookDetail) {
+function getRenderableAction(action: BookAction | null, book: BookDetail): RenderableBookAction | null {
   if (!action) {
     return null;
   }
@@ -44,16 +48,10 @@ function getRenderableAction(action: BookAction | null, book: BookDetail) {
   return { href, label };
 }
 
-function BookActionLink({ action, book, uiId }: BookActionLinkProps) {
-  const renderableAction = getRenderableAction(action, book);
-
-  if (!renderableAction) {
-    return null;
-  }
-
+function BookActionLink({ action, uiId }: BookActionLinkProps) {
   return (
     <Link
-      href={renderableAction.href}
+      href={action.href}
       data-ui-id={uiId}
       className={cn(
         "flex w-full items-center justify-center border border-black bg-[#66f274] px-3 text-center leading-tight font-bold text-black",
@@ -62,24 +60,23 @@ function BookActionLink({ action, book, uiId }: BookActionLinkProps) {
           : "min-h-[58px] text-[26px]",
       )}
     >
-      {renderActionLabel(renderableAction.label, uiId)}
+      {renderActionLabel(action.label, uiId)}
     </Link>
   );
 }
 
 export function BookDetailActions({ book }: BookDetailActionsProps) {
-  const hasPrimaryAction = getRenderableAction(book.actions.primary, book) !== null;
-  const hasSecondaryAction = getRenderableAction(book.actions.secondary, book) !== null;
+  const primaryAction = getRenderableAction(book.actions.primary, book);
+  const secondaryAction = getRenderableAction(book.actions.secondary, book);
 
-  if (!hasPrimaryAction && !hasSecondaryAction) {
+  if (!primaryAction && !secondaryAction) {
     return null;
   }
 
   return (
-    <div className="w-full space-y-4">
-      <BookActionLink action={book.actions.primary} book={book} uiId="btn_primary" />
-      <BookActionLink action={book.actions.secondary} book={book} uiId="btn_secondary" />
-      {hasPrimaryAction && !hasSecondaryAction ? <div className="min-h-[58px]" aria-hidden="true" /> : null}
+    <div className="h-[186px] w-full space-y-4">
+      {primaryAction ? <BookActionLink action={primaryAction} uiId="btn_primary" /> : null}
+      {secondaryAction ? <BookActionLink action={secondaryAction} uiId="btn_secondary" /> : null}
     </div>
   );
 }
