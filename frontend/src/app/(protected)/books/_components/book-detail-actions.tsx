@@ -11,11 +11,11 @@ type BookDetailActionsProps = {
 type BookActionLinkProps = {
   action: BookAction | null;
   book: BookDetail;
-  uiId: "btn_action" | "btn_change";
+  uiId: "btn_primary" | "btn_secondary";
 };
 
 function renderActionLabel(label: string, uiId: BookActionLinkProps["uiId"]) {
-  if (uiId !== "btn_action" || !label.startsWith("この本を")) {
+  if (uiId !== "btn_primary" || !label.startsWith("この本を")) {
     return label;
   }
 
@@ -55,7 +55,7 @@ function BookActionLink({ action, book, uiId }: BookActionLinkProps) {
       data-ui-id={uiId}
       className={cn(
         "flex w-full items-center justify-center border border-black bg-[#66f274] px-3 text-center leading-tight font-bold text-black",
-        uiId === "btn_action"
+        uiId === "btn_primary"
           ? "min-h-[112px] text-[32px]"
           : "min-h-[58px] text-[26px]",
       )}
@@ -75,8 +75,8 @@ export function BookDetailActions({ book }: BookDetailActionsProps) {
 
   return (
     <div className="w-full space-y-4">
-      <BookActionLink action={book.actions.primary} book={book} uiId="btn_action" />
-      <BookActionLink action={book.actions.secondary} book={book} uiId="btn_change" />
+      <BookActionLink action={book.actions.primary} book={book} uiId="btn_primary" />
+      <BookActionLink action={book.actions.secondary} book={book} uiId="btn_secondary" />
       {hasPrimaryAction && !hasSecondaryAction ? <div className="min-h-[58px]" aria-hidden="true" /> : null}
     </div>
   );
