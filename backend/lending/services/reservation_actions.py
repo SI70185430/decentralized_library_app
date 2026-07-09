@@ -124,7 +124,7 @@ def convert_reservation_to_lending(user: AppUser, reservation_id: UUID) -> Lendi
             if book_copy.status != BookCopy.Status.RESERVED:
                 raise ActionConflictError("予約中の蔵書ではありません")
 
-            borrowed_date = today
+            borrowed_date = reservation.scheduled_date
             lending = Lending.objects.create(
                 book_copy=book_copy,
                 user=user,
