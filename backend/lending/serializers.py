@@ -27,6 +27,10 @@ class BookSummarySerializer(serializers.Serializer):
     cover_image_url = serializers.URLField(read_only=True, allow_null=True)
 
 
+class LendingCreateResponseSerializer(serializers.Serializer):
+    id = serializers.UUIDField(read_only=True)
+
+
 class LendingActionResponseSerializer(serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
     book_copy_id = serializers.UUIDField(read_only=True)
@@ -57,6 +61,10 @@ class LendingHistoryListResponseSerializer(BaseLendingListResponseSerializer):
     lending_id = serializers.UUIDField(source="id", read_only=True)
     borrowed_date = serializers.DateField(read_only=True)
     returned_date = serializers.DateField(read_only=True, allow_null=True)
+
+
+class ReservationCreateResponseSerializer(serializers.Serializer):
+    id = serializers.UUIDField(read_only=True)
 
 
 class ReservationActionResponseSerializer(serializers.Serializer):

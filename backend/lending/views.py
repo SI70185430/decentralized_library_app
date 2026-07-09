@@ -7,9 +7,11 @@ from lending.serializers import (
     BorrowBookSerializer,
     CurrentLendingListResponseSerializer,
     LendingActionResponseSerializer,
+    LendingCreateResponseSerializer,
     LendingDetailResponseSerializer,
     LendingHistoryListResponseSerializer,
     ReservationActionResponseSerializer,
+    ReservationCreateResponseSerializer,
     ReservationCreateSerializer,
     ReservationDetailResponseSerializer,
     ReservationListResponseSerializer,
@@ -94,7 +96,7 @@ class LendingCreateView(APIView):
     @extend_schema(
         request=BorrowBookSerializer,
         responses={
-            201: LendingActionResponseSerializer,
+            201: LendingCreateResponseSerializer,
             400: ValidationErrorResponseSerializer,
             403: ForbiddenResponseSerializer,
             404: NotFoundResponseSerializer,
@@ -115,7 +117,7 @@ class LendingCreateView(APIView):
         except ActionConflictError as error:
             return conflict_response(error)
 
-        response_serializer = LendingActionResponseSerializer(lending)
+        response_serializer = LendingCreateResponseSerializer(lending)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -207,7 +209,7 @@ class ReservationCreateView(APIView):
     @extend_schema(
         request=ReservationCreateSerializer,
         responses={
-            201: ReservationActionResponseSerializer,
+            201: ReservationCreateResponseSerializer,
             400: ValidationErrorResponseSerializer,
             403: ForbiddenResponseSerializer,
             404: NotFoundResponseSerializer,
@@ -229,7 +231,7 @@ class ReservationCreateView(APIView):
         except ActionConflictError as error:
             return conflict_response(error)
 
-        response_serializer = ReservationActionResponseSerializer(reservation)
+        response_serializer = ReservationCreateResponseSerializer(reservation)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
