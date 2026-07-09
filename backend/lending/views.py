@@ -7,9 +7,11 @@ from lending.serializers import (
     BorrowBookSerializer,
     CurrentLendingListResponseSerializer,
     LendingActionResponseSerializer,
+    LendingDetailResponseSerializer,
     LendingHistoryListResponseSerializer,
     ReservationActionResponseSerializer,
     ReservationCreateSerializer,
+    ReservationDetailResponseSerializer,
     ReservationListResponseSerializer,
 )
 from lending.services.book_actions import (
@@ -18,6 +20,7 @@ from lending.services.book_actions import (
     LendingNotFoundError,
     borrow_book,
     extend_lending,
+    get_lending_detail,
     list_current_lendings,
     list_lending_history,
     return_lending,
@@ -27,6 +30,7 @@ from lending.services.reservation_actions import (
     cancel_reservation,
     convert_reservation_to_lending,
     create_reservation,
+    get_reservation_detail,
     list_current_reservations,
 )
 
@@ -116,9 +120,21 @@ class LendingCreateView(APIView):
 
 
 class LendingDetailView(APIView):
-    @extend_schema(responses={501: NotImplementedResponseSerializer})
+    @extend_schema(
+        request=None,
+        responses={
+            200: LendingDetailResponseSerializer,
+            404: NotFoundResponseSerializer,
+        },
+    )
     def get(self, request, lending_id):
-        return not_implemented_response()
+        try:
+            lending = get_lending_detail(user=request.user, lending_id=lending_id)
+        except LendingNotFoundError as error:
+            return not_found_response(error)
+
+        response_serializer = LendingDetailResponseSerializer(lending)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class LendingExtendView(APIView):
@@ -218,9 +234,21 @@ class ReservationCreateView(APIView):
 
 
 class ReservationDetailView(APIView):
-    @extend_schema(responses={501: NotImplementedResponseSerializer})
+    @extend_schema(
+        request=None,
+        responses={
+            200: ReservationDetailResponseSerializer,
+            404: NotFoundResponseSerializer,
+        },
+    )
     def get(self, request, reservation_id):
-        return not_implemented_response()
+        try:
+            reservation = get_reservation_detail(user=request.user, reservation_id=reservation_id)
+        except ReservationNotFoundError as error:
+            return not_found_response(error)
+
+        response_serializer = ReservationDetailResponseSerializer(reservation)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class ReservationCancelView(APIView):

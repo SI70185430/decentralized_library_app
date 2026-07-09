@@ -148,6 +148,16 @@ def list_current_reservations(user: AppUser):
     )
 
 
+def get_reservation_detail(user: AppUser, reservation_id: UUID) -> Reservation:
+    try:
+        return Reservation.objects.select_related("book_copy", "book_copy__book").get(
+            pk=reservation_id,
+            user=user,
+        )
+    except Reservation.DoesNotExist as error:
+        raise ReservationNotFoundError("予約が見つかりません") from error
+
+
 def _get_locked_reservation(reservation_id: UUID) -> Reservation:
     try:
         return Reservation.objects.select_for_update().select_related("book_copy").get(pk=reservation_id)

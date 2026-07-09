@@ -95,6 +95,16 @@ def list_lending_history(user: AppUser):
     )
 
 
+def get_lending_detail(user: AppUser, lending_id: UUID) -> Lending:
+    try:
+        return Lending.objects.select_related("book_copy", "book_copy__book").get(
+            pk=lending_id,
+            user=user,
+        )
+    except Lending.DoesNotExist as error:
+        raise LendingNotFoundError("貸出が見つかりません") from error
+
+
 def return_lending(user: AppUser, lending_id: UUID) -> Lending:
     with transaction.atomic():
         lending = _get_locked_lending(lending_id)
