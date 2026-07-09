@@ -1,0 +1,197 @@
+"use client";
+
+import { format, parse } from "date-fns";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+import { fetchLendingDetail } from "@/lib/lending/client";
+import type { LendingDetailResponse } from "@/lib/lending/types";
+import { fetchReservationDetail } from "@/lib/reservations/client";
+import type { ReservationDetailResponse } from "@/lib/reservations/types";
+
+const API_DATE_FORMAT = "yyyy-MM-dd";
+const DISPLAY_DATE_FORMAT = "yyyy/MM/dd";
+const DETAIL_FETCH_ERROR_MESSAGE =
+  "完了情報を取得できませんでした。ホームに戻って貸出状況をご確認ください。";
+
+type BorrowResultType = "lending" | "reservation";
+
+type BorrowCompleteContentProps = {
+  resultType: BorrowResultType;
+  resultId: string;
+};
+
+type CompleteData =
+  | {
+      type: "lending";
+      detail: LendingDetailResponse;
+    }
+  | {
+      type: "reservation";
+      detail: ReservationDetailResponse;
+    };
+
+function formatApiDate(value: string): string {
+  return format(parse(value, API_DATE_FORMAT, new Date()), DISPLAY_DATE_FORMAT);
+}
+
+function formatPeriod(startDate: string, endDate: string): string {
+  return `${formatApiDate(startDate)}~${formatApiDate(endDate)}`;
+}
+
+function CompleteIllustration({ uiId }: { uiId: "img_loan_complete" | "img_reserve_complete" }) {
+  return (
+    <div
+      data-ui-id={uiId}
+      className="mx-auto flex h-36 w-48 items-center justify-center rounded-md border border-gray-400 bg-gray-200 text-lg font-semibold text-gray-600"
+    >
+      イラスト
+    </div>
+  );
+}
+
+function HomeLink() {
+  return (
+    <Link
+      href="/home"
+      data-ui-id="btn_home"
+      className="flex min-h-[58px] w-full items-center justify-center border border-black bg-[#66f274] px-4 text-center text-2xl font-bold text-black"
+    >
+      ホームに戻る
+    </Link>
+  );
+}
+
+export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteContentProps) {
+  const [completeData, setCompleteData] = useState<CompleteData | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchDetail() {
+      setCompleteData(null);
+      setErrorMessage(null);
+
+      try {
+        if (resultType === "lending") {
+          const detail = await fetchLendingDetail(resultId);
+
+          if (isMounted) {
+            setCompleteData({ type: "lending", detail });
+          }
+          return;
+        }
+
+        const detail = await fetchReservationDetail(resultId);
+
+        if (isMounted) {
+          setCompleteData({ type: "reservation", detail });
+        }
+      } catch {
+        if (isMounted) {
+          setErrorMessage(DETAIL_FETCH_ERROR_MESSAGE);
+        }
+      }
+    }
+
+    fetchDetail();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [resultType, resultId]);
+
+  if (errorMessage) {
+    return (
+      <div className="space-y-6 rounded-md border border-red-300 bg-red-50 px-5 py-6 text-center text-red-700">
+        <p className="font-semibold">{errorMessage}</p>
+        <HomeLink />
+      </div>
+    );
+  }
+
+  if (!completeData) {
+    return (
+      <div className="rounded-md border border-gray-300 bg-gray-50 px-5 py-6 text-center font-semibold">
+        完了情報を取得しています...
+      </div>
+    );
+  }
+
+  if (completeData.type === "reservation") {
+    const { detail } = completeData;
+
+    return (
+      <div className="space-y-7">
+        <CompleteIllustration uiId="img_reserve_complete" />
+
+        <p data-ui-id="txt_reservation" className="text-center text-lg font-semibold">
+          予約処理が完了しました。予約期間内に本を受け取ってください。
+        </p>
+
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-[#777]">書籍タイトル</p>
+            <p data-ui-id="lbl_title" className="text-xl font-bold break-words">
+              {detail.book_title}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-[#777]">取り置き期間</p>
+            <p data-ui-id="lbl_hold_period" className="text-xl font-bold">
+              {formatPeriod(detail.scheduled_date, detail.expires_date)}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-[#777]">貸出期間</p>
+            <p data-ui-id="lbl_loan_period" className="text-xl font-bold">
+              {formatPeriod(detail.loan_period_start, detail.loan_period_end)}
+            </p>
+          </div>
+        </div>
+
+        <HomeLink />
+      </div>
+    );
+  }
+
+  const { detail } = completeData;
+
+  return (
+    <div className="space-y-7">
+      <CompleteIllustration uiId="img_loan_complete" />
+
+      <p data-ui-id="txt_loan_description" className="text-center text-lg font-semibold">
+        貸出処理が完了しました。期限までに返却してください。
+      </p>
+
+      <div className="space-y-5">
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-[#777]">書籍タイトル</p>
+          <p data-ui-id="lbl_title" className="text-xl font-bold break-words">
+            {detail.book_title}
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-[#777]">貸出期間</p>
+          <p data-ui-id="lbl_loan_period" className="text-xl font-bold">
+            {formatPeriod(detail.borrowed_date, detail.due_date)}
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-[#777]">保管場所</p>
+          <p data-ui-id="lbl_location" className="text-xl font-bold break-words">
+            {detail.book_copy_location}
+          </p>
+        </div>
+      </div>
+
+      <HomeLink />
+    </div>
+  );
+}

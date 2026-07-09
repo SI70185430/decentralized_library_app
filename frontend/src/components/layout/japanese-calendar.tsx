@@ -1,24 +1,30 @@
 "use client";
 
-import { format } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import { ja } from "date-fns/locale";
 import type { Matcher } from "react-day-picker";
 
 import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 type JapaneseCalendarProps = React.ComponentProps<typeof Calendar> & {
   disabledDates?: Matcher[];
 };
 
-export function JapaneseCalendar({ disabledDates, ...props }: JapaneseCalendarProps) {
-  const disabledDays = [{ before: new Date() }, ...(disabledDates ?? [])];
+export function JapaneseCalendar({
+  disabledDates,
+  className,
+  classNames,
+  ...props
+}: JapaneseCalendarProps) {
+  const disabledDays = [{ before: startOfDay(new Date()) }, ...(disabledDates ?? [])];
 
   return (
     <Calendar
       {...props}
       disabled={disabledDays}
       locale={ja}
-      className="rounded-xl border bg-card p-3 shadow-sm"
+      className={cn("rounded-xl border bg-card p-3 shadow-sm", className)}
       classNames={{
         today: "rounded-(--cell-radius) bg-green-300",
         day_button:
@@ -26,6 +32,7 @@ export function JapaneseCalendar({ disabledDates, ...props }: JapaneseCalendarPr
         weekday: "flex-1 text-[0.8rem] font-normal select-none bg-gray-300",
         weekdays: "flex [&>*:first-child]:text-red-500 [&>*:last-child]:text-blue-500",
         disabled: "text-muted-foreground opacity-80 bg-gray-300",
+        ...classNames,
       }}
       formatters={{
         formatCaption: (month) => format(month, "yyyy年M月"),
