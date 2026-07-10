@@ -49,7 +49,7 @@ export function BookBorrowScheduleForm({
   const isBorrowToday = isSameDay(selectedDay, today);
   const selectedApiDate = format(selectedDay, API_DATE_FORMAT);
   const lendingPeriod = useMemo(() => formatPeriod(selectedDay), [selectedDay]);
-  const submitLabel = isBorrowToday ? "この日程で本を借りる" : "この日程で本を予約する";
+  const submitLabel = isBorrowToday ? "本を借りる" : "本を予約する";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -109,7 +109,7 @@ export function BookBorrowScheduleForm({
         ) : null}
 
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-[#777]">書籍タイトル</p>
+          <p className="text-sm font-semibold text-[#777]">タイトル</p>
           <p data-ui-id="lbl_title" className="text-xl font-bold break-words">
             {title}
           </p>
@@ -126,9 +126,16 @@ export function BookBorrowScheduleForm({
           type="submit"
           data-ui-id="btn_borrow_or_reserve"
           disabled={isSubmitting || isPastDate}
-          className="flex min-h-[72px] w-full items-center justify-center border border-black bg-[#66f274] px-4 text-center text-2xl leading-tight font-bold text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+          className="mx-auto flex min-h-[72px] w-48 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl leading-tight font-bold text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
         >
-          {isSubmitting ? "処理中..." : submitLabel}
+          {isSubmitting ? (
+            "処理中..."
+          ) : (
+            <>
+              この日程で<br />
+              {submitLabel}
+            </>
+          )}
         </button>
       </div>
     </form>

@@ -29,7 +29,7 @@ export default async function BookBorrowSchedulePage({ params }: BookBorrowSched
       backHref={`/books/${bookId}`}
       breadcrumbs={[
         { label: "ホーム", href: "/home" },
-        { label: "書籍検索", href: "/books" },
+        { type: "ellipsis" },
         { label: "本の詳細", href: `/books/${bookId}` },
         { label: "日程設定" },
       ]}
