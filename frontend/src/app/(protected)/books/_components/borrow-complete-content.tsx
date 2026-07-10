@@ -1,6 +1,7 @@
 "use client";
 
 import { format, parse } from "date-fns";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -39,13 +40,19 @@ function formatPeriod(startDate: string, endDate: string): string {
   return `${formatApiDate(startDate)}~${formatApiDate(endDate)}`;
 }
 
-function CompleteIllustration({ uiId }: { uiId: "img_loan_complete" | "img_reserve_complete" }) {
+type CompleteIllustrationProps = {
+  uiId: "img_loan_complete" | "img_reserve_complete";
+  src: string;
+  alt: string;
+};
+
+function CompleteIllustration({ uiId, src, alt }: CompleteIllustrationProps) {
   return (
     <div
       data-ui-id={uiId}
-      className="mx-auto flex h-36 w-48 items-center justify-center rounded-md border border-gray-400 bg-gray-200 text-lg font-semibold text-gray-600"
+      className="relative mx-auto h-36 w-48 overflow-hidden rounded-md border border-gray-400 bg-gray-200"
     >
-      イラスト
+      <Image src={src} alt={alt} fill sizes="192px" className="object-contain" />
     </div>
   );
 }
@@ -55,7 +62,7 @@ function HomeLink() {
     <Link
       href="/home"
       data-ui-id="btn_home"
-      className="flex min-h-[58px] w-full items-center justify-center border border-black bg-[#66f274] px-4 text-center text-2xl font-bold text-black"
+      className="mx-auto flex min-h-[58px] w-48 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl font-bold text-black"
     >
       ホームに戻る
     </Link>
@@ -124,15 +131,21 @@ export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteCo
 
     return (
       <div className="space-y-7">
-        <CompleteIllustration uiId="img_reserve_complete" />
+        <CompleteIllustration
+          uiId="img_reserve_complete"
+          src="/images/reservation-complete.svg"
+          alt="予約処理完了"
+        />
 
-        <p data-ui-id="txt_reservation" className="text-center text-lg font-semibold">
-          予約処理が完了しました。予約期間内に本を受け取ってください。
+        <p data-ui-id="txt_reservation" className="text-left text-lg font-semibold">
+          ご利用ありがとうございます。<br />
+          予約処理が涵養しました。<br />
+          取り置き期間内に書籍の受け取りをお願いします。
         </p>
 
         <div className="space-y-5">
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-[#777]">書籍タイトル</p>
+            <p className="text-sm font-semibold text-[#777]">タイトル</p>
             <p data-ui-id="lbl_title" className="text-xl font-bold break-words">
               {detail.book_title}
             </p>
@@ -162,15 +175,21 @@ export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteCo
 
   return (
     <div className="space-y-7">
-      <CompleteIllustration uiId="img_loan_complete" />
+      <CompleteIllustration
+        uiId="img_loan_complete"
+        src="/images/loan-complete.svg"
+        alt="貸出処理完了"
+      />
 
-      <p data-ui-id="txt_loan_description" className="text-center text-lg font-semibold">
-        貸出処理が完了しました。期限までに返却してください。
+      <p data-ui-id="txt_loan_description" className="text-left text-lg font-semibold">
+        ご利用ありがとうございます。<br />
+        貸出処理が完了しました。<br />
+        期限までの返却をお願いします。
       </p>
 
       <div className="space-y-5">
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-[#777]">書籍タイトル</p>
+          <p className="text-sm font-semibold text-[#777]">タイトル</p>
           <p data-ui-id="lbl_title" className="text-xl font-bold break-words">
             {detail.book_title}
           </p>

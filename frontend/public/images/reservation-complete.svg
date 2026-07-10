@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="144" viewBox="0 0 192 144" role="img" aria-labelledby="title">
+  <title id="title">予約処理完了</title>
+  <rect width="192" height="144" fill="#e5e7eb"/>
+  <path d="M57 41h58a8 8 0 0 1 8 8v55H57a8 8 0 0 1-8-8V49a8 8 0 0 1 8-8Z" fill="#fff" stroke="#6b7280" stroke-width="3"/>
+  <path d="M65 57h42M65 69h42M65 81h25" stroke="#9ca3af" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="134" cy="94" r="22" fill="#66f274" stroke="#111827" stroke-width="3"/>
+  <path d="M134 82v13l9 5" fill="none" stroke="#111827" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
