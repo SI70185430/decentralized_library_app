@@ -27,8 +27,8 @@ function renderActionLabel(label: string, uiId: BookActionLinkProps["uiId"]) {
 
   return (
     <span className="flex flex-col items-center leading-tight">
-      <span>{actionLabelPrefix}</span>
-      <span>{label.slice(actionLabelPrefix.length)}</span>
+      <span className="whitespace-nowrap">{actionLabelPrefix}</span>
+      <span className="whitespace-nowrap">{label.slice(actionLabelPrefix.length)}</span>
     </span>
   );
 }
@@ -56,7 +56,7 @@ function BookActionLink({ action, uiId }: BookActionLinkProps) {
       className={cn(
         "flex w-full items-center justify-center border border-black bg-[#66f274] px-3 text-center leading-tight font-bold text-black",
         uiId === "btn_primary"
-          ? "min-h-[112px] text-[32px]"
+          ? "min-h-[112px] text-[32px] max-[374px]:text-[28px]"
           : "min-h-[58px] text-[26px]",
       )}
     >
