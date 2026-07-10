@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AppTabs } from "@/components/layout/app-tabs";
-import { PageHeader } from "@/components/layout/page-header";
+import { PageFrame } from "@/components/layout/page-frame";
 import { getCurrentUser } from "@/lib/auth/server";
 import { type LoanHistoryItem, LoanHistoryList } from "./_components/loan-history-list";
 import { type LoanItem, LoanList } from "./_components/loan-list";
@@ -55,45 +55,41 @@ export default async function HomePage() {
   const username = user?.username ?? "";
 
   return (
-    <div className="min-h-dvh bg-white text-black">
-      <PageHeader title="ホーム" />
+    <PageFrame title="ホーム">
+      <p className="px-8 text-sm text-[#777]">ホーム</p>
 
-      <section className="pt-4">
-        <p className="px-8 text-sm text-[#777]">ホーム</p>
+      <div className="mt-8 flex items-start justify-between gap-4 px-8">
+        <Link href="/books" className="shrink-0 text-2xl leading-none font-bold">
+          書籍検索
+        </Link>
+        <p className="min-w-0 flex-1 break-all text-right text-xl leading-snug font-semibold">
+          {username}
+        </p>
+      </div>
 
-        <div className="mt-8 flex items-start justify-between gap-4 px-8">
-          <Link href="/books" className="shrink-0 text-2xl leading-none font-bold">
-            書籍検索
-          </Link>
-          <p className="min-w-0 flex-1 break-all text-right text-xl leading-snug font-semibold">
-            {username}
-          </p>
-        </div>
-
-        <AppTabs
-          defaultValue="loan"
-          className="mt-7"
-          tabListClassName="px-8"
-          tabPanelClassName="mt-4"
-          tabs={[
-            {
-              value: "loan",
-              label: "利用中",
-              content: <LoanList items={loanItems} />,
-            },
-            {
-              value: "reservation",
-              label: "予約中",
-              content: <ReservationList items={reservationItems} />,
-            },
-            {
-              value: "history",
-              label: "履歴",
-              content: <LoanHistoryList items={loanHistoryItems} />,
-            },
-          ]}
-        />
-      </section>
-    </div>
+      <AppTabs
+        defaultValue="loan"
+        className="mt-7"
+        tabListClassName="px-8"
+        tabPanelClassName="mt-4"
+        tabs={[
+          {
+            value: "loan",
+            label: "利用中",
+            content: <LoanList items={loanItems} />,
+          },
+          {
+            value: "reservation",
+            label: "予約中",
+            content: <ReservationList items={reservationItems} />,
+          },
+          {
+            value: "history",
+            label: "履歴",
+            content: <LoanHistoryList items={loanHistoryItems} />,
+          },
+        ]}
+      />
+    </PageFrame>
   );
 }

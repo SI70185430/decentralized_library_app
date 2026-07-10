@@ -1,5 +1,4 @@
-import { BreadcrumbNav } from "@/components/layout/breadcrumb-nav";
-import { PageHeader } from "@/components/layout/page-header";
+import { PageFrame } from "@/components/layout/page-frame";
 import {
   buildBookResultsHref,
   getTotalBookPages,
@@ -16,7 +15,14 @@ type BookResultsPageProps = {
   searchParams?: Promise<RawBookSearchParams>;
 };
 
-const SEARCH_BACK_QUERY_KEYS = ["keyword", "title", "author", "publisher", "isbn", "genre"] as const;
+const SEARCH_BACK_QUERY_KEYS = [
+  "keyword",
+  "title",
+  "author",
+  "publisher",
+  "isbn",
+  "genre",
+] as const;
 
 type SearchBackQueryKey = (typeof SEARCH_BACK_QUERY_KEYS)[number];
 
@@ -43,51 +49,46 @@ export default async function BookResultsPage({ searchParams }: BookResultsPageP
   const currentResultsHref = buildBookResultsHref(params);
 
   return (
-    <div className="min-h-dvh bg-white text-black">
-      <PageHeader title="検索結果" backHref={buildSearchBackHref(params)} className="bg-[#66f274]" />
+    <PageFrame
+      title="検索結果"
+      backHref={buildSearchBackHref(params)}
+      headerClassName="bg-[#66f274]"
+      breadcrumbs={[
+        { label: "ホーム", href: "/home" },
+        { label: "書籍検索", href: buildSearchBackHref(params) },
+        { label: "検索結果" },
+      ]}
+    >
+      <div className="mt-6 px-6">
+        {!result.ok ? (
+          <BookSearchError error={result} />
+        ) : result.data.count === 0 ? (
+          <p className="rounded-lg border border-[#d9d9d9] bg-white px-4 py-6 text-center text-sm font-semibold">
+            検索結果はありません
+          </p>
+        ) : (
+          <div>
+            <BookResultPagination
+              currentPage={params.page}
+              totalPages={getTotalBookPages(result.data.count)}
+              params={params}
+            />
 
-      <section className="pt-4">
-        <div className="px-8 text-sm text-[#777]">
-          <BreadcrumbNav
-            items={[
-              { label: "ホーム", href: "/home" },
-              { label: "書籍検索", href: buildSearchBackHref(params) },
-              { label: "検索結果" },
-            ]}
-          />
-        </div>
-
-        <div className="mt-6 px-6">
-          {!result.ok ? (
-            <BookSearchError error={result} />
-          ) : result.data.count === 0 ? (
-            <p className="rounded-lg border border-[#d9d9d9] bg-white px-4 py-6 text-center text-sm font-semibold">
-              検索結果はありません
-            </p>
-          ) : (
-            <div>
-              <BookResultPagination
-                currentPage={params.page}
-                totalPages={getTotalBookPages(result.data.count)}
-                params={params}
-              />
-
-              <div
-                data-ui-id="scroll_bar"
-                className="mt-4 max-h-[calc(100dvh-190px)] space-y-4 overflow-y-auto pb-6"
-              >
-                {result.data.results.map((book) => (
-                  <BookResultCard
-                    key={book.id}
-                    book={book}
-                    href={`/books/${book.id}?returnTo=${encodeURIComponent(currentResultsHref)}`}
-                  />
-                ))}
-              </div>
+            <div
+              data-ui-id="scroll_bar"
+              className="mt-4 max-h-[calc(100dvh-190px)] space-y-4 overflow-y-auto pb-6"
+            >
+              {result.data.results.map((book) => (
+                <BookResultCard
+                  key={book.id}
+                  book={book}
+                  href={`/books/${book.id}?returnTo=${encodeURIComponent(currentResultsHref)}`}
+                />
+              ))}
             </div>
-          )}
-        </div>
-      </section>
-    </div>
+          </div>
+        )}
+      </div>
+    </PageFrame>
   );
 }
