@@ -1,7 +1,8 @@
 "use client";
 
-import { Fragment, type ReactNode, useState } from "react";
+import { Fragment, type ReactNode } from "react";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 type AppTab = {
@@ -27,56 +28,42 @@ export function AppTabs({
   tabButtonClassName,
   tabPanelClassName,
 }: AppTabsProps) {
-  const [activeValue, setActiveValue] = useState(defaultValue ?? tabs[0]?.value ?? "");
-  const activeTab = tabs.find((tab) => tab.value === activeValue) ?? tabs[0];
+  const defaultTab = tabs.find((tab) => tab.value === defaultValue) ?? tabs[0];
 
-  if (!activeTab) {
+  if (!defaultTab) {
     return null;
   }
 
   return (
-    <div className={cn(className)}>
-      <div
-        role="tablist"
-        aria-label="表示切替"
-        className={cn("flex items-center text-[23px] leading-none font-medium", tabListClassName)}
+    <Tabs defaultValue={defaultTab.value} className={cn("gap-0", className)}>
+      <TabsList
+        variant="line"
+        className={cn(
+          "h-auto gap-0 rounded-none bg-transparent p-0 text-[23px] leading-none font-medium",
+          tabListClassName,
+        )}
       >
-        {tabs.map((tab, index) => {
-          const isActive = tab.value === activeTab.value;
-          const tabId = `app-tab-${tab.value}`;
-          const panelId = `app-tab-panel-${tab.value}`;
+        {tabs.map((tab, index) => (
+          <Fragment key={tab.value}>
+            <TabsTrigger
+              value={tab.value}
+              className={cn(
+                "h-auto flex-none rounded-none border-0 px-0 py-0 text-[23px] leading-none font-medium text-foreground transition-opacity after:hidden data-[state=active]:font-semibold data-[state=inactive]:opacity-80",
+                tabButtonClassName,
+              )}
+            >
+              {tab.label}
+            </TabsTrigger>
+            {index < tabs.length - 1 ? <span aria-hidden="true" className="mx-1">|</span> : null}
+          </Fragment>
+        ))}
+      </TabsList>
 
-          return (
-            <Fragment key={tab.value}>
-              <button
-                type="button"
-                id={tabId}
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={panelId}
-                className={cn(
-                  "font-medium transition-opacity disabled:pointer-events-none aria-selected:font-semibold",
-                  !isActive && "opacity-80",
-                  tabButtonClassName,
-                )}
-                onClick={() => setActiveValue(tab.value)}
-              >
-                {tab.label}
-              </button>
-              {index < tabs.length - 1 ? <span className="mx-1">|</span> : null}
-            </Fragment>
-          );
-        })}
-      </div>
-
-      <div
-        id={`app-tab-panel-${activeTab.value}`}
-        role="tabpanel"
-        aria-labelledby={`app-tab-${activeTab.value}`}
-        className={cn(tabPanelClassName)}
-      >
-        {activeTab.content}
-      </div>
-    </div>
+      {tabs.map((tab) => (
+        <TabsContent key={tab.value} value={tab.value} className={cn("mt-4 flex-none", tabPanelClassName)}>
+          {tab.content}
+        </TabsContent>
+      ))}
+    </Tabs>
   );
 }
