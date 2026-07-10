@@ -1,4 +1,10 @@
-import Link from "next/link";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+} from "@/components/ui/pagination";
 import { buildBookResultsHref } from "@/lib/books/search-params";
 import type { BookSearchParams } from "@/lib/books/types";
 
@@ -103,44 +109,45 @@ export function BookResultPagination({ currentPage, totalPages, params }: BookRe
   const items = buildNavigationItems(safeCurrentPage, safeTotalPages);
 
   return (
-    <nav id="pager_book_list" aria-label="書籍検索結果ページ" className="flex justify-center">
-      <ul className="flex flex-wrap items-center justify-center gap-1 text-sm font-semibold">
+    <Pagination id="pager_book_list" aria-label="書籍検索結果ページ" className="flex justify-center">
+      <PaginationContent className="flex flex-wrap items-center justify-center gap-1 text-sm font-semibold">
         {items.map((item, index) => (
-          <li
+          <PaginationItem
             key={item.type === "control" ? item.label : item.type === "page" ? item.page : `ellipsis-${index}`}
             className="flex items-center gap-1"
           >
             {index > 0 ? <PaginationSeparator /> : null}
 
             {item.type === "ellipsis" ? (
-              <span className="px-1 text-[#777]">...</span>
+              <PaginationEllipsis className="text-[#777]" />
             ) : item.type === "control" ? (
               item.disabled ? (
                 <span aria-disabled="true" className="px-1 text-[#999]">
                   {item.label}
                 </span>
               ) : (
-                <Link
+                <PaginationLink
                   href={buildBookResultsHref(params, item.page)}
                   aria-label={item.ariaLabel}
+                  size="xs"
                   className="px-1 text-black underline-offset-2 hover:underline"
                 >
                   {item.label}
-                </Link>
+                </PaginationLink>
               )
-            ) : item.page === safeCurrentPage ? (
-              <span aria-current="page" className="px-1 text-black underline">{item.page}</span>
             ) : (
-              <Link
+              <PaginationLink
                 href={buildBookResultsHref(params, item.page)}
+                isActive={item.page === safeCurrentPage}
+                size="xs"
                 className="px-1 text-black underline-offset-2 hover:underline"
               >
                 {item.page}
-              </Link>
+              </PaginationLink>
             )}
-          </li>
+          </PaginationItem>
         ))}
-      </ul>
-    </nav>
+      </PaginationContent>
+    </Pagination>
   );
 }
