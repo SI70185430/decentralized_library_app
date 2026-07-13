@@ -51,7 +51,7 @@ export default async function BorrowCompletePage({ searchParams }: BorrowComplet
   const title = resultType === "reservation" ? "予約情報" : "貸出情報";
 
   return (
-    <PageFrame title={title} backHref="/home">
+    <PageFrame title={title} backHref="/home" headerClassName="bg-[#9ff1ff]">
       <div className="mx-auto mt-6 max-w-[480px] px-6 pb-10">
         {resultType && resultId ? (
           <BorrowCompleteContent resultType={resultType} resultId={resultId} />

@@ -27,6 +27,7 @@ export default async function BookBorrowSchedulePage({ params }: BookBorrowSched
     <PageFrame
       title="日程設定"
       backHref={`/books/${bookId}`}
+      headerClassName="bg-[#9ff1ff]"
       breadcrumbs={[
         { label: "ホーム", href: "/home" },
         { type: "ellipsis" },
