@@ -50,7 +50,7 @@ function CompleteIllustration({ uiId, src, alt }: CompleteIllustrationProps) {
   return (
     <div
       data-ui-id={uiId}
-      className="relative mx-auto h-36 w-48 overflow-hidden rounded-md border border-gray-400 bg-gray-200"
+      className="relative mx-auto h-36 w-48 overflow-hidden rounded-md"
     >
       <Image src={src} alt={alt} fill sizes="192px" className="object-contain" />
     </div>
@@ -133,7 +133,7 @@ export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteCo
       <div className="space-y-7">
         <CompleteIllustration
           uiId="img_reserve_complete"
-          src="/images/reservation-complete.svg"
+          src="/images/reservation-complete.png"
           alt="予約処理完了"
         />
 
@@ -177,7 +177,7 @@ export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteCo
     <div className="space-y-7">
       <CompleteIllustration
         uiId="img_loan_complete"
-        src="/images/loan-complete.svg"
+        src="/images/loan-complete.png"
         alt="貸出処理完了"
       />
 
