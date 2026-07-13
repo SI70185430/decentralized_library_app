@@ -139,7 +139,7 @@ export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteCo
 
         <p data-ui-id="txt_reservation" className="text-left text-lg font-semibold">
           ご利用ありがとうございます。<br />
-          予約処理が涵養しました。<br />
+          予約処理が完了しました。<br />
           取り置き期間内に書籍の受け取りをお願いします。
         </p>
 
