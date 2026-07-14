@@ -1,4 +1,4 @@
-export type HomeBookSummary = {
+type HomeBookSummary = {
   id: string;
   title: string;
   cover_image_url: string | null;
