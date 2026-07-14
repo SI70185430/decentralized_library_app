@@ -10,7 +10,6 @@ from lending.serializers import (
     LendingCreateResponseSerializer,
     LendingDetailResponseSerializer,
     LendingHistoryListResponseSerializer,
-    ReservationActionResponseSerializer,
     ReservationCreateResponseSerializer,
     ReservationCreateSerializer,
     ReservationDetailResponseSerializer,
