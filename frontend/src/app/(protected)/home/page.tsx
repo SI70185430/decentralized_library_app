@@ -1,57 +1,36 @@
 import Link from "next/link";
+
 import { AppTabs } from "@/components/layout/app-tabs";
 import { PageFrame } from "@/components/layout/page-frame";
 import { getCurrentUser } from "@/lib/auth/server";
-import { type LoanHistoryItem, LoanHistoryList } from "./_components/loan-history-list";
-import { type LoanItem, LoanList } from "./_components/loan-list";
-import { type ReservationItem, ReservationList } from "./_components/reservation-list";
+import { fetchHomeTabData } from "@/lib/home/server";
+import { LoanHistoryList } from "./_components/loan-history-list";
+import { LoanList } from "./_components/loan-list";
+import { ReservationList } from "./_components/reservation-list";
 
-const loanItems: LoanItem[] = [
-  {
-    id: "loan-1",
-    title: "銀河鉄道の夜",
-    dueDate: "2026/06/15",
-    location: "中央図書館 2階 文学棚",
-    coverImageUrl: "https://covers.openlibrary.org/b/id/10523338-L.jpg",
-  },
-  {
-    id: "loan-2",
-    title: "走れメロス",
-    dueDate: "2026/06/22",
-    location: "駅前分館 1階 資料保管室 一般書棚",
-  },
-];
+const CURRENT_LENDINGS_FETCH_ERROR_MESSAGE =
+  "利用中の書籍情報の取得に失敗しました。時間をおいて再度お試しください。";
+const CURRENT_RESERVATIONS_FETCH_ERROR_MESSAGE =
+  "予約情報の取得に失敗しました。時間をおいて再度お試しください。";
+const LENDING_HISTORY_FETCH_ERROR_MESSAGE =
+  "貸出履歴の取得に失敗しました。時間をおいて再度お試しください。";
 
-const reservationItems: ReservationItem[] = [
-  {
-    id: "reservation-1",
-    title: "こころ00000000000000000000",
-    reservePeriod: "2026/06/03\n~2026/06/10",
-    coverImageUrl: "https://covers.openlibrary.org/b/id/240726-L.jpg",
-  },
-  {
-    id: "reservation-2",
-    title: "注文の多い料理店",
-    reservePeriod: "2026/06/05\n~2026/06/12",
-  },
-];
+type HomeTabErrorProps = {
+  message: string;
+};
 
-const loanHistoryItems: LoanHistoryItem[] = [
-  {
-    id: "history-1",
-    title: "坊っちゃん",
-    loanPeriod: "2026/05/01\n~2026/05/14",
-    coverImageUrl: "https://covers.openlibrary.org/b/id/8231856-L.jpg",
-  },
-  {
-    id: "history-2",
-    title: "羅生門",
-    loanPeriod: "2026/05/10\n~2026/05/24",
-  },
-];
+function HomeTabError({ message }: HomeTabErrorProps) {
+  return (
+    <div className="max-h-[calc(100dvh-260px)] overflow-y-auto px-4 pb-8">
+      <p role="alert" className="px-4 py-8 text-center text-[#777]">
+        {message}
+      </p>
+    </div>
+  );
+}
 
 export default async function HomePage() {
-  const user = await getCurrentUser();
+  const [user, tabData] = await Promise.all([getCurrentUser(), fetchHomeTabData()]);
   const username = user?.username ?? "";
 
   return (
@@ -76,17 +55,29 @@ export default async function HomePage() {
           {
             value: "loan",
             label: "利用中",
-            content: <LoanList items={loanItems} />,
+            content: tabData.currentLendings.ok ? (
+              <LoanList items={tabData.currentLendings.data} />
+            ) : (
+              <HomeTabError message={CURRENT_LENDINGS_FETCH_ERROR_MESSAGE} />
+            ),
           },
           {
             value: "reservation",
             label: "予約中",
-            content: <ReservationList items={reservationItems} />,
+            content: tabData.currentReservations.ok ? (
+              <ReservationList items={tabData.currentReservations.data} />
+            ) : (
+              <HomeTabError message={CURRENT_RESERVATIONS_FETCH_ERROR_MESSAGE} />
+            ),
           },
           {
             value: "history",
             label: "履歴",
-            content: <LoanHistoryList items={loanHistoryItems} />,
+            content: tabData.lendingHistory.ok ? (
+              <LoanHistoryList items={tabData.lendingHistory.data} />
+            ) : (
+              <HomeTabError message={LENDING_HISTORY_FETCH_ERROR_MESSAGE} />
+            ),
           },
         ]}
       />

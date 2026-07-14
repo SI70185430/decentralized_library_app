@@ -91,7 +91,7 @@ def list_lending_history(user: AppUser):
             user=user,
             returned_date__isnull=False,
         )
-        .order_by("-returned_date", "-created_at")
+        .order_by("-returned_date", "-created_at")[:10]
     )
 
 
