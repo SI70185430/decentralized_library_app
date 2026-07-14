@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 
+import { apiOrigin } from "@/lib/api/config";
 import { buildBookSearchApiQuery } from "@/lib/books/search-params";
 import type {
   BookDetail,
@@ -8,7 +9,6 @@ import type {
   PaginatedBookResponse,
 } from "@/lib/books/types";
 
-const apiOrigin = "http://127.0.0.1:8000";
 const BOOK_GENRES_FETCH_ERROR_MESSAGE = "ジャンル一覧の取得に失敗しました";
 const BOOK_SEARCH_FATAL_MESSAGE = "検索結果の取得に失敗しました";
 const BOOK_DETAIL_FETCH_ERROR_MESSAGE = "書籍詳細の取得に失敗しました";

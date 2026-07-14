@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 
+import { apiOrigin } from "@/lib/api/config";
 import type {
   CurrentLendingListItem,
   CurrentReservationListItem,
@@ -7,8 +8,6 @@ import type {
   HomeTabFetchResult,
   LendingHistoryListItem,
 } from "./types";
-
-const apiOrigin = "http://127.0.0.1:8000";
 
 async function fetchHomeList<T>(
   path: string,

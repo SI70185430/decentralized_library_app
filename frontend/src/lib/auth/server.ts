@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
 
+import { apiOrigin } from "@/lib/api/config";
 import type { AuthUser, AuthUserResponse } from "./types";
-
-const apiOrigin = "http://127.0.0.1:8000";
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
