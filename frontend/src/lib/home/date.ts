@@ -8,6 +8,6 @@ export function formatHomeDate(value: string): string {
   return format(date, HOME_DISPLAY_DATE_FORMAT);
 }
 
-export function formatHomePeriod(start: string, end: string | null): string {
-  return `${formatHomeDate(start)}\n~${end ? formatHomeDate(end) : "-"}`;
+export function formatHomePeriod(start: string, end: string): string {
+  return `${formatHomeDate(start)}\n~${formatHomeDate(end)}`;
 }

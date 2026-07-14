@@ -20,7 +20,7 @@ export type LendingHistoryListItem = {
   lending_id: string;
   book: HomeBookSummary;
   borrowed_date: string;
-  returned_date: string | null;
+  returned_date: string;
 };
 
 export type HomeTabFetchResult<T> =
