@@ -99,10 +99,6 @@ function buildNavigationItems(currentPage: number, totalPages: number): Navigati
   ];
 }
 
-function PaginationSeparator() {
-  return <span className="text-sm text-[#777]">|</span>;
-}
-
 export function BookResultPagination({ currentPage, totalPages, params }: BookResultPaginationProps) {
   const safeTotalPages = Math.max(1, totalPages);
   const safeCurrentPage = Math.min(Math.max(1, currentPage), safeTotalPages);
@@ -116,8 +112,6 @@ export function BookResultPagination({ currentPage, totalPages, params }: BookRe
             key={item.type === "control" ? item.label : item.type === "page" ? item.page : `ellipsis-${index}`}
             className="flex items-center gap-1"
           >
-            {index > 0 ? <PaginationSeparator /> : null}
-
             {item.type === "ellipsis" ? (
               <PaginationEllipsis className="text-[#777]" />
             ) : item.type === "control" ? (
