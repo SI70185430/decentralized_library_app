@@ -13,6 +13,11 @@ from lending.services.book_actions import (
     ActionConflictError,
     BookNotFoundError,
 )
+from lending.services.borrowing_limits import (
+    LENDING_RESERVATION_LIMIT_ERROR_MESSAGE,
+    MAX_CONCURRENT_LENDING_AND_RESERVATION_COUNT,
+    lock_user_and_get_current_usage,
+)
 
 DEFAULT_RESERVATION_HOLD_DAYS = 10
 
@@ -49,6 +54,10 @@ def create_reservation(user: AppUser, book_id: UUID, scheduled_date) -> Reservat
         with transaction.atomic():
             if not Book.objects.filter(pk=book_id).exists():
                 raise BookNotFoundError("書籍が見つかりません")
+
+            current_usage = lock_user_and_get_current_usage(user)
+            if current_usage >= MAX_CONCURRENT_LENDING_AND_RESERVATION_COUNT:
+                raise ActionConflictError(LENDING_RESERVATION_LIMIT_ERROR_MESSAGE)
 
             if (
                 Lending.objects.select_for_update()
