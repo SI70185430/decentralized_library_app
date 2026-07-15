@@ -65,14 +65,14 @@ export function BookBorrowScheduleForm({
     try {
       if (isBorrowToday) {
         const lending = await createLending(bookId);
-        router.push(
+        router.replace(
           `/books/${bookId}/borrow/complete?resultType=lending&resultId=${encodeURIComponent(lending.id)}`,
         );
         return;
       }
 
       const reservation = await createReservation(bookId, selectedApiDate);
-      router.push(
+      router.replace(
         `/books/${bookId}/borrow/complete?resultType=reservation&resultId=${encodeURIComponent(
           reservation.id,
         )}`,
