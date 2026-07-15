@@ -42,7 +42,13 @@ class LendingActionResponseSerializer(serializers.Serializer):
 
 
 class LendingDetailResponseSerializer(serializers.Serializer):
+    book_id = serializers.UUIDField(source="book_copy.book_id", read_only=True)
     book_title = serializers.CharField(source="book_copy.book.title", read_only=True)
+    cover_image_url = serializers.URLField(
+        source="book_copy.book.cover_image_url",
+        read_only=True,
+        allow_null=True,
+    )
     book_copy_location = serializers.CharField(source="book_copy.location", read_only=True)
     borrowed_date = serializers.DateField(read_only=True)
     due_date = serializers.DateField(read_only=True)

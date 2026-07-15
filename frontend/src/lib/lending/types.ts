@@ -3,7 +3,9 @@ export type LendingActionResponse = {
 };
 
 export type LendingDetailResponse = {
+  book_id: string;
   book_title: string;
+  cover_image_url: string | null;
   book_copy_location: string;
   borrowed_date: string;
   due_date: string;

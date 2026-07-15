@@ -8,6 +8,7 @@ import {
 const LENDING_CREATE_FATAL_MESSAGE = "処理に失敗しました。時間をおいて再度お試しください。";
 const LENDING_FORBIDDEN_MESSAGE = "処理を実行できませんでした。再ログイン後にお試しください。";
 const LENDING_NOT_FOUND_MESSAGE = "対象の書籍が見つかりません。";
+const LENDING_RETURN_NOT_FOUND_MESSAGE = "対象の貸出情報が見つかりません。";
 const LENDING_DETAIL_FETCH_ERROR_MESSAGE =
   "完了情報を取得できませんでした。ホームに戻って貸出状況をご確認ください。";
 
@@ -64,6 +65,22 @@ function createLendingError(status: number, data: unknown): LendingApiError {
   return new LendingApiError(LENDING_CREATE_FATAL_MESSAGE, status);
 }
 
+function createReturnLendingError(status: number, data: unknown): LendingApiError {
+  if (status === 403) {
+    return new LendingApiError(LENDING_FORBIDDEN_MESSAGE, status);
+  }
+
+  if (status === 404) {
+    return new LendingApiError(LENDING_RETURN_NOT_FOUND_MESSAGE, status);
+  }
+
+  if (status === 409) {
+    return new LendingApiError(getDetailMessage(data) ?? LENDING_CREATE_FATAL_MESSAGE, status);
+  }
+
+  return new LendingApiError(LENDING_CREATE_FATAL_MESSAGE, status);
+}
+
 export async function createLending(bookId: string): Promise<LendingActionResponse> {
   try {
     const csrfToken = await getCsrfToken();
@@ -82,6 +99,31 @@ export async function createLending(bookId: string): Promise<LendingActionRespon
     }
 
     throw createLendingError(response.status, await readJson(response));
+  } catch (error) {
+    if (error instanceof LendingApiError) {
+      throw error;
+    }
+
+    throw new LendingApiError(LENDING_CREATE_FATAL_MESSAGE);
+  }
+}
+
+export async function returnLending(lendingId: string): Promise<void> {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await fetch(`/api/lendings/${lendingId}/return/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "same-origin",
+    });
+
+    if (response.status === 200) {
+      return;
+    }
+
+    throw createReturnLendingError(response.status, await readJson(response));
   } catch (error) {
     if (error instanceof LendingApiError) {
       throw error;

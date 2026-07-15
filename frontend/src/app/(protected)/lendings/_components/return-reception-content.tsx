@@ -1,0 +1,101 @@
+"use client";
+
+import { format, parse } from "date-fns";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { BookDetailCover } from "@/app/(protected)/books/_components/book-detail-cover";
+import { returnLending } from "@/lib/lending/client";
+
+const API_DATE_FORMAT = "yyyy-MM-dd";
+const DISPLAY_DATE_FORMAT = "yyyy/MM/dd";
+const GENERIC_SUBMIT_ERROR_MESSAGE = "処理に失敗しました。時間をおいて再度お試しください。";
+
+type ReturnReceptionContentProps = {
+  lendingId: string;
+  title: string;
+  coverImageUrl: string | null;
+  dueDate: string;
+  bookCopyLocation: string;
+};
+
+function formatApiDate(value: string): string {
+  return format(parse(value, API_DATE_FORMAT, new Date()), DISPLAY_DATE_FORMAT);
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : GENERIC_SUBMIT_ERROR_MESSAGE;
+}
+
+export function ReturnReceptionContent({
+  lendingId,
+  title,
+  coverImageUrl,
+  dueDate,
+  bookCopyLocation,
+}: ReturnReceptionContentProps) {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      await returnLending(lendingId);
+      router.replace(`/lendings/${lendingId}/return/complete`);
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div data-ui-id="img_book_cover" className="flex justify-center">
+        <BookDetailCover title={title} coverImageUrl={coverImageUrl} />
+      </div>
+
+      <div className="space-y-5 px-2">
+        {errorMessage ? (
+          <p className="whitespace-pre-line rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            {errorMessage}
+          </p>
+        ) : null}
+
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-[#777]">タイトル</p>
+          <p data-ui-id="lbl_title" className="text-xl font-bold break-words">
+            {title}
+          </p>
+        </div>
+
+        <div data-ui-id="lbl_due_date" className="space-y-2">
+          <p className="text-sm font-semibold text-[#777]">返却期限</p>
+          <p className="text-xl font-bold">{formatApiDate(dueDate)}</p>
+        </div>
+
+        <div data-ui-id="lbl_location" className="space-y-2">
+          <p className="text-sm font-semibold text-[#777]">保管場所</p>
+          <p className="text-xl font-bold break-words">{bookCopyLocation}</p>
+        </div>
+
+        <button
+          type="submit"
+          data-ui-id="btn_book_return"
+          disabled={isSubmitting}
+          className="mx-auto flex min-h-[72px] w-56 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl leading-tight font-bold text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+        >
+          {isSubmitting ? "処理中..." : "保管場所への返却が完了"}
+        </button>
+      </div>
+    </form>
+  );
+}
