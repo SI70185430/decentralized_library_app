@@ -1,15 +1,7 @@
 import { PageFrame } from "@/components/layout/page-frame";
 import { ReturnCompleteContent } from "../../../_components/return-complete-content";
 
-type ReturnCompletePageProps = {
-  params: Promise<{
-    lendingId: string;
-  }>;
-};
-
-export default async function ReturnCompletePage({ params }: ReturnCompletePageProps) {
-  await params;
-
+export default function ReturnCompletePage() {
   return (
     <PageFrame title="返却完了" backHref="/home" headerClassName="bg-[#9ff1ff]">
       <div className="mx-auto mt-6 max-w-[480px] px-6 pb-10">
