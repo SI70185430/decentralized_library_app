@@ -2,14 +2,14 @@ import { getCsrfToken } from "@/lib/api/csrf";
 import {
   LendingApiError,
   type LendingActionResponse,
-  type LendingDetailResponse,
+  type LendingCompletionResponse,
 } from "@/lib/lending/types";
 
 const LENDING_CREATE_FATAL_MESSAGE = "処理に失敗しました。時間をおいて再度お試しください。";
 const LENDING_FORBIDDEN_MESSAGE = "処理を実行できませんでした。再ログイン後にお試しください。";
 const LENDING_NOT_FOUND_MESSAGE = "対象の書籍が見つかりません。";
 const LENDING_RETURN_NOT_FOUND_MESSAGE = "対象の貸出情報が見つかりません。";
-const LENDING_DETAIL_FETCH_ERROR_MESSAGE =
+const LENDING_COMPLETION_FETCH_ERROR_MESSAGE =
   "完了情報を取得できませんでした。ホームに戻って貸出状況をご確認ください。";
 
 type ValidationErrorResponse = Record<string, string[]>;
@@ -133,22 +133,22 @@ export async function returnLending(lendingId: string): Promise<void> {
   }
 }
 
-export async function fetchLendingDetail(lendingId: string): Promise<LendingDetailResponse> {
+export async function fetchLendingCompletion(lendingId: string): Promise<LendingCompletionResponse> {
   try {
     const response = await fetch(`/api/lendings/${lendingId}/`, {
       credentials: "same-origin",
     });
 
     if (response.status === 200) {
-      return (await response.json()) as LendingDetailResponse;
+      return (await response.json()) as LendingCompletionResponse;
     }
 
-    throw new LendingApiError(LENDING_DETAIL_FETCH_ERROR_MESSAGE, response.status);
+    throw new LendingApiError(LENDING_COMPLETION_FETCH_ERROR_MESSAGE, response.status);
   } catch (error) {
     if (error instanceof LendingApiError) {
       throw error;
     }
 
-    throw new LendingApiError(LENDING_DETAIL_FETCH_ERROR_MESSAGE);
+    throw new LendingApiError(LENDING_COMPLETION_FETCH_ERROR_MESSAGE);
   }
 }

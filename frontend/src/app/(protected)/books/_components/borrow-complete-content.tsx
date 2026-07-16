@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { fetchLendingDetail } from "@/lib/lending/client";
-import type { LendingDetailResponse } from "@/lib/lending/types";
+import { fetchLendingCompletion } from "@/lib/lending/client";
+import type { LendingCompletionResponse } from "@/lib/lending/types";
 import { fetchReservationDetail } from "@/lib/reservations/client";
 import type { ReservationDetailResponse } from "@/lib/reservations/types";
 
@@ -25,7 +25,7 @@ type BorrowCompleteContentProps = {
 type CompleteData =
   | {
       type: "lending";
-      detail: LendingDetailResponse;
+      detail: LendingCompletionResponse;
     }
   | {
       type: "reservation";
@@ -82,7 +82,7 @@ export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteCo
 
       try {
         if (resultType === "lending") {
-          const detail = await fetchLendingDetail(resultId);
+          const detail = await fetchLendingCompletion(resultId);
 
           if (isMounted) {
             setCompleteData({ type: "lending", detail });

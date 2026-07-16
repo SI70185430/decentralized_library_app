@@ -1,17 +1,17 @@
 import { cookies } from "next/headers";
 
 import { apiOrigin } from "@/lib/api/config";
-import type { LendingDetailResponse } from "@/lib/lending/types";
+import type { LendingReturnPreviewResponse } from "@/lib/lending/types";
 
-const LENDING_DETAIL_SERVER_FETCH_ERROR_MESSAGE = "貸出情報の取得に失敗しました。";
+const LENDING_RETURN_PREVIEW_SERVER_FETCH_ERROR_MESSAGE = "貸出情報の取得に失敗しました。";
 
-export async function fetchLendingDetailForServer(
+export async function fetchLendingReturnPreviewForServer(
   lendingId: string,
-): Promise<LendingDetailResponse | null> {
+): Promise<LendingReturnPreviewResponse | null> {
   const cookieStore = await cookies();
 
   try {
-    const response = await fetch(`${apiOrigin}/api/lendings/${lendingId}/`, {
+    const response = await fetch(`${apiOrigin}/api/lendings/${lendingId}/return/`, {
       headers: {
         cookie: cookieStore.toString(),
       },
@@ -23,11 +23,11 @@ export async function fetchLendingDetailForServer(
     }
 
     if (response.status !== 200) {
-      throw new Error(LENDING_DETAIL_SERVER_FETCH_ERROR_MESSAGE);
+      throw new Error(LENDING_RETURN_PREVIEW_SERVER_FETCH_ERROR_MESSAGE);
     }
 
-    return (await response.json()) as LendingDetailResponse;
+    return (await response.json()) as LendingReturnPreviewResponse;
   } catch {
-    throw new Error(LENDING_DETAIL_SERVER_FETCH_ERROR_MESSAGE);
+    throw new Error(LENDING_RETURN_PREVIEW_SERVER_FETCH_ERROR_MESSAGE);
   }
 }

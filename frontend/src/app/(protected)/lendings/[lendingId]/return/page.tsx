@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/layout/page-frame";
 import { fetchBookDetail } from "@/lib/books/server";
-import { fetchLendingDetailForServer } from "@/lib/lending/server";
+import { fetchLendingReturnPreviewForServer } from "@/lib/lending/server";
 import { ReturnReceptionContent } from "../../_components/return-reception-content";
 
 type ReturnReceptionPageProps = {
@@ -37,7 +37,7 @@ export default async function ReturnReceptionPage({
 
   const [book, lendingDetail] = await Promise.all([
     fetchBookDetail(bookId),
-    fetchLendingDetailForServer(lendingId),
+    fetchLendingReturnPreviewForServer(lendingId),
   ]);
 
   if (!book || !lendingDetail) {
@@ -45,7 +45,6 @@ export default async function ReturnReceptionPage({
   }
 
   const isReturnable =
-    lendingDetail.book_id === bookId &&
     book.availability.status_code === "using" &&
     book.availability.current_lending_id === lendingId;
 
@@ -65,8 +64,8 @@ export default async function ReturnReceptionPage({
         {isReturnable ? (
           <ReturnReceptionContent
             lendingId={lendingId}
-            title={lendingDetail.book_title}
-            coverImageUrl={lendingDetail.cover_image_url}
+            title={book.title}
+            coverImageUrl={book.cover_image_url}
             dueDate={lendingDetail.due_date}
             bookCopyLocation={lendingDetail.book_copy_location}
           />

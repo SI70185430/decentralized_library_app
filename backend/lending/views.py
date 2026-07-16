@@ -7,9 +7,10 @@ from lending.serializers import (
     BorrowBookSerializer,
     CurrentLendingListResponseSerializer,
     LendingActionResponseSerializer,
+    LendingCompletionResponseSerializer,
     LendingCreateResponseSerializer,
-    LendingDetailResponseSerializer,
     LendingHistoryListResponseSerializer,
+    LendingReturnPreviewResponseSerializer,
     ReservationCreateResponseSerializer,
     ReservationCreateSerializer,
     ReservationDetailResponseSerializer,
@@ -35,10 +36,6 @@ from lending.services.reservation_actions import (
     list_current_reservations,
 )
 
-NotImplementedResponseSerializer = inline_serializer(
-    name="LendingNotImplementedResponse",
-    fields={"detail": serializers.CharField()},
-)
 ConflictResponseSerializer = inline_serializer(
     name="LendingConflictResponse",
     fields={"detail": serializers.CharField()},
@@ -68,13 +65,6 @@ ValidationErrorResponseSerializer = inline_serializer(
         ),
     },
 )
-
-
-def not_implemented_response():
-    return Response(
-        {"detail": "Not implemented"},
-        status=status.HTTP_501_NOT_IMPLEMENTED,
-    )
 
 
 def conflict_response(error: ActionConflictError) -> Response:
@@ -124,7 +114,7 @@ class LendingDetailView(APIView):
     @extend_schema(
         request=None,
         responses={
-            200: LendingDetailResponseSerializer,
+            200: LendingCompletionResponseSerializer,
             404: NotFoundResponseSerializer,
         },
     )
@@ -134,7 +124,7 @@ class LendingDetailView(APIView):
         except LendingNotFoundError as error:
             return not_found_response(error)
 
-        response_serializer = LendingDetailResponseSerializer(lending)
+        response_serializer = LendingCompletionResponseSerializer(lending)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
@@ -161,6 +151,22 @@ class LendingExtendView(APIView):
 
 
 class LendingReturnView(APIView):
+    @extend_schema(
+        request=None,
+        responses={
+            200: LendingReturnPreviewResponseSerializer,
+            404: NotFoundResponseSerializer,
+        },
+    )
+    def get(self, request, lending_id):
+        try:
+            lending = get_lending_detail(user=request.user, lending_id=lending_id)
+        except LendingNotFoundError as error:
+            return not_found_response(error)
+
+        response_serializer = LendingReturnPreviewResponseSerializer(lending)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
+
     @extend_schema(
         request=None,
         responses={
