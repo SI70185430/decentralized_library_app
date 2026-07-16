@@ -48,8 +48,21 @@ NotFoundResponseSerializer = inline_serializer(
     name="LendingNotFoundResponse",
     fields={"detail": serializers.CharField()},
 )
-ValidationErrorResponseSerializer = inline_serializer(
+LendingValidationErrorResponseSerializer = inline_serializer(
     name="LendingValidationErrorResponse",
+    fields={
+        "book_id": serializers.ListField(
+            child=serializers.CharField(),
+            required=False,
+        ),
+        "non_field_errors": serializers.ListField(
+            child=serializers.CharField(),
+            required=False,
+        ),
+    },
+)
+ReservationValidationErrorResponseSerializer = inline_serializer(
+    name="ReservationValidationErrorResponse",
     fields={
         "book_id": serializers.ListField(
             child=serializers.CharField(),
@@ -86,7 +99,7 @@ class LendingCreateView(APIView):
         request=BorrowBookSerializer,
         responses={
             201: LendingCreateResponseSerializer,
-            400: ValidationErrorResponseSerializer,
+            400: LendingValidationErrorResponseSerializer,
             403: ForbiddenResponseSerializer,
             404: NotFoundResponseSerializer,
             409: ConflictResponseSerializer,
@@ -215,7 +228,7 @@ class ReservationCreateView(APIView):
         request=ReservationCreateSerializer,
         responses={
             201: ReservationCreateResponseSerializer,
-            400: ValidationErrorResponseSerializer,
+            400: ReservationValidationErrorResponseSerializer,
             403: ForbiddenResponseSerializer,
             404: NotFoundResponseSerializer,
             409: ConflictResponseSerializer,
