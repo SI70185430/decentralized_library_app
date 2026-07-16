@@ -18,7 +18,7 @@ export function ReturnCompleteContent() {
       </div>
 
       <p data-ui-id="txt_book_return" className="text-left text-lg font-semibold">
-        ご利用ありがとうございます。<br />
+        ご利用ありがとうございました。<br />
         返却処理が完了しました。
       </p>
 
