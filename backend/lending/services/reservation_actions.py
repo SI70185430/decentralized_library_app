@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from accounts.models import AppUser
 from books.models import Book, BookCopy
+from config.api_errors import ApiErrorCode, DomainError
 from lending.models import Lending, Reservation
 from lending.services.book_actions import (
     DEFAULT_LENDING_DAYS,
@@ -14,7 +15,6 @@ from lending.services.book_actions import (
     BookNotFoundError,
 )
 from lending.services.borrowing_limits import (
-    LENDING_RESERVATION_LIMIT_ERROR_MESSAGE,
     MAX_CONCURRENT_LENDING_AND_RESERVATION_COUNT,
     lock_user_and_get_current_usage,
 )
@@ -22,8 +22,11 @@ from lending.services.borrowing_limits import (
 DEFAULT_RESERVATION_HOLD_DAYS = 10
 
 
-class ReservationNotFoundError(Exception):
+class ReservationNotFoundError(DomainError):
     """指定された予約が見つからない場合の例外。"""
+
+    def __init__(self):
+        super().__init__(ApiErrorCode.RESERVATION_NOT_FOUND)
 
 
 # 「基準日」を外から渡せる余地があると保守性・確認容易性が向上するため、引数として渡せるように記述
@@ -34,7 +37,9 @@ def release_expired_reservations(reference_date=None) -> int:
 
     released_count = 0
     with transaction.atomic():
-        reservations = Reservation.objects.select_for_update().filter(expires_date__lt=reference_date)
+        reservations = Reservation.objects.select_for_update().filter(
+            expires_date__lt=reference_date
+        )
         for reservation in reservations:
             book_copy = BookCopy.objects.select_for_update().get(pk=reservation.book_copy_id)
             if book_copy.status != BookCopy.Status.RESERVED:
@@ -50,55 +55,58 @@ def release_expired_reservations(reference_date=None) -> int:
 
 
 def create_reservation(user: AppUser, book_id: UUID, scheduled_date) -> Reservation:
-    try:
-        with transaction.atomic():
-            if not Book.objects.filter(pk=book_id).exists():
-                raise BookNotFoundError("書籍が見つかりません")
+    with transaction.atomic():
+        if not Book.objects.filter(pk=book_id).exists():
+            raise BookNotFoundError()
 
-            current_usage = lock_user_and_get_current_usage(user)
-            if current_usage >= MAX_CONCURRENT_LENDING_AND_RESERVATION_COUNT:
-                raise ActionConflictError(LENDING_RESERVATION_LIMIT_ERROR_MESSAGE)
+        current_usage = lock_user_and_get_current_usage(user)
+        if current_usage >= MAX_CONCURRENT_LENDING_AND_RESERVATION_COUNT:
+            raise ActionConflictError(ApiErrorCode.BORROWING_LIMIT_REACHED)
 
-            if (
-                Lending.objects.select_for_update()
-                .filter(
-                    user=user,
-                    book_copy__book_id=book_id,
-                    returned_date__isnull=True,
-                )
-                .exists()
-            ):
-                raise ActionConflictError("すでにこの本を利用中です")
-
-            if (
-                Reservation.objects.select_for_update()
-                .filter(
-                    user=user,
-                    book_copy__book_id=book_id,
-                )
-                .exists()
-            ):
-                raise ActionConflictError("すでにこの本を予約中です")
-
-            book_copy = (
-                BookCopy.objects.select_for_update()
-                .filter(book_id=book_id, status=BookCopy.Status.AVAILABLE)
-                .order_by("id")
-                .first()
+        if (
+            Lending.objects.select_for_update()
+            .filter(
+                user=user,
+                book_copy__book_id=book_id,
+                returned_date__isnull=True,
             )
-            if book_copy is None:
-                raise ActionConflictError("予約可能な蔵書がありません")
+            .exists()
+        ):
+            raise ActionConflictError(ApiErrorCode.ALREADY_BORROWING_BOOK)
 
+        if (
+            Reservation.objects.select_for_update()
+            .filter(
+                user=user,
+                book_copy__book_id=book_id,
+            )
+            .exists()
+        ):
+            raise ActionConflictError(ApiErrorCode.ALREADY_RESERVING_BOOK)
+
+        book_copy = (
+            BookCopy.objects.select_for_update()
+            .filter(book_id=book_id, status=BookCopy.Status.AVAILABLE)
+            .order_by("id")
+            .first()
+        )
+        if book_copy is None:
+            raise ActionConflictError(ApiErrorCode.NO_AVAILABLE_BOOK_COPY)
+
+        try:
             reservation = Reservation.objects.create(
                 book_copy=book_copy,
                 user=user,
                 scheduled_date=scheduled_date,
                 expires_date=scheduled_date + timedelta(days=DEFAULT_RESERVATION_HOLD_DAYS - 1),
             )
-            book_copy.status = BookCopy.Status.RESERVED
-            book_copy.save(update_fields=["status", "updated_at"])
-    except IntegrityError as error:
-        raise ActionConflictError("この蔵書はすでに予約されています") from error
+        except IntegrityError as error:
+            if not _is_constraint_violation(error, "reservation_book_copy_unique"):
+                raise
+            raise ActionConflictError(ApiErrorCode.BOOK_COPY_ALREADY_RESERVED) from error
+
+        book_copy.status = BookCopy.Status.RESERVED
+        book_copy.save(update_fields=["status", "updated_at"])
 
     return reservation
 
@@ -118,33 +126,36 @@ def cancel_reservation(user: AppUser, reservation_id: UUID) -> None:
 
 
 def convert_reservation_to_lending(user: AppUser, reservation_id: UUID) -> Lending:
-    try:
-        with transaction.atomic():
-            reservation = _get_locked_reservation(reservation_id)
-            _ensure_reservation_owner(reservation, user)
+    with transaction.atomic():
+        reservation = _get_locked_reservation(reservation_id)
+        _ensure_reservation_owner(reservation, user)
 
-            today = timezone.localdate()
-            if today < reservation.scheduled_date:
-                raise ActionConflictError("予約日より前には貸出に変換できません")
-            if today > reservation.expires_date:
-                raise ActionConflictError("取り置き期限を過ぎています")
+        today = timezone.localdate()
+        if today < reservation.scheduled_date:
+            raise ActionConflictError(ApiErrorCode.RESERVATION_NOT_STARTED)
+        if today > reservation.expires_date:
+            raise ActionConflictError(ApiErrorCode.RESERVATION_EXPIRED)
 
-            book_copy = reservation.book_copy
-            if book_copy.status != BookCopy.Status.RESERVED:
-                raise ActionConflictError("予約中の蔵書ではありません")
+        book_copy = reservation.book_copy
+        if book_copy.status != BookCopy.Status.RESERVED:
+            raise ActionConflictError(ApiErrorCode.BOOK_COPY_NOT_RESERVED)
 
-            borrowed_date = reservation.scheduled_date
+        borrowed_date = reservation.scheduled_date
+        try:
             lending = Lending.objects.create(
                 book_copy=book_copy,
                 user=user,
                 borrowed_date=borrowed_date,
                 due_date=borrowed_date + timedelta(days=DEFAULT_LENDING_DAYS - 1),
             )
-            book_copy.status = BookCopy.Status.ON_LOAN
-            book_copy.save(update_fields=["status", "updated_at"])
-            reservation.delete()
-    except IntegrityError as error:
-        raise ActionConflictError("貸出状態が競合しました") from error
+        except IntegrityError as error:
+            if not _is_constraint_violation(error, "lending_active_book_copy_unique"):
+                raise
+            raise ActionConflictError(ApiErrorCode.LENDING_STATE_CONFLICT) from error
+
+        book_copy.status = BookCopy.Status.ON_LOAN
+        book_copy.save(update_fields=["status", "updated_at"])
+        reservation.delete()
 
     return lending
 
@@ -164,16 +175,27 @@ def get_reservation_detail(user: AppUser, reservation_id: UUID) -> Reservation:
             user=user,
         )
     except Reservation.DoesNotExist as error:
-        raise ReservationNotFoundError("予約が見つかりません") from error
+        raise ReservationNotFoundError() from error
 
 
 def _get_locked_reservation(reservation_id: UUID) -> Reservation:
     try:
-        return Reservation.objects.select_for_update().select_related("book_copy").get(pk=reservation_id)
+        return (
+            Reservation.objects.select_for_update()
+            .select_related("book_copy")
+            .get(pk=reservation_id)
+        )
     except Reservation.DoesNotExist as error:
-        raise ReservationNotFoundError("予約が見つかりません") from error
+        raise ReservationNotFoundError() from error
 
 
 def _ensure_reservation_owner(reservation: Reservation, user: AppUser) -> None:
     if reservation.user_id != user.id:
-        raise PermissionDenied("この予約を操作する権限がありません")
+        raise PermissionDenied()
+
+
+def _is_constraint_violation(error: IntegrityError, constraint_name: str) -> bool:
+    """Identify only the known PostgreSQL constraints that represent races."""
+    cause = getattr(error, "__cause__", None)
+    diagnostic = getattr(cause, "diag", None) or getattr(error, "diag", None)
+    return getattr(diagnostic, "constraint_name", None) == constraint_name

@@ -4,6 +4,7 @@ from django.utils import timezone
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from config.api_errors import ApiErrorCode
 from lending.services.book_actions import DEFAULT_LENDING_DAYS
 
 
@@ -17,7 +18,10 @@ class ReservationCreateSerializer(serializers.Serializer):
 
     def validate_scheduled_date(self, value):
         if value <= timezone.localdate():
-            raise serializers.ValidationError("予約日は明日以降の日付を指定してください")
+            raise serializers.ValidationError(
+                "予約日は明日以降の日付を指定してください",
+                code=ApiErrorCode.RESERVATION_DATE_MUST_BE_FUTURE.value,
+            )
         return value
 
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { JapaneseCalendar } from "@/components/layout/japanese-calendar";
+import { ApiError, GENERIC_API_ERROR_MESSAGE } from "@/lib/api/errors";
 import { createLending } from "@/lib/lending/client";
 import { createReservation } from "@/lib/reservations/client";
 
@@ -12,7 +13,7 @@ const DEFAULT_LENDING_DAYS = 30;
 const API_DATE_FORMAT = "yyyy-MM-dd";
 const DISPLAY_DATE_FORMAT = "yyyy/MM/dd";
 const PAST_DATE_ERROR_MESSAGE = "過去の日付は選択できません。";
-const GENERIC_SUBMIT_ERROR_MESSAGE = "処理に失敗しました。時間をおいて再度お試しください。";
+const GENERIC_SUBMIT_ERROR_MESSAGE = GENERIC_API_ERROR_MESSAGE;
 
 type BookBorrowScheduleFormProps = {
   bookId: string;
@@ -30,7 +31,7 @@ function formatPeriod(startDate: Date): string {
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : GENERIC_SUBMIT_ERROR_MESSAGE;
+  return error instanceof ApiError ? error.message : GENERIC_SUBMIT_ERROR_MESSAGE;
 }
 
 export function BookBorrowScheduleForm({

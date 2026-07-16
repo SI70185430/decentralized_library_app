@@ -1,3 +1,5 @@
+import { ApiError } from "@/lib/api/errors";
+
 export type ReservationActionResponse = {
   id: string;
 };
@@ -10,12 +12,6 @@ export type ReservationDetailResponse = {
   loan_period_end: string;
 };
 
-export class ReservationApiError extends Error {
-  status: number | null;
-
-  constructor(message: string, status: number | null = null) {
-    super(message);
-    this.name = "ReservationApiError";
-    this.status = status;
-  }
-}
+// Backward-compatible domain name; the payload and message policy are shared.
+export type ReservationApiError = ApiError;
+export const ReservationApiError = ApiError;

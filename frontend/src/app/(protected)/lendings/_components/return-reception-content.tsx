@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { BookDetailCover } from "@/app/(protected)/books/_components/book-detail-cover";
+import { ApiError, GENERIC_API_ERROR_MESSAGE } from "@/lib/api/errors";
 import { returnLending } from "@/lib/lending/client";
 
 const API_DATE_FORMAT = "yyyy-MM-dd";
 const DISPLAY_DATE_FORMAT = "yyyy/MM/dd";
-const GENERIC_SUBMIT_ERROR_MESSAGE = "処理に失敗しました。時間をおいて再度お試しください。";
+const GENERIC_SUBMIT_ERROR_MESSAGE = GENERIC_API_ERROR_MESSAGE;
 
 type ReturnReceptionContentProps = {
   lendingId: string;
@@ -24,7 +25,7 @@ function formatApiDate(value: string): string {
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : GENERIC_SUBMIT_ERROR_MESSAGE;
+  return error instanceof ApiError ? error.message : GENERIC_SUBMIT_ERROR_MESSAGE;
 }
 
 export function ReturnReceptionContent({

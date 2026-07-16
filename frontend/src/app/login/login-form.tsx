@@ -5,10 +5,15 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ApiValidationError, type ApiValidationErrors } from "@/lib/auth/types";
+import {
+  GENERIC_API_ERROR_MESSAGE,
+  messageForFieldError,
+  ApiError,
+} from "@/lib/api/errors";
 import { login } from "@/lib/auth/client";
+import type { LoginFormErrors } from "@/lib/auth/types";
 
-function fieldError(errors: ApiValidationErrors, field: string) {
+function fieldError(errors: LoginFormErrors, field: string) {
   return errors[field]?.[0];
 }
 
@@ -21,8 +26,8 @@ function normalizeEmployeeId(value: string) {
     );
 }
 
-function validateLoginForm(employeeId: string, password: string): ApiValidationErrors {
-  const errors: ApiValidationErrors = {};
+function validateLoginForm(employeeId: string, password: string): LoginFormErrors {
+  const errors: LoginFormErrors = {};
   const normalizedEmployeeId = normalizeEmployeeId(employeeId);
 
   if (!normalizedEmployeeId) {
@@ -38,9 +43,18 @@ function validateLoginForm(employeeId: string, password: string): ApiValidationE
   return errors;
 }
 
+function toLoginFormErrors(error: ApiError): LoginFormErrors {
+  return Object.fromEntries(
+    Object.entries(error.fieldErrors).map(([field, codes]) => [
+      field,
+      codes.map((code) => messageForFieldError(field, code)),
+    ]),
+  );
+}
+
 export function LoginForm() {
   const router = useRouter();
-  const [errors, setErrors] = useState<ApiValidationErrors>({});
+  const [errors, setErrors] = useState<LoginFormErrors>({});
   const [submitError, setSubmitError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -68,12 +82,14 @@ export function LoginForm() {
       await login(normalizeEmployeeId(employeeId), password);
       router.replace("/home");
     } catch (error) {
-      if (error instanceof ApiValidationError) {
-        setErrors(error.errors);
+      if (error instanceof ApiError && error.code === "VALIDATION_ERROR") {
+        setErrors(toLoginFormErrors(error));
         return;
       }
 
-      setSubmitError(error instanceof Error ? error.message : "ログインに失敗しました");
+      setSubmitError(
+        error instanceof ApiError ? error.message : GENERIC_API_ERROR_MESSAGE,
+      );
     } finally {
       setIsSubmitting(false);
     }

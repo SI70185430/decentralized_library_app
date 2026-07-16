@@ -1,5 +1,11 @@
 import { cookies } from "next/headers";
 
+import {
+  apiErrorFromResponse,
+  apiErrorFromUnknown,
+  GENERIC_API_ERROR_MESSAGE,
+  type ApiFieldErrors,
+} from "@/lib/api/errors";
 import { apiOrigin } from "@/lib/api/config";
 import { buildBookSearchApiQuery } from "@/lib/books/search-params";
 import type {
@@ -9,11 +15,7 @@ import type {
   PaginatedBookResponse,
 } from "@/lib/books/types";
 
-const BOOK_GENRES_FETCH_ERROR_MESSAGE = "ジャンル一覧の取得に失敗しました";
-const BOOK_SEARCH_FATAL_MESSAGE = "検索結果の取得に失敗しました";
-const BOOK_DETAIL_FETCH_ERROR_MESSAGE = "書籍詳細の取得に失敗しました";
-
-export type BookSearchValidationErrors = Record<string, string[]>;
+export type BookSearchValidationErrors = ApiFieldErrors;
 
 export type FetchBooksResult =
   | {
@@ -28,7 +30,7 @@ export type FetchBooksResult =
   | {
       ok: false;
       type: "fatal";
-      message: string;
+      fallbackMessage: string;
     };
 
 async function getCookieHeader(): Promise<string> {
@@ -37,26 +39,34 @@ async function getCookieHeader(): Promise<string> {
 }
 
 export async function fetchBookGenres(): Promise<BookGenre[]> {
-  const response = await fetch(`${apiOrigin}/api/books/genres/`, {
-    headers: {
-      cookie: await getCookieHeader(),
-    },
-    cache: "no-store",
-  });
+  const cookieHeader = await getCookieHeader();
 
-  if (!response.ok) {
-    throw new Error(BOOK_GENRES_FETCH_ERROR_MESSAGE);
+  try {
+    const response = await fetch(`${apiOrigin}/api/books/genres/`, {
+      headers: {
+        cookie: cookieHeader,
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw await apiErrorFromResponse(response);
+    }
+
+    return (await response.json()) as BookGenre[];
+  } catch (error) {
+    throw apiErrorFromUnknown(error);
   }
-
-  return (await response.json()) as BookGenre[];
 }
 
 export async function fetchBooks(params: BookSearchParams): Promise<FetchBooksResult> {
+  const query = buildBookSearchApiQuery(params);
+  const cookieHeader = await getCookieHeader();
+
   try {
-    const query = buildBookSearchApiQuery(params);
     const response = await fetch(`${apiOrigin}/api/books/?${query.toString()}`, {
       headers: {
-        cookie: await getCookieHeader(),
+        cookie: cookieHeader,
       },
       cache: "no-store",
     });
@@ -68,43 +78,51 @@ export async function fetchBooks(params: BookSearchParams): Promise<FetchBooksRe
       };
     }
 
-    if (response.status === 400) {
+    const error = await apiErrorFromResponse(response);
+
+    if (response.status === 400 && error.code === "VALIDATION_ERROR") {
       return {
         ok: false,
         type: "validation",
-        errors: (await response.json()) as BookSearchValidationErrors,
+        errors: error.fieldErrors,
       };
     }
 
     return {
       ok: false,
       type: "fatal",
-      message: BOOK_SEARCH_FATAL_MESSAGE,
+      fallbackMessage: error.message || GENERIC_API_ERROR_MESSAGE,
     };
   } catch {
     return {
       ok: false,
       type: "fatal",
-      message: BOOK_SEARCH_FATAL_MESSAGE,
+      fallbackMessage: GENERIC_API_ERROR_MESSAGE,
     };
   }
 }
 
 export async function fetchBookDetail(bookId: string): Promise<BookDetail | null> {
-  const response = await fetch(`${apiOrigin}/api/books/${bookId}/`, {
-    headers: {
-      cookie: await getCookieHeader(),
-    },
-    cache: "no-store",
-  });
+  const cookieHeader = await getCookieHeader();
 
-  if (response.ok) {
-    return (await response.json()) as BookDetail;
+  try {
+    const response = await fetch(`${apiOrigin}/api/books/${bookId}/`, {
+      headers: {
+        cookie: cookieHeader,
+      },
+      cache: "no-store",
+    });
+
+    if (response.ok) {
+      return (await response.json()) as BookDetail;
+    }
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    throw await apiErrorFromResponse(response);
+  } catch (error) {
+    throw apiErrorFromUnknown(error);
   }
-
-  if (response.status === 404) {
-    return null;
-  }
-
-  throw new Error(BOOK_DETAIL_FETCH_ERROR_MESSAGE);
 }

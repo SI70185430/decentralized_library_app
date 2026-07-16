@@ -5,23 +5,11 @@ export type AuthUser = {
   username: string;
 };
 
-// ログインユーザーを基にしたAPI responseの型
-// login/me/等で使用
+// login/me/等で使用する正常 response の型
 export type AuthUserResponse = {
   user: AuthUser;
 };
 
-// DRFでのvalidetion errorをfrontendで扱うための型
-// DRFではerrorのvalueは一般的にstring[]型
-export type ApiValidationErrors = Record<string, string[]>;
-
-// APIのvalidetion error内容を保持するclass
-export class ApiValidationError extends Error {
-  readonly errors: ApiValidationErrors;
-
-  constructor(errors: ApiValidationErrors) {
-    super("入力内容を確認してください");
-    this.name = "ApiValidationError";
-    this.errors = errors;
-  }
-}
+// ブラウザ上のログインフォームだけが扱う表示文言の型。
+// Backend の validation code 型とは分離する。
+export type LoginFormErrors = Record<string, string[]>;

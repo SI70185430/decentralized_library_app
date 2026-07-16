@@ -9,6 +9,7 @@ from books.models import Book, Genre
 from books.services.book_detail import build_book_detail_state
 from books.services.book_search import BookSearchParams
 from books.services.isbn import normalize_isbn
+from config.api_errors import ApiErrorCode
 
 GENRE_ERROR_MESSAGE = "存在するジャンルを指定してください"
 SEARCH_PARAM_FIELDS = ("keyword", "title", "author", "publisher", "isbn", "genre")
@@ -29,7 +30,10 @@ class BookSearchQuerySerializer(serializers.Serializer):
         try:
             return normalize_isbn(value)
         except DjangoValidationError as error:
-            raise serializers.ValidationError(error.messages) from error
+            raise serializers.ValidationError(
+                error.messages,
+                code=ApiErrorCode.ISBN_INVALID.value,
+            ) from error
 
     def validate_genre(self, value: str) -> str:
         if not value:
@@ -37,7 +41,10 @@ class BookSearchQuerySerializer(serializers.Serializer):
 
         # htmlのみで仮UIを作成した都合で生じたエラーチェック
         if not Genre.objects.filter(c_code_genre=value).exists():
-            raise serializers.ValidationError(GENRE_ERROR_MESSAGE)
+            raise serializers.ValidationError(
+                GENRE_ERROR_MESSAGE,
+                code=ApiErrorCode.GENRE_NOT_FOUND.value,
+            )
 
         return value
 
@@ -118,7 +125,9 @@ class BookDetailSerializer(BookListSerializer):
         }
 
     def _get_detail_state(self, obj: Book):
-        if not hasattr(self, "_book_detail_state"): #get_availability()とget_actions()でDBの読み込みが重複しないようにするための一時キャッシュ
+        if not hasattr(
+            self, "_book_detail_state"
+        ):  # get_availability()とget_actions()でDBの読み込みが重複しないようにするための一時キャッシュ
             request = self.context["request"]
             self._book_detail_state = build_book_detail_state(obj, request.user)
 

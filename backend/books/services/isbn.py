@@ -2,6 +2,8 @@ import re
 
 from django.core.exceptions import ValidationError
 
+from config.api_errors import ApiErrorCode
+
 ISBN_ERROR_MESSAGE = "10桁または13桁で正当なISBNを入力してください"
 
 
@@ -12,15 +14,15 @@ def normalize_isbn(value: str) -> str:
 
     if re.fullmatch(r"\d{13}", normalized):
         if not is_valid_isbn13(normalized):
-            raise ValidationError(ISBN_ERROR_MESSAGE)
+            raise ValidationError(ISBN_ERROR_MESSAGE, code=ApiErrorCode.ISBN_INVALID.value)
         return normalized
 
     if re.fullmatch(r"\d{9}[\dX]", normalized):
         if not is_valid_isbn10(normalized):
-            raise ValidationError(ISBN_ERROR_MESSAGE)
+            raise ValidationError(ISBN_ERROR_MESSAGE, code=ApiErrorCode.ISBN_INVALID.value)
         return convert_isbn10_to_isbn13(normalized)
 
-    raise ValidationError(ISBN_ERROR_MESSAGE)
+    raise ValidationError(ISBN_ERROR_MESSAGE, code=ApiErrorCode.ISBN_INVALID.value)
 
 
 def is_valid_isbn10(value: str) -> bool:

@@ -1,78 +1,64 @@
 import { getCsrfToken } from "@/lib/api/csrf";
-import {
-  ApiValidationError,
-  type ApiValidationErrors,
-  type AuthUser,
-  type AuthUserResponse,
-} from "./types";
-
-function isValidationErrors(data: unknown): data is ApiValidationErrors {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return false;
-  }
-
-  return Object.values(data).every(
-    (value) =>
-      Array.isArray(value) && value.every((item) => typeof item === "string"),
-  );
-}
-
-async function readJson(response: Response): Promise<unknown> {
-  return response.json().catch(() => null);
-}
+import { apiErrorFromResponse, apiErrorFromUnknown } from "@/lib/api/errors";
+import type { AuthUser, AuthUserResponse } from "./types";
 
 export async function login(
   employeeId: string,
   password: string,
 ): Promise<AuthUserResponse> {
-  const csrfToken = await getCsrfToken();
-  const response = await fetch("/api/auth/login/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": csrfToken,
-    },
-    body: JSON.stringify({ employee_id: employeeId, password }),
-  });
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await fetch("/api/auth/login/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify({ employee_id: employeeId, password }),
+    });
 
-  if (!response.ok) {
-    const data = await readJson(response);
-
-    if (isValidationErrors(data)) {
-      throw new ApiValidationError(data);
+    if (!response.ok) {
+      throw await apiErrorFromResponse(response);
     }
 
-    throw new Error("ログインに失敗しました");
+    return (await response.json()) as AuthUserResponse;
+  } catch (error) {
+    throw apiErrorFromUnknown(error);
   }
-
-  return (await response.json()) as AuthUserResponse;
 }
 
 export async function logout() {
-  const csrfToken = await getCsrfToken();
-  const response = await fetch("/api/auth/logout/", {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": csrfToken,
-    },
-  });
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await fetch("/api/auth/logout/", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error("ログアウトに失敗しました");
+    if (!response.ok) {
+      throw await apiErrorFromResponse(response);
+    }
+  } catch (error) {
+    throw apiErrorFromUnknown(error);
   }
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
-  const response = await fetch("/api/auth/me/");
+  try {
+    const response = await fetch("/api/auth/me/");
 
-  if (response.status === 401 || response.status === 403) {
-    return null;
+    if (response.status === 401 || response.status === 403) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw await apiErrorFromResponse(response);
+    }
+
+    return ((await response.json()) as AuthUserResponse).user;
+  } catch (error) {
+    throw apiErrorFromUnknown(error);
   }
-
-  if (!response.ok) {
-    throw new Error("ユーザー情報の取得に失敗しました");
-  }
-
-  const data = (await response.json()) as AuthUserResponse;
-  return data.user;
 }

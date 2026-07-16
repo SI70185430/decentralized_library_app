@@ -51,8 +51,8 @@ export function MobileMenu() {
       await logout();
       router.replace("/login");
       router.refresh();
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "ログアウトに失敗しました");
+    } catch {
+      setErrorMessage("ログアウトに失敗しました");
     } finally {
       setIsLoggingOut(false);
     }

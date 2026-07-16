@@ -7,9 +7,9 @@ from django.utils import timezone
 
 from accounts.models import AppUser
 from books.models import Book, BookCopy
+from config.api_errors import ApiErrorCode, DomainError
 from lending.models import MAX_EXTENSION_COUNT, Lending, Reservation
 from lending.services.borrowing_limits import (
-    LENDING_RESERVATION_LIMIT_ERROR_MESSAGE,
     MAX_CONCURRENT_LENDING_AND_RESERVATION_COUNT,
     lock_user_and_get_current_usage,
 )
@@ -18,26 +18,32 @@ DEFAULT_LENDING_DAYS = 30
 DEFAULT_EXTENSION_DAYS = 10
 
 
-class ActionConflictError(Exception):
+class ActionConflictError(DomainError):
     """業務状態により lending action を実行できない場合の例外。"""
 
 
-class BookNotFoundError(Exception):
+class BookNotFoundError(DomainError):
     """指定された書籍が見つからない場合の例外。"""
 
+    def __init__(self):
+        super().__init__(ApiErrorCode.BOOK_NOT_FOUND)
 
-class LendingNotFoundError(Exception):
+
+class LendingNotFoundError(DomainError):
     """指定された貸出が見つからない場合の例外。"""
+
+    def __init__(self):
+        super().__init__(ApiErrorCode.LENDING_NOT_FOUND)
 
 
 def borrow_book(user: AppUser, book_id: UUID) -> Lending:
     with transaction.atomic():
         if not Book.objects.filter(pk=book_id).exists():
-            raise BookNotFoundError("書籍が見つかりません")
+            raise BookNotFoundError()
 
         current_usage = lock_user_and_get_current_usage(user)
         if current_usage >= MAX_CONCURRENT_LENDING_AND_RESERVATION_COUNT:
-            raise ActionConflictError(LENDING_RESERVATION_LIMIT_ERROR_MESSAGE)
+            raise ActionConflictError(ApiErrorCode.BORROWING_LIMIT_REACHED)
 
         if (
             Lending.objects.select_for_update()
@@ -48,7 +54,7 @@ def borrow_book(user: AppUser, book_id: UUID) -> Lending:
             )
             .exists()
         ):
-            raise ActionConflictError("すでにこの本を利用中です")
+            raise ActionConflictError(ApiErrorCode.ALREADY_BORROWING_BOOK)
 
         if (
             Reservation.objects.select_for_update()
@@ -58,7 +64,7 @@ def borrow_book(user: AppUser, book_id: UUID) -> Lending:
             )
             .exists()
         ):
-            raise ActionConflictError("すでにこの本を予約中です")
+            raise ActionConflictError(ApiErrorCode.ALREADY_RESERVING_BOOK)
 
         book_copy = (
             BookCopy.objects.select_for_update()
@@ -67,14 +73,15 @@ def borrow_book(user: AppUser, book_id: UUID) -> Lending:
             .first()
         )
         if book_copy is None:
-            raise ActionConflictError("貸出可能な蔵書がありません")
+            raise ActionConflictError(ApiErrorCode.NO_AVAILABLE_BOOK_COPY)
 
         borrowed_date = timezone.localdate()
         lending = Lending.objects.create(
             book_copy=book_copy,
             user=user,
             borrowed_date=borrowed_date,
-            due_date=borrowed_date + timedelta(days=DEFAULT_LENDING_DAYS - 1), # 当日も含めた30日にするための-1
+            due_date=borrowed_date
+            + timedelta(days=DEFAULT_LENDING_DAYS - 1),  # 当日も含めた30日にするための-1
         )
         book_copy.status = BookCopy.Status.ON_LOAN
         book_copy.save(update_fields=["status", "updated_at"])
@@ -111,7 +118,7 @@ def get_lending_detail(user: AppUser, lending_id: UUID) -> Lending:
             user=user,
         )
     except Lending.DoesNotExist as error:
-        raise LendingNotFoundError("貸出が見つかりません") from error
+        raise LendingNotFoundError() from error
 
 
 def return_lending(user: AppUser, lending_id: UUID) -> Lending:
@@ -142,7 +149,7 @@ def extend_lending(user: AppUser, lending_id: UUID) -> Lending:
         _ensure_book_copy_on_loan(book_copy)
 
         if lending.extension_count >= MAX_EXTENSION_COUNT:
-            raise ActionConflictError("延長回数の上限に達しています")
+            raise ActionConflictError(ApiErrorCode.LENDING_EXTENSION_LIMIT_REACHED)
 
         lending.due_date += timedelta(days=DEFAULT_EXTENSION_DAYS)
         lending.extension_count += 1
@@ -155,19 +162,19 @@ def _get_locked_lending(lending_id: UUID) -> Lending:
     try:
         return Lending.objects.select_for_update().get(pk=lending_id)
     except Lending.DoesNotExist as error:
-        raise LendingNotFoundError("貸出が見つかりません") from error
+        raise LendingNotFoundError() from error
 
 
 def _ensure_lending_owner(lending: Lending, user: AppUser) -> None:
     if lending.user_id != user.id:
-        raise PermissionDenied("この貸出を操作する権限がありません")
+        raise PermissionDenied()
 
 
 def _ensure_active_lending(lending: Lending) -> None:
     if lending.returned_date is not None:
-        raise ActionConflictError("返却済みの貸出です")
+        raise ActionConflictError(ApiErrorCode.LENDING_ALREADY_RETURNED)
 
 
 def _ensure_book_copy_on_loan(book_copy: BookCopy) -> None:
     if book_copy.status != BookCopy.Status.ON_LOAN:
-        raise ActionConflictError("貸出中の蔵書ではありません")
+        raise ActionConflictError(ApiErrorCode.BOOK_COPY_NOT_ON_LOAN)

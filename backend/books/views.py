@@ -13,6 +13,10 @@ from books.serializers import (
     GenreSerializer,
 )
 from books.services.book_search import search_books
+from config.api_error_serializers import (
+    ApiErrorResponseSerializer,
+    ValidationErrorResponseSerializer,
+)
 
 
 class BookPagination(PageNumberPagination):
@@ -35,7 +39,11 @@ class BookListView(APIView):
     @extend_schema(
         operation_id="books_list",
         parameters=[BookSearchQuerySerializer],
-        responses={200: PaginatedBookListResponseSerializer},
+        responses={
+            200: PaginatedBookListResponseSerializer,
+            400: ValidationErrorResponseSerializer,
+            403: ApiErrorResponseSerializer,
+        },
     )
     def get(self, request):
         query_serializer = BookSearchQuerySerializer(data=request.query_params)
@@ -49,7 +57,10 @@ class BookListView(APIView):
 
 
 class GenreListView(APIView):
-    @extend_schema(operation_id="book_genres_list", responses={200: GenreSerializer(many=True)})
+    @extend_schema(
+        operation_id="book_genres_list",
+        responses={200: GenreSerializer(many=True), 403: ApiErrorResponseSerializer},
+    )
     def get(self, request):
         queryset = Genre.objects.order_by("c_code_genre")
         serializer = GenreSerializer(queryset, many=True)
@@ -57,7 +68,14 @@ class GenreListView(APIView):
 
 
 class BookDetailView(APIView):
-    @extend_schema(operation_id="books_retrieve", responses={200: BookDetailSerializer})
+    @extend_schema(
+        operation_id="books_retrieve",
+        responses={
+            200: BookDetailSerializer,
+            403: ApiErrorResponseSerializer,
+            404: ApiErrorResponseSerializer,
+        },
+    )
     def get(self, request, pk):
         book = get_object_or_404(Book.objects.select_related("genre"), pk=pk)
         serializer = BookDetailSerializer(book, context={"request": request})

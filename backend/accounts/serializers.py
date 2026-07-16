@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from config.api_errors import ApiErrorCode
+
 INVALID_LOGIN_MESSAGE = "社員番号またはパスワードが正しくありません"
 
 
@@ -27,10 +29,16 @@ class LoginSerializer(serializers.Serializer):
         try:
             user = User.objects.get(employee_id=employee_id)
         except User.DoesNotExist:
-            raise serializers.ValidationError(INVALID_LOGIN_MESSAGE) from None
+            raise serializers.ValidationError(
+                INVALID_LOGIN_MESSAGE,
+                code=ApiErrorCode.INVALID_CREDENTIALS.value,
+            ) from None
 
         if not user.check_password(password) or not user.is_active:
-            raise serializers.ValidationError(INVALID_LOGIN_MESSAGE)
+            raise serializers.ValidationError(
+                INVALID_LOGIN_MESSAGE,
+                code=ApiErrorCode.INVALID_CREDENTIALS.value,
+            )
 
         self._user = user
         return attrs

@@ -1,3 +1,5 @@
+import { ApiError } from "@/lib/api/errors";
+
 export type LendingActionResponse = {
   id: string;
 };
@@ -14,12 +16,6 @@ export type LendingReturnPreviewResponse = {
   due_date: string;
 };
 
-export class LendingApiError extends Error {
-  status: number | null;
-
-  constructor(message: string, status: number | null = null) {
-    super(message);
-    this.name = "LendingApiError";
-    this.status = status;
-  }
-}
+// Backward-compatible domain name; the payload and message policy are shared.
+export type LendingApiError = ApiError;
+export const LendingApiError = ApiError;

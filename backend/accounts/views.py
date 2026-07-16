@@ -10,6 +10,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.serializers import LoginSerializer, UserSerializer
+from config.api_error_serializers import (
+    ApiErrorResponseSerializer,
+    ValidationErrorResponseSerializer,
+)
 from lending.services.reservation_actions import release_expired_reservations
 
 logger = logging.getLogger(__name__)
@@ -38,7 +42,13 @@ class CsrfTokenView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
-    @extend_schema(request=LoginSerializer, responses={200: UserResponseSerializer})
+    @extend_schema(
+        request=LoginSerializer,
+        responses={
+            200: UserResponseSerializer,
+            400: ValidationErrorResponseSerializer,
+        },
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -54,13 +64,18 @@ class LoginView(APIView):
 
 @method_decorator(csrf_protect, name="dispatch")
 class LogoutView(APIView):
-    @extend_schema(request=None, responses={200: OkResponseSerializer})
+    @extend_schema(
+        request=None,
+        responses={200: OkResponseSerializer, 403: ApiErrorResponseSerializer},
+    )
     def post(self, request):
         logout(request)
         return Response({"detail": "OK"}, status=status.HTTP_200_OK)
 
 
 class MeView(APIView):
-    @extend_schema(responses={200: UserResponseSerializer})
+    @extend_schema(
+        responses={200: UserResponseSerializer, 403: ApiErrorResponseSerializer},
+    )
     def get(self, request):
         return Response({"user": UserSerializer(request.user).data}, status=status.HTTP_200_OK)
