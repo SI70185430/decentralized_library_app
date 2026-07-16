@@ -93,7 +93,15 @@ export function ReturnReceptionContent({
           disabled={isSubmitting}
           className="mx-auto flex min-h-[72px] w-56 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl leading-tight font-bold text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
         >
-          {isSubmitting ? "処理中..." : "保管場所への返却が完了"}
+          {isSubmitting ? (
+            "処理中..."
+          ) : (
+            <>
+              保管場所への
+              <br />
+              返却が完了
+            </>
+          )}
         </button>
       </div>
     </form>
