@@ -4,6 +4,7 @@ import {
   apiErrorFromUnknown,
   ApiError,
 } from "@/lib/api/errors";
+import type { LendingActionResponse } from "@/lib/lending/types";
 import type {
   ReservationActionResponse,
   ReservationDetailResponse,
@@ -30,6 +31,32 @@ export async function createReservation(
     }
 
     return (await response.json()) as ReservationActionResponse;
+  } catch (error) {
+    throw apiErrorFromUnknown(error);
+  }
+}
+
+export async function convertReservationToLending(
+  reservationId: string,
+): Promise<LendingActionResponse> {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await fetch(
+      `/api/reservations/${reservationId}/convert-to-lending/`,
+      {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
+        credentials: "same-origin",
+      },
+    );
+
+    if (response.status !== 200) {
+      throw await apiErrorFromResponse(response);
+    }
+
+    return (await response.json()) as LendingActionResponse;
   } catch (error) {
     throw apiErrorFromUnknown(error);
   }
