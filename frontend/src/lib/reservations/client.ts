@@ -36,6 +36,25 @@ export async function createReservation(
   }
 }
 
+export async function cancelReservation(reservationId: string): Promise<void> {
+  try {
+    const csrfToken = await getCsrfToken();
+    const response = await fetch(`/api/reservations/${reservationId}/cancel/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "same-origin",
+    });
+
+    if (response.status !== 204) {
+      throw await apiErrorFromResponse(response);
+    }
+  } catch (error) {
+    throw apiErrorFromUnknown(error);
+  }
+}
+
 export async function convertReservationToLending(
   reservationId: string,
 ): Promise<LendingActionResponse> {
