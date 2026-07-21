@@ -24,7 +24,6 @@ export function ReservationCancelCompleteContent({
       </div>
 
       <p data-ui-id="txt_cancel_reservation" className="text-left text-lg font-semibold">
-        ご利用ありがとうございます。<br />
         予約のキャンセルが完了しました。
       </p>
 
