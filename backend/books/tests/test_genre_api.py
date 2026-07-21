@@ -2,12 +2,13 @@ from django.test import TestCase
 from django.urls import reverse
 
 from books.models import Genre
-from books.tests.helpers import create_genre
+from books.tests.helpers import create_genre, create_staff_user
 
 
 class GenreApiTests(TestCase):
     def setUp(self):
         Genre.objects.all().delete()
+        self.client.force_login(create_staff_user())
 
     def get_genre_list(self):
         return self.client.get(reverse("books:genre-list"))

@@ -11,11 +11,14 @@ from books.tests.helpers import (
     VALID_ISBN_WITH_HYPHENS,
     create_book,
     create_genre,
+    create_staff_user,
 )
+from config.api_errors import ApiErrorCode
 
 
 class BookSearchApiTests(TestCase):
     def setUp(self):
+        self.client.force_login(create_staff_user())
         self.tech_genre = create_genre(code="55", name="電子通信")
         self.literature_genre = create_genre(code="90", name="文学")
         self.alpha_book = create_book(
@@ -102,13 +105,25 @@ class BookSearchApiTests(TestCase):
         response = self.get_book_list({"isbn": INVALID_ISBN})
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("isbn", response.json())
+        self.assertEqual(
+            response.json(),
+            {
+                "code": ApiErrorCode.VALIDATION_ERROR.value,
+                "field_errors": {"isbn": [ApiErrorCode.ISBN_INVALID.value]},
+            },
+        )
 
     def test_book_list_returns_400_for_unknown_genre(self):
         response = self.get_book_list({"genre": "99"})
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"genre": ["存在するジャンルを指定してください"]})
+        self.assertEqual(
+            response.json(),
+            {
+                "code": ApiErrorCode.VALIDATION_ERROR.value,
+                "field_errors": {"genre": [ApiErrorCode.GENRE_NOT_FOUND.value]},
+            },
+        )
 
     def test_book_list_ignores_category_query_parameter(self):
         response = self.get_book_list({"category": "5", "category_code": "5"})
@@ -170,6 +185,7 @@ class BookSearchPaginationApiTests(TestCase):
         return self.client.get(reverse("books:book-list"), params or {})
 
     def setUp(self):
+        self.client.force_login(create_staff_user())
         for index in range(12):
             create_book(
                 isbn=f"97800000000{index:02d}",

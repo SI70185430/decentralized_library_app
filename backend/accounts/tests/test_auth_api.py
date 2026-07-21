@@ -2,11 +2,12 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
+from config.api_errors import ApiErrorCode
+
 LOGIN_USERNAME = "認証API確認用"
 LOGIN_EMPLOYEE_ID = 888888
 UNKNOWN_EMPLOYEE_ID = 999999
 LOGIN_PASSWORD = "testloginlogoutme"
-INVALID_LOGIN_MESSAGE = "社員番号またはパスワードが正しくありません"
 FRONTEND_ORIGIN = "https://localhost:3000"
 
 
@@ -49,9 +50,11 @@ class AuthApiTests(TestCase):
     def assert_validation_errors_for(self, response, *fields: str):
         self.assertEqual(response.status_code, 400)
         errors = response.json()
-        self.assertEqual(set(errors.keys()), set(fields))
+        self.assertEqual(errors["code"], ApiErrorCode.VALIDATION_ERROR.value)
+        field_errors = errors["field_errors"]
+        self.assertEqual(set(field_errors.keys()), set(fields))
         for field in fields:
-            self.assertTrue(errors[field])
+            self.assertTrue(field_errors[field])
         self.assertNotIn("sessionid", self.client.cookies)
 
     def test_csrf_endpoint_sets_csrf_cookie(self):
@@ -116,7 +119,15 @@ class AuthApiTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"non_field_errors": [INVALID_LOGIN_MESSAGE]})
+        self.assertEqual(
+            response.json(),
+            {
+                "code": ApiErrorCode.VALIDATION_ERROR.value,
+                "field_errors": {
+                    "non_field_errors": [ApiErrorCode.INVALID_CREDENTIALS.value]
+                },
+            },
+        )
         self.assertNotIn("sessionid", self.client.cookies)
 
     def test_login_rejects_unknown_employee_id(self):
@@ -125,7 +136,15 @@ class AuthApiTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {"non_field_errors": [INVALID_LOGIN_MESSAGE]})
+        self.assertEqual(
+            response.json(),
+            {
+                "code": ApiErrorCode.VALIDATION_ERROR.value,
+                "field_errors": {
+                    "non_field_errors": [ApiErrorCode.INVALID_CREDENTIALS.value]
+                },
+            },
+        )
         self.assertNotIn("sessionid", self.client.cookies)
 
     def test_me_returns_authenticated_user(self):

@@ -1,6 +1,6 @@
 from datetime import date
 
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 
 from books.serializers import (
     BookDetailSerializer,
@@ -18,6 +18,7 @@ from books.tests.helpers import (
     VALID_ISBN_WITH_HYPHENS,
     create_book,
     create_genre,
+    create_staff_user,
 )
 
 
@@ -164,8 +165,10 @@ class BookResponseSerializerTests(TestCase):
     def test_book_detail_serializer_returns_same_basic_fields(self):
         genre = create_genre(code="90", name="文学")
         book = create_book(genre=genre, isbn=VALID_ISBN, title="Detail Book")
+        request = RequestFactory().get("/")
+        request.user = create_staff_user()
 
-        data = BookDetailSerializer(book).data
+        data = BookDetailSerializer(book, context={"request": request}).data
 
         self.assertEqual(data["id"], str(book.id))
         self.assertEqual(data["isbn"], VALID_ISBN)
