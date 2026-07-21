@@ -341,11 +341,10 @@ class BookSearchAdminNavigationTests(TestCase):
             employee_id=700011,
         )
 
-    def test_admin_header_links_to_book_search_view(self):
+    def test_admin_header_does_not_link_to_book_search_view(self):
         self.client.force_login(self.staff_user)
 
         response = self.client.get(reverse("admin:index"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "書籍検索", count=1)
-        self.assertContains(response, f'href="{reverse("admin_books_search")}"', count=1)
+        self.assertNotContains(response, f'href="{reverse("admin_books_search")}"')
