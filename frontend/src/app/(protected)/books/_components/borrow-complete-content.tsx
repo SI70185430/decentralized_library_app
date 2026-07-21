@@ -1,17 +1,15 @@
 "use client";
 
-import { format, parse } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { formatPeriod } from "@/lib/date";
 import { fetchLendingCompletion } from "@/lib/lending/client";
 import type { LendingCompletionResponse } from "@/lib/lending/types";
 import { fetchReservationDetail } from "@/lib/reservations/client";
 import type { ReservationDetailResponse } from "@/lib/reservations/types";
 
-const API_DATE_FORMAT = "yyyy-MM-dd";
-const DISPLAY_DATE_FORMAT = "yyyy/MM/dd";
 const DETAIL_FETCH_ERROR_MESSAGE =
   "完了情報を取得できませんでした。ホームに戻って貸出状況をご確認ください。";
 
@@ -31,14 +29,6 @@ type CompleteData =
       type: "reservation";
       detail: ReservationDetailResponse;
     };
-
-function formatApiDate(value: string): string {
-  return format(parse(value, API_DATE_FORMAT, new Date()), DISPLAY_DATE_FORMAT);
-}
-
-function formatPeriod(startDate: string, endDate: string): string {
-  return `${formatApiDate(startDate)}~${formatApiDate(endDate)}`;
-}
 
 type CompleteIllustrationProps = {
   uiId: "img_loan_complete" | "img_reserve_complete";

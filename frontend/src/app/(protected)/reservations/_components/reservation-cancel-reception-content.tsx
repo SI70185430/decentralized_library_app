@@ -1,14 +1,12 @@
 "use client";
 
-import { format, parse } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ApiError, GENERIC_API_ERROR_MESSAGE } from "@/lib/api/errors";
+import { formatPeriod } from "@/lib/date";
 import { cancelReservation } from "@/lib/reservations/client";
 
-const API_DATE_FORMAT = "yyyy-MM-dd";
-const DISPLAY_DATE_FORMAT = "yyyy/MM/dd";
 const GENERIC_SUBMIT_ERROR_MESSAGE = GENERIC_API_ERROR_MESSAGE;
 
 type ReservationCancelReceptionContentProps = {
@@ -18,14 +16,6 @@ type ReservationCancelReceptionContentProps = {
   scheduledDate: string;
   expiresDate: string;
 };
-
-function formatApiDate(value: string): string {
-  return format(parse(value, API_DATE_FORMAT, new Date()), DISPLAY_DATE_FORMAT);
-}
-
-function formatPeriod(startDate: string, endDate: string): string {
-  return `${formatApiDate(startDate)}~${formatApiDate(endDate)}`;
-}
 
 function getErrorMessage(error: unknown): string {
   return error instanceof ApiError ? error.message : GENERIC_SUBMIT_ERROR_MESSAGE;

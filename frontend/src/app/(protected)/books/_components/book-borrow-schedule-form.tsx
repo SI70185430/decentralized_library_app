@@ -1,17 +1,16 @@
 "use client";
 
-import { addDays, format, isBefore, isSameDay, parse, startOfDay } from "date-fns";
+import { addDays, isBefore, isSameDay, startOfDay } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { JapaneseCalendar } from "@/components/layout/japanese-calendar";
 import { ApiError, GENERIC_API_ERROR_MESSAGE } from "@/lib/api/errors";
+import { formatDateForApi, formatDisplayDate, parseApiDate } from "@/lib/date";
 import { createLending } from "@/lib/lending/client";
 import { createReservation } from "@/lib/reservations/client";
 
 const DEFAULT_LENDING_DAYS = 30;
-const API_DATE_FORMAT = "yyyy-MM-dd";
-const DISPLAY_DATE_FORMAT = "yyyy/MM/dd";
 const PAST_DATE_ERROR_MESSAGE = "過去の日付は選択できません。";
 const GENERIC_SUBMIT_ERROR_MESSAGE = GENERIC_API_ERROR_MESSAGE;
 
@@ -21,13 +20,9 @@ type BookBorrowScheduleFormProps = {
   initialSelectedDate: string;
 };
 
-function parseApiDate(value: string): Date {
-  return startOfDay(parse(value, API_DATE_FORMAT, new Date()));
-}
-
-function formatPeriod(startDate: Date): string {
+function formatLendingPeriod(startDate: Date): string {
   const endDate = addDays(startDate, DEFAULT_LENDING_DAYS - 1);
-  return `${format(startDate, DISPLAY_DATE_FORMAT)}~${format(endDate, DISPLAY_DATE_FORMAT)}`;
+  return `${formatDisplayDate(startDate)}~${formatDisplayDate(endDate)}`;
 }
 
 function getErrorMessage(error: unknown): string {
@@ -40,7 +35,9 @@ export function BookBorrowScheduleForm({
   initialSelectedDate,
 }: BookBorrowScheduleFormProps) {
   const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState(() => parseApiDate(initialSelectedDate));
+  const [selectedDate, setSelectedDate] = useState(() =>
+    startOfDay(parseApiDate(initialSelectedDate)),
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -48,8 +45,8 @@ export function BookBorrowScheduleForm({
   const selectedDay = startOfDay(selectedDate);
   const isPastDate = isBefore(selectedDay, today);
   const isBorrowToday = isSameDay(selectedDay, today);
-  const selectedApiDate = format(selectedDay, API_DATE_FORMAT);
-  const lendingPeriod = useMemo(() => formatPeriod(selectedDay), [selectedDay]);
+  const selectedApiDate = formatDateForApi(selectedDay);
+  const lendingPeriod = useMemo(() => formatLendingPeriod(selectedDay), [selectedDay]);
   const submitLabel = isBorrowToday ? "本を借りる" : "本を予約する";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

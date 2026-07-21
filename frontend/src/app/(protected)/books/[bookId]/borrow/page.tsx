@@ -1,8 +1,8 @@
-import { format } from "date-fns";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/layout/page-frame";
+import { formatDateForApi } from "@/lib/date";
 import { fetchBookDetail } from "@/lib/books/server";
 import { BookBorrowScheduleForm } from "../../_components/book-borrow-schedule-form";
 
@@ -40,7 +40,7 @@ export default async function BookBorrowSchedulePage({ params }: BookBorrowSched
           <BookBorrowScheduleForm
             bookId={book.id}
             title={book.title}
-            initialSelectedDate={format(new Date(), "yyyy-MM-dd")}
+            initialSelectedDate={formatDateForApi(new Date())}
           />
         ) : (
           <div className="space-y-5 rounded-md border border-gray-300 bg-gray-50 px-5 py-6 text-center">
