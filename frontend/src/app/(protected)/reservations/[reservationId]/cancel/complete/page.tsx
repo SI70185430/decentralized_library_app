@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/layout/page-frame";
 import { fetchBookDetail } from "@/lib/books/server";
+import { getSingleSearchParam } from "@/lib/search-params";
 import { ReservationCancelCompleteContent } from "../../../_components/reservation-cancel-complete-content";
 
 type ReservationCancelCompletePageProps = {
@@ -10,20 +11,11 @@ type ReservationCancelCompletePageProps = {
   }>;
 };
 
-function getSingleBookId(value: string | string[] | undefined): string | null {
-  if (!value || Array.isArray(value)) {
-    return null;
-  }
-
-  const bookId = value.trim();
-  return bookId || null;
-}
-
 export default async function ReservationCancelCompletePage({
   searchParams,
 }: ReservationCancelCompletePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const bookId = getSingleBookId(resolvedSearchParams.bookId);
+  const bookId = getSingleSearchParam(resolvedSearchParams.bookId);
 
   if (!bookId) {
     notFound();

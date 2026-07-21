@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/layout/page-frame";
 import { fetchBookDetail } from "@/lib/books/server";
+import { getSingleSearchParam } from "@/lib/search-params";
 import { fetchReservationDetailForServer } from "@/lib/reservations/server";
 import { ReservationBorrowReceptionContent } from "../../_components/reservation-borrow-reception-content";
 
@@ -15,21 +16,13 @@ type ReservationBorrowReceptionPageProps = {
   }>;
 };
 
-function getSingleBookId(value: string | string[] | undefined): string | null {
-  if (!value || Array.isArray(value) || !value.trim()) {
-    return null;
-  }
-
-  return value;
-}
-
 export default async function ReservationBorrowReceptionPage({
   params,
   searchParams,
 }: ReservationBorrowReceptionPageProps) {
   const { reservationId } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
-  const bookId = getSingleBookId(resolvedSearchParams.bookId);
+  const bookId = getSingleSearchParam(resolvedSearchParams.bookId);
 
   if (!bookId) {
     notFound();

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { PageFrame } from "@/components/layout/page-frame";
+import { getSingleSearchParam } from "@/lib/search-params";
 import { BorrowCompleteContent } from "../../../_components/borrow-complete-content";
 
 type BorrowResultType = "lending" | "reservation";
@@ -11,14 +12,6 @@ type BorrowCompletePageProps = {
     resultId?: string | string[];
   }>;
 };
-
-function getSingleValue(value: string | string[] | undefined): string | null {
-  if (!value || Array.isArray(value)) {
-    return null;
-  }
-
-  return value;
-}
 
 function getResultType(value: string | null): BorrowResultType | null {
   if (value === "lending" || value === "reservation") {
@@ -46,8 +39,10 @@ function InvalidCompleteParams() {
 
 export default async function BorrowCompletePage({ searchParams }: BorrowCompletePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const resultType = getResultType(getSingleValue(resolvedSearchParams.resultType));
-  const resultId = getSingleValue(resolvedSearchParams.resultId);
+  const resultType = getResultType(
+    getSingleSearchParam(resolvedSearchParams.resultType),
+  );
+  const resultId = getSingleSearchParam(resolvedSearchParams.resultId);
   const title = resultType === "reservation" ? "予約情報" : "貸出情報";
 
   return (

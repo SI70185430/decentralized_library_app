@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PageFrame } from "@/components/layout/page-frame";
 import { fetchBookDetail } from "@/lib/books/server";
 import { fetchLendingReturnPreviewForServer } from "@/lib/lending/server";
+import { getSingleSearchParam } from "@/lib/search-params";
 import { ReturnReceptionContent } from "../../_components/return-reception-content";
 
 type ReturnReceptionPageProps = {
@@ -15,21 +16,13 @@ type ReturnReceptionPageProps = {
   }>;
 };
 
-function getSingleBookId(value: string | string[] | undefined): string | null {
-  if (!value || Array.isArray(value) || !value.trim()) {
-    return null;
-  }
-
-  return value;
-}
-
 export default async function ReturnReceptionPage({
   params,
   searchParams,
 }: ReturnReceptionPageProps) {
   const { lendingId } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
-  const bookId = getSingleBookId(resolvedSearchParams.bookId);
+  const bookId = getSingleSearchParam(resolvedSearchParams.bookId);
 
   if (!bookId) {
     notFound();
