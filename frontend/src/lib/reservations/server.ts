@@ -10,22 +10,28 @@ export async function fetchReservationDetailForServer(
 ): Promise<ReservationDetailResponse | null> {
   const cookieStore = await cookies();
 
+  let response: Response;
+
   try {
-    const response = await fetch(`${apiOrigin}/api/reservations/${reservationId}/`, {
+    response = await fetch(`${apiOrigin}/api/reservations/${reservationId}/`, {
       headers: {
         cookie: cookieStore.toString(),
       },
       cache: "no-store",
     });
+  } catch {
+    throw new Error(RESERVATION_DETAIL_SERVER_FETCH_ERROR_MESSAGE);
+  }
 
-    if (response.status === 404) {
-      return null;
-    }
+  if (response.status === 404) {
+    return null;
+  }
 
-    if (response.status !== 200) {
-      throw new Error(RESERVATION_DETAIL_SERVER_FETCH_ERROR_MESSAGE);
-    }
+  if (response.status !== 200) {
+    throw new Error(RESERVATION_DETAIL_SERVER_FETCH_ERROR_MESSAGE);
+  }
 
+  try {
     return (await response.json()) as ReservationDetailResponse;
   } catch {
     throw new Error(RESERVATION_DETAIL_SERVER_FETCH_ERROR_MESSAGE);
