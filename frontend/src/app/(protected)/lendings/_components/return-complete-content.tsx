@@ -9,7 +9,7 @@ export function ReturnCompleteContent() {
         className="relative mx-auto h-36 w-48 overflow-hidden rounded-md"
       >
         <Image
-          src="/images/loan-complete.png"
+          src="/images/return-complete.png"
           alt="返却処理完了"
           fill
           sizes="192px"
