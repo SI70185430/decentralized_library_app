@@ -53,7 +53,7 @@ function setQueryIfPresent(query: URLSearchParams, key: string, value: FormDataE
 
 export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
   const router = useRouter();
-  const [category, setCategory] = useState(initialValues.genre.slice(0, 1));
+  const [category, setCategory] = useState("");
   const [genre, setGenre] = useState(initialValues.genre);
 
   const genreOptions = category
