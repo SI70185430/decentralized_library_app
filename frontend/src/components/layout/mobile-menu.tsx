@@ -25,14 +25,6 @@ const menuItems = [
     label: "書籍検索",
     href: "/books",
   },
-  {
-    label: "お気に入りレビュー",
-    href: "/favorit_reviews",
-  },
-  {
-    label: "フォローユーザー",
-    href: "/follow_users",
-  },
 ];
 
 const menuItemClassName =
