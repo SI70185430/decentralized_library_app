@@ -9,6 +9,10 @@ EDITABLE_FIELDS = (
     "is_active",
 )
 
+GROUP_FIELDS = (
+    "groups",
+)
+
 
 @admin.register(AppUser)
 class AppUserAdmin(UserAdmin):
@@ -19,7 +23,15 @@ class AppUserAdmin(UserAdmin):
                 "fields": EDITABLE_FIELDS,
             },
         ),
+        (
+            "権限グループ",
+            {
+                "fields": GROUP_FIELDS,
+            },
+        ),
     )
+
+    filter_horizontal = GROUP_FIELDS
 
     list_display = (
         "id",
