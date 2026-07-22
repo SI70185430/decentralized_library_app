@@ -34,9 +34,7 @@ export default async function HomePage() {
   const username = user?.username ?? "";
 
   return (
-    <PageFrame title="ホーム">
-      <p className="px-8 text-sm text-[#777]">ホーム</p>
-
+    <PageFrame title="ホーム" breadcrumbs={[{ label: "ホーム" }]}>
       <div className="mt-8 flex items-start justify-between gap-4 px-8">
         <Link href="/books" className="shrink-0 text-2xl leading-none font-bold">
           書籍検索
