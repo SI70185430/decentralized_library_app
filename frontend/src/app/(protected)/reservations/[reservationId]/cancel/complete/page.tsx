@@ -28,7 +28,7 @@ export default async function ReservationCancelCompletePage({
   }
 
   return (
-    <PageFrame title="予約キャンセル完了" backHref="/home" headerClassName="bg-[#9ff1ff]">
+    <PageFrame title="予約キャンセル完了" backHref="/home">
       <div className="mx-auto mt-6 max-w-[480px] px-6 pb-10">
         <ReservationCancelCompleteContent title={book.title} />
       </div>

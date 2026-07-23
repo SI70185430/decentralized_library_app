@@ -46,7 +46,6 @@ export default async function ReservationCancelReceptionPage({
     <PageFrame
       title="予約キャンセル"
       backHref={`/books/${bookId}`}
-      headerClassName="bg-[#9ff1ff]"
       breadcrumbs={[
         { label: "ホーム", href: "/home" },
         { type: "ellipsis" },

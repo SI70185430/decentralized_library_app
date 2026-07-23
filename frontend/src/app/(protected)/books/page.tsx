@@ -15,7 +15,6 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
     <PageFrame
       title="書籍検索"
       backHref="/home"
-      headerClassName="bg-[#66f274]"
       breadcrumbs={[{ label: "ホーム", href: "/home" }, { label: "書籍検索" }]}
     >
       <div className="mt-8">

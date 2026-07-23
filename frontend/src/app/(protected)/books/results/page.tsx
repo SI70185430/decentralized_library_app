@@ -52,7 +52,6 @@ export default async function BookResultsPage({ searchParams }: BookResultsPageP
     <PageFrame
       title="検索結果"
       backHref={buildSearchBackHref(params)}
-      headerClassName="bg-[#66f274]"
       breadcrumbs={[
         { label: "ホーム", href: "/home" },
         { label: "書籍検索", href: buildSearchBackHref(params) },

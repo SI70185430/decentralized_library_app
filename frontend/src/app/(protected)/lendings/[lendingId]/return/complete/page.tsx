@@ -3,7 +3,7 @@ import { ReturnCompleteContent } from "../../../_components/return-complete-cont
 
 export default function ReturnCompletePage() {
   return (
-    <PageFrame title="返却完了" backHref="/home" headerClassName="bg-[#9ff1ff]">
+    <PageFrame title="返却完了" backHref="/home">
       <div className="mx-auto mt-6 max-w-[480px] px-6 pb-10">
         <ReturnCompleteContent />
       </div>

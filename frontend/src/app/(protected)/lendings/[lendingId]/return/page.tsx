@@ -45,7 +45,6 @@ export default async function ReturnReceptionPage({
     <PageFrame
       title="返却受付"
       backHref={`/books/${bookId}`}
-      headerClassName="bg-[#9ff1ff]"
       breadcrumbs={[
         { label: "ホーム", href: "/home" },
         { type: "ellipsis" },

@@ -46,7 +46,6 @@ export default async function ReservationBorrowReceptionPage({
     <PageFrame
       title="予約書籍の貸出"
       backHref={`/books/${bookId}`}
-      headerClassName="bg-[#9ff1ff]"
       breadcrumbs={[
         { label: "ホーム", href: "/home" },
         { type: "ellipsis" },
