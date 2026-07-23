@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
 import { AppTabs } from "@/components/layout/app-tabs";
 import { PageFrame } from "@/components/layout/page-frame";
 import { getCurrentUser } from "@/lib/auth/server";
@@ -35,10 +36,16 @@ export default async function HomePage() {
 
   return (
     <PageFrame title="ホーム" breadcrumbs={[{ label: "ホーム" }]}>
-      <div className="mt-8 flex items-start justify-between gap-4 px-8">
-        <Link href="/books" className="shrink-0 text-2xl leading-none font-bold">
-          書籍検索
-        </Link>
+      <div className="mt-8 flex items-center justify-between gap-4 px-8">
+        <Button
+          asChild
+          variant="outline"
+          className="h-11 w-fit rounded-lg border-black bg-[#eeeeff] px-4 text-base font-medium whitespace-nowrap text-black shadow-none hover:bg-[#e4e4ff]"
+        >
+          <Link href="/books" id="btn_book_search">
+            書籍検索
+          </Link>
+        </Button>
         <p className="min-w-0 flex-1 break-all text-right text-xl leading-snug font-semibold">
           {username}
         </p>
