@@ -29,7 +29,7 @@ function InvalidCompleteParams() {
       </p>
       <Link
         href="/home"
-        className="inline-flex min-h-12 items-center justify-center border border-black bg-[#66f274] px-6 font-bold text-black"
+        className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black"
       >
         ホームに戻る
       </Link>

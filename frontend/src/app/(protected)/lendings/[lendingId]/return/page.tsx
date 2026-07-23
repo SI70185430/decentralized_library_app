@@ -66,7 +66,7 @@ export default async function ReturnReceptionPage({
             <p className="font-semibold">この貸出は現在返却手続きを行えません。</p>
             <Link
               href={`/books/${bookId}`}
-              className="inline-flex min-h-12 items-center justify-center border border-black bg-[#66f274] px-6 font-bold text-black"
+              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black"
             >
               本の詳細に戻る
             </Link>

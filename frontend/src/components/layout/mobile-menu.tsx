@@ -28,7 +28,7 @@ const menuItems = [
 ];
 
 const menuItemClassName =
-  "block rounded-none px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground";
+  "block rounded-lg px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground";
 
 export function MobileMenu() {
   const router = useRouter();

@@ -48,7 +48,7 @@ export function AppTabs({
             <TabsTrigger
               value={tab.value}
               className={cn(
-                "h-auto flex-none rounded-none border-0 px-0 py-0 text-[23px] leading-none font-medium text-foreground transition-opacity after:hidden data-[state=active]:font-semibold data-[state=inactive]:opacity-80",
+                "h-auto flex-none rounded-lg border-0 px-0 py-0 text-[23px] leading-none font-medium text-foreground transition-opacity after:hidden data-[state=active]:font-semibold data-[state=inactive]:opacity-80",
                 tabButtonClassName,
               )}
             >

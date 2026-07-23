@@ -67,7 +67,7 @@ export default async function ReservationCancelReceptionPage({
             <p className="font-semibold">この予約は現在キャンセルできません。</p>
             <Link
               href={`/books/${bookId}`}
-              className="inline-flex min-h-12 items-center justify-center border border-black bg-[#66f274] px-6 font-bold text-black"
+              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black"
             >
               本の詳細に戻る
             </Link>

@@ -112,7 +112,7 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
             <SelectTrigger
               id="input_category"
               className={cn(
-                "h-12 w-[112px] rounded-none border-black bg-white px-2 text-base",
+                "h-12 w-[112px] rounded-lg border-black bg-white px-2 text-base",
                 category ? "text-black" : "text-[#888]",
               )}
             >
@@ -132,7 +132,7 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
             <SelectTrigger
               id="input_genre"
               className={cn(
-                "h-12 w-[112px] rounded-none border-black bg-white px-2 text-base",
+                "h-12 w-[112px] rounded-lg border-black bg-white px-2 text-base",
                 genre ? "text-black" : "text-[#888]",
               )}
             >

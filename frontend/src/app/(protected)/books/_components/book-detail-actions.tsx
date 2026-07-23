@@ -54,7 +54,7 @@ function BookActionLink({ action, uiId }: BookActionLinkProps) {
       href={action.href}
       data-ui-id={uiId}
       className={cn(
-        "flex w-full items-center justify-center border border-black bg-[#66f274] px-3 text-center leading-tight font-bold text-black",
+        "flex w-full items-center justify-center rounded-lg border border-black bg-[#66f274] px-3 text-center leading-tight font-bold text-black",
         uiId === "btn_primary"
           ? "min-h-[112px] text-[32px] max-[374px]:text-[28px]"
           : "min-h-[58px] text-[26px]",
