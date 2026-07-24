@@ -123,9 +123,7 @@ class AuthApiTests(TestCase):
             response.json(),
             {
                 "code": ApiErrorCode.VALIDATION_ERROR.value,
-                "field_errors": {
-                    "non_field_errors": [ApiErrorCode.INVALID_CREDENTIALS.value]
-                },
+                "field_errors": {"non_field_errors": [ApiErrorCode.INVALID_CREDENTIALS.value]},
             },
         )
         self.assertNotIn("sessionid", self.client.cookies)
@@ -140,9 +138,7 @@ class AuthApiTests(TestCase):
             response.json(),
             {
                 "code": ApiErrorCode.VALIDATION_ERROR.value,
-                "field_errors": {
-                    "non_field_errors": [ApiErrorCode.INVALID_CREDENTIALS.value]
-                },
+                "field_errors": {"non_field_errors": [ApiErrorCode.INVALID_CREDENTIALS.value]},
             },
         )
         self.assertNotIn("sessionid", self.client.cookies)

@@ -9,9 +9,7 @@ EDITABLE_FIELDS = (
     "is_active",
 )
 
-GROUP_FIELDS = (
-    "groups",
-)
+GROUP_FIELDS = ("groups",)
 
 
 @admin.register(AppUser)
