@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { ApiError, GENERIC_API_ERROR_MESSAGE } from "@/lib/api/errors";
 import { formatPeriod } from "@/lib/date";
 import { cancelReservation } from "@/lib/reservations/client";
@@ -74,14 +75,15 @@ export function ReservationCancelReceptionContent({
           </p>
         </div>
 
-        <button
+        <Button
           type="submit"
+          variant="default"
           data-ui-id="btn_cancel_reservation"
           disabled={isSubmitting}
-          className="mx-auto flex min-h-[72px] w-56 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl font-bold text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+          className="mx-auto flex min-h-[72px] w-56 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl font-bold text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600 disabled:opacity-100"
         >
           {isSubmitting ? "処理中..." : "キャンセル"}
-        </button>
+        </Button>
       </div>
     </form>
   );

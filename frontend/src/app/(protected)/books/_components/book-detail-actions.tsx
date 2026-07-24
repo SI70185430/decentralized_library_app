@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
 import { buildBookActionHref, getBookActionLabel } from "@/lib/books/detail-actions";
 import type { BookAction, BookDetail } from "@/lib/books/types";
 import { cn } from "@/lib/utils";
@@ -50,18 +51,20 @@ function getRenderableAction(action: BookAction | null, book: BookDetail): Rende
 
 function BookActionLink({ action, uiId }: BookActionLinkProps) {
   return (
-    <Link
-      href={action.href}
-      data-ui-id={uiId}
+    <Button
+      asChild
+      variant="default"
       className={cn(
-        "flex w-full items-center justify-center rounded-lg border border-black bg-[#66f274] px-3 text-center leading-tight font-bold text-black",
+        "flex w-full items-center justify-center rounded-lg border border-black bg-[#66f274] px-3 text-center leading-tight font-bold text-black hover:bg-[#66f274] hover:text-black",
         uiId === "btn_primary"
           ? "min-h-[112px] text-[32px] max-[374px]:text-[28px]"
           : "min-h-[58px] text-[26px]",
       )}
     >
-      {renderActionLabel(action.label, uiId)}
-    </Link>
+      <Link href={action.href} data-ui-id={uiId}>
+        {renderActionLabel(action.label, uiId)}
+      </Link>
+    </Button>
   );
 }
 

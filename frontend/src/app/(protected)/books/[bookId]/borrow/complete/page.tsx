@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { PageFrame } from "@/components/layout/page-frame";
+import { Button } from "@/components/ui/button";
 import { getSingleSearchParam } from "@/lib/search-params";
 import { BorrowCompleteContent } from "../../../_components/borrow-complete-content";
 
@@ -27,12 +28,13 @@ function InvalidCompleteParams() {
       <p className="font-semibold">
         完了情報を取得できませんでした。ホームに戻って貸出状況をご確認ください。
       </p>
-      <Link
-        href="/home"
-        className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black"
+      <Button
+        asChild
+        variant="default"
+        className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black hover:bg-[#66f274] hover:text-black"
       >
-        ホームに戻る
-      </Link>
+        <Link href="/home">ホームに戻る</Link>
+      </Button>
     </div>
   );
 }

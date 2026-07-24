@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
+
 export function ReturnCompleteContent() {
   return (
     <div className="space-y-7">
@@ -22,13 +24,15 @@ export function ReturnCompleteContent() {
         返却処理が完了しました。
       </p>
 
-      <Link
-        href="/home"
-        data-ui-id="btn_home"
-        className="mx-auto flex min-h-[58px] w-48 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl font-bold text-black"
+      <Button
+        asChild
+        variant="default"
+        className="mx-auto flex min-h-[58px] w-48 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl font-bold text-black hover:bg-[#66f274] hover:text-black"
       >
-        ホームに戻る
-      </Link>
+        <Link href="/home" data-ui-id="btn_home">
+          ホームに戻る
+        </Link>
+      </Button>
     </div>
   );
 }

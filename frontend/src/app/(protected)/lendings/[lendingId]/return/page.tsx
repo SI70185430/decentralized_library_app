@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/layout/page-frame";
+import { Button } from "@/components/ui/button";
 import { fetchBookDetail } from "@/lib/books/server";
 import { fetchLendingReturnPreviewForServer } from "@/lib/lending/server";
 import { getSingleSearchParam } from "@/lib/search-params";
@@ -64,12 +65,13 @@ export default async function ReturnReceptionPage({
         ) : (
           <div className="space-y-5 rounded-md border border-gray-300 bg-gray-50 px-5 py-6 text-center">
             <p className="font-semibold">この貸出は現在返却手続きを行えません。</p>
-            <Link
-              href={`/books/${bookId}`}
-              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black"
+            <Button
+              asChild
+              variant="default"
+              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black hover:bg-[#66f274] hover:text-black"
             >
-              本の詳細に戻る
-            </Link>
+              <Link href={`/books/${bookId}`}>本の詳細に戻る</Link>
+            </Button>
           </div>
         )}
       </div>

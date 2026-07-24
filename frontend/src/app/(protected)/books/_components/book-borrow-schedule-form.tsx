@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { JapaneseCalendar } from "@/components/layout/japanese-calendar";
+import { Button } from "@/components/ui/button";
 import { ApiError, GENERIC_API_ERROR_MESSAGE } from "@/lib/api/errors";
 import { formatDateForApi, formatDisplayDate, parseApiDate } from "@/lib/date";
 import { createLending } from "@/lib/lending/client";
@@ -120,11 +121,12 @@ export function BookBorrowScheduleForm({
           </p>
         </div>
 
-        <button
+        <Button
           type="submit"
+          variant="default"
           data-ui-id="btn_borrow_or_reserve"
           disabled={isSubmitting || isPastDate}
-          className="mx-auto flex min-h-[72px] w-48 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl leading-tight font-bold text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+          className="mx-auto flex min-h-[72px] w-48 items-center justify-center rounded-[10px] border border-black bg-[#66f274] px-4 text-center text-2xl leading-tight font-bold text-black disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600 disabled:opacity-100"
         >
           {isSubmitting ? (
             "処理中..."
@@ -134,7 +136,7 @@ export function BookBorrowScheduleForm({
               {submitLabel}
             </>
           )}
-        </button>
+        </Button>
       </div>
     </form>
   );

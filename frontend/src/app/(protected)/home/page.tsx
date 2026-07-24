@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { AppTabs } from "@/components/layout/app-tabs";
 import { PageFrame } from "@/components/layout/page-frame";
+import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth/server";
 import { fetchHomeTabData } from "@/lib/home/server";
 import { LoanHistoryList } from "./_components/loan-history-list";
@@ -36,13 +37,15 @@ export default async function HomePage() {
   return (
     <PageFrame title="ホーム" breadcrumbs={[{ label: "ホーム" }]}>
       <div className="mt-8 flex items-center justify-between gap-4 px-8">
-        <Link
-          href="/books"
-          id="btn_book_search"
-          className="inline-flex h-11 w-fit shrink-0 items-center justify-center rounded-lg border border-black bg-[#66f274] bg-clip-padding px-4 text-base font-medium whitespace-nowrap text-black shadow-none transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px"
+        <Button
+          asChild
+          variant="default"
+          className="inline-flex h-11 w-fit shrink-0 items-center justify-center rounded-lg border border-black bg-[#66f274] bg-clip-padding px-4 text-base font-medium whitespace-nowrap text-black shadow-none transition-all outline-none select-none hover:bg-[#66f274] hover:text-black"
         >
-          書籍検索
-        </Link>
+          <Link href="/books" id="btn_book_search">
+            書籍検索
+          </Link>
+        </Button>
         <p className="min-w-0 flex-1 break-all text-right text-xl leading-snug font-semibold">
           {username}
         </p>

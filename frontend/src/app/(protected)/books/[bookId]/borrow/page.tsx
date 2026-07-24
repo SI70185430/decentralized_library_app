@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/layout/page-frame";
-import { formatDateForApi } from "@/lib/date";
+import { Button } from "@/components/ui/button";
 import { fetchBookDetail } from "@/lib/books/server";
+import { formatDateForApi } from "@/lib/date";
 import { BookBorrowScheduleForm } from "../../_components/book-borrow-schedule-form";
 
 type BookBorrowSchedulePageProps = {
@@ -44,12 +45,13 @@ export default async function BookBorrowSchedulePage({ params }: BookBorrowSched
         ) : (
           <div className="space-y-5 rounded-md border border-gray-300 bg-gray-50 px-5 py-6 text-center">
             <p className="font-semibold">この書籍は現在貸出手続きを行えません。</p>
-            <Link
-              href={`/books/${bookId}`}
-              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black"
+            <Button
+              asChild
+              variant="default"
+              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black bg-[#66f274] px-6 font-bold text-black hover:bg-[#66f274] hover:text-black"
             >
-              本の詳細に戻る
-            </Link>
+              <Link href={`/books/${bookId}`}>本の詳細に戻る</Link>
+            </Button>
           </div>
         )}
       </div>
