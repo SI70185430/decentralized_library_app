@@ -40,7 +40,7 @@ export default async function HomePage() {
         <Button
           asChild
           variant="outline"
-          className="h-11 w-fit rounded-lg border-black bg-[#eeeeff] px-4 text-base font-medium whitespace-nowrap text-black shadow-none hover:bg-[#e4e4ff]"
+          className="h-11 w-fit rounded-lg border-black bg-[#66f274] px-4 text-base font-medium whitespace-nowrap text-black shadow-none hover:bg-[#66f274]"
         >
           <Link href="/books" id="btn_book_search">
             書籍検索

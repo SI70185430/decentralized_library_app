@@ -154,7 +154,7 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
         id="btn_book_search"
         type="submit"
         variant="outline"
-        className="mx-auto mt-8 flex h-11 w-[176px] rounded-lg border-black bg-[#eeeeff] text-base font-medium text-black hover:bg-[#e4e4ff]"
+        className="mx-auto mt-8 flex h-11 w-[176px] rounded-lg border-black bg-[#66f274] text-base font-medium text-black hover:bg-[#66f274]"
       >
         検索
       </Button>
