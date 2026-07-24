@@ -14,9 +14,56 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework.permissions import AllowAny
+
+from books import admin_views as book_admin_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(
+        "admin/books/register/",
+        admin.site.admin_view(book_admin_views.book_register),
+        name="admin_books_register",
+    ),
+    path(
+        "admin/books/search/",
+        admin.site.admin_view(book_admin_views.book_search),
+        name="admin_books_search",
+    ),
+    path(
+        "admin/books/search/results/",
+        admin.site.admin_view(book_admin_views.book_search_results),
+        name="admin_books_search_results",
+    ),
+    path(
+        "admin/books/isbn-lookup/",
+        admin.site.admin_view(book_admin_views.isbn_lookup),
+        name="admin_books_isbn_lookup",
+    ),
+    path("admin/", admin.site.urls),
+    path(
+        "api/schema/",
+        SpectacularAPIView.as_view(permission_classes=[AllowAny]),
+        name="schema",
+    ),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(
+            url_name="schema",
+            permission_classes=[AllowAny],
+        ),
+        name="swagger-ui",
+    ),
+    path("api/auth/", include("accounts.urls")),
+    path("api/books/", include("books.urls")),
+    path("api/", include("lending.urls")),
 ]
+
+# 書籍登録画面用のcssとjsを読み込むための設定
+if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns()

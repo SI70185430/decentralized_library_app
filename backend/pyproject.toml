@@ -6,9 +6,56 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "django>=6.0.3",
-    "django-cors-headers>=4.9.0",
+    "django-jazzmin>=3.0.4",
     "djangorestframework>=3.17.1",
-    "djangorestframework-simplejwt>=5.5.1",
+    "drf-spectacular>=0.29.0",
     "psycopg2-binary>=2.9.11",
     "python-dotenv>=1.2.2",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.13",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+# Django の自動生成ファイルや環境系は対象外
+extend-exclude = [
+    "migrations",
+    ".venv",
+    "venv",
+    "__pycache__",
+]
+
+[tool.ruff.lint]
+select = [  # 適宜変更予定
+    "E",    # pycodestyle error
+    "F",    # Pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "SIM",  # flake8-simplify
+    "C4",   # flake8-comprehensions
+    "T20",  # print文検出
+]
+
+ignore = [
+    "E501", # 行長。format側に任せる。長いURLや文字列で邪魔になりやすい
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "accounts",
+    "books",
+    "lending",
+    "reviews",
+    "config",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

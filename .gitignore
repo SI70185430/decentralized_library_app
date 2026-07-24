@@ -39,6 +39,7 @@ yarn-error.log*
 
 # env files
 .env
+.env*.local
 next-env.d.ts
 
 # vercel
@@ -54,3 +55,9 @@ Thumbs.db
 
 # VSCode
 .vscode/
+
+# CA
+frontend/certs/
+
+# Reference Material
+docs/

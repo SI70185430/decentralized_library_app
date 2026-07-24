@@ -1,0 +1,182 @@
+.book-register-card {
+  max-width: 404px;
+  margin: 0 auto 32px;
+}
+
+.book-register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.book-register-field {
+  min-width: 0;
+}
+
+.book-register-two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.book-register-form input[type="text"],
+.book-register-form input[type="url"],
+.book-register-form input[type="number"],
+.book-register-form input[type="date"] {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  color: #222;
+  font-size: 20px;
+  line-height: 48px;
+  background: #fff;
+  border: 1px solid #222;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.book-register-form input::placeholder {
+  color: #8e8e8e;
+  opacity: 1;
+}
+
+.book-register-form input[type="date"] {
+  color: #8e8e8e;
+}
+
+.book-register-form input[type="date"]:valid {
+  color: #222;
+}
+
+.book-register-date-control {
+  position: relative;
+}
+
+.book-register-date-field input[type="date"] {
+  padding-right: 20px;
+  font-size: 17px;
+}
+
+#input_purchase_date::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+.book-register-date-control:not(.has-value) input[type="date"] {
+  color: transparent;
+}
+
+.book-register-date-control:focus-within input[type="date"],
+.book-register-date-control.has-value input[type="date"] {
+  color: #222;
+}
+
+.book-register-date-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 1;
+  color: #8e8e8e;
+  font-size: 20px;
+  line-height: 48px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.book-register-date-control:focus-within .book-register-date-placeholder,
+.book-register-date-control.has-value .book-register-date-placeholder {
+  display: none;
+}
+
+.book-register-calendar-button {
+  position: absolute;
+  top: 50%;
+  right: 1px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 46px;
+  padding: 0;
+  color: #fff;
+  background: #2f6fd6;
+  border: 0;
+  border-left: 1px solid #222;
+  border-radius: 0 11px 11px 0;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.book-register-calendar-button svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.book-register-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.book-register-actions button,
+.book-register-primary-action {
+  height: 43px;
+  padding: 0 12px;
+  color: #111;
+  font-size: 15px;
+  line-height: 43px;
+  text-align: center;
+  white-space: nowrap;
+  background: #f0f1ff;
+  border: 1px solid #222;
+  border-radius: 9px;
+  box-sizing: border-box;
+}
+
+.book-register-actions button:disabled {
+  opacity: 0.65;
+}
+
+.book-register-submit {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.book-register-primary-action {
+  width: 178px;
+}
+
+.book-register-error,
+.book-register-form .errorlist {
+  margin: 0 0 4px;
+  padding: 0;
+  color: var(--danger, #dc3545);
+  list-style: none;
+}
+
+.book-register-sr-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+#book_lookup_message {
+  min-height: 1.2em;
+  margin-top: -6px;
+  font-size: 13px;
+}
+
+@media (max-width: 480px) {
+  .book-register-card {
+    margin: 0;
+    border-right: 0;
+    border-left: 0;
+  }
+}
