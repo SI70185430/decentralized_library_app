@@ -162,7 +162,7 @@ export function LoginForm() {
         <div className="mt-[clamp(56px,9dvh,83px)] flex justify-center">
           <Button
             type="submit"
-            className="h-[43px] w-44 rounded-[8px] border border-black bg-[#eef0ff] text-xl font-normal text-black shadow-none hover:bg-[#e3e6ff]"
+            className="h-[43px] w-44 rounded-[8px] border border-black bg-[#eef0ff] text-xl font-normal text-black shadow-none"
             disabled={isSubmitting}
           >
             {isSubmitting ? "ログイン中..." : "ログイン"}
