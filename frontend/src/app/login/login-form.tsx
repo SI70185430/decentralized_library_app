@@ -5,11 +5,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  GENERIC_API_ERROR_MESSAGE,
-  messageForFieldError,
-  ApiError,
-} from "@/lib/api/errors";
+import { ApiError, GENERIC_API_ERROR_MESSAGE, messageForFieldError } from "@/lib/api/errors";
 import { login } from "@/lib/auth/client";
 import type { LoginFormErrors } from "@/lib/auth/types";
 
@@ -21,9 +17,7 @@ function fieldError(errors: LoginFormErrors, field: string) {
 function normalizeEmployeeId(value: string) {
   return value
     .trim()
-    .replace(/[０-９]/g, (char) =>
-      String.fromCharCode(char.charCodeAt(0) - 0xfee0),
-    );
+    .replace(/[０-９]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0xfee0));
 }
 
 function validateLoginForm(employeeId: string, password: string): LoginFormErrors {
@@ -87,9 +81,7 @@ export function LoginForm() {
         return;
       }
 
-      setSubmitError(
-        error instanceof ApiError ? error.message : GENERIC_API_ERROR_MESSAGE,
-      );
+      setSubmitError(error instanceof ApiError ? error.message : GENERIC_API_ERROR_MESSAGE);
     } finally {
       setIsSubmitting(false);
     }

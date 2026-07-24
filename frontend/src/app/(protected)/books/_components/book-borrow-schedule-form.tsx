@@ -132,7 +132,8 @@ export function BookBorrowScheduleForm({
             "処理中..."
           ) : (
             <>
-              この日程で<br />
+              この日程で
+              <br />
               {submitLabel}
             </>
           )}

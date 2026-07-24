@@ -1,7 +1,6 @@
 import Link from "next/link";
-
-import type { CurrentLendingListItem } from "@/lib/home/types";
 import { formatHomeDate } from "@/lib/home/date";
+import type { CurrentLendingListItem } from "@/lib/home/types";
 import { BookSummaryCard } from "./book-summary-card";
 
 type LoanListProps = {

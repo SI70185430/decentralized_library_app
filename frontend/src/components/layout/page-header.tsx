@@ -17,9 +17,7 @@ export function PageHeader({ title, backHref, className }: PageHeaderProps) {
             {backHref ? <BackButton href={backHref} /> : null}
           </div>
 
-          <h1 className="truncate text-2xl leading-none font-semibold">
-            {title}
-          </h1>
+          <h1 className="truncate text-2xl leading-none font-semibold">{title}</h1>
         </div>
 
         <div className="ml-auto">

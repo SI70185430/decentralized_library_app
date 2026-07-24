@@ -54,13 +54,21 @@ export function AppTabs({
             >
               {tab.label}
             </TabsTrigger>
-            {index < tabs.length - 1 ? <span aria-hidden="true" className="mx-1">|</span> : null}
+            {index < tabs.length - 1 ? (
+              <span aria-hidden="true" className="mx-1">
+                |
+              </span>
+            ) : null}
           </Fragment>
         ))}
       </TabsList>
 
       {tabs.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value} className={cn("mt-4 flex-none", tabPanelClassName)}>
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          className={cn("mt-4 flex-none", tabPanelClassName)}
+        >
           {tab.content}
         </TabsContent>
       ))}

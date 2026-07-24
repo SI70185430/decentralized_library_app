@@ -99,17 +99,31 @@ function buildNavigationItems(currentPage: number, totalPages: number): Navigati
   ];
 }
 
-export function BookResultPagination({ currentPage, totalPages, params }: BookResultPaginationProps) {
+export function BookResultPagination({
+  currentPage,
+  totalPages,
+  params,
+}: BookResultPaginationProps) {
   const safeTotalPages = Math.max(1, totalPages);
   const safeCurrentPage = Math.min(Math.max(1, currentPage), safeTotalPages);
   const items = buildNavigationItems(safeCurrentPage, safeTotalPages);
 
   return (
-    <Pagination id="pager_book_list" aria-label="書籍検索結果ページ" className="flex justify-center">
+    <Pagination
+      id="pager_book_list"
+      aria-label="書籍検索結果ページ"
+      className="flex justify-center"
+    >
       <PaginationContent className="flex flex-wrap items-center justify-center gap-1 text-sm font-semibold">
         {items.map((item, index) => (
           <PaginationItem
-            key={item.type === "control" ? item.label : item.type === "page" ? item.page : `ellipsis-${index}`}
+            key={
+              item.type === "control"
+                ? item.label
+                : item.type === "page"
+                  ? item.page
+                  : `ellipsis-${index}`
+            }
             className="flex items-center gap-1"
           >
             {item.type === "ellipsis" ? (

@@ -39,10 +39,7 @@ type CompleteIllustrationProps = {
 
 function CompleteIllustration({ uiId, src, alt }: CompleteIllustrationProps) {
   return (
-    <div
-      data-ui-id={uiId}
-      className="relative mx-auto h-36 w-48 overflow-hidden rounded-md"
-    >
+    <div data-ui-id={uiId} className="relative mx-auto h-36 w-48 overflow-hidden rounded-md">
       <Image src={src} alt={alt} fill sizes="192px" className="object-contain" />
     </div>
   );
@@ -131,8 +128,10 @@ export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteCo
         />
 
         <p data-ui-id="txt_reservation" className="text-left text-lg font-semibold">
-          ご利用ありがとうございます。<br />
-          予約処理が完了しました。<br />
+          ご利用ありがとうございます。
+          <br />
+          予約処理が完了しました。
+          <br />
           取り置き期間内に書籍の受け取りをお願いします。
         </p>
 
@@ -175,8 +174,10 @@ export function BorrowCompleteContent({ resultType, resultId }: BorrowCompleteCo
       />
 
       <p data-ui-id="txt_loan_description" className="text-left text-lg font-semibold">
-        ご利用ありがとうございます。<br />
-        貸出処理が完了しました。<br />
+        ご利用ありがとうございます。
+        <br />
+        貸出処理が完了しました。
+        <br />
         期限までの返却をお願いします。
       </p>
 

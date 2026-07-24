@@ -7,9 +7,7 @@ type ReservationCancelCompleteContentProps = {
   title: string;
 };
 
-export function ReservationCancelCompleteContent({
-  title,
-}: ReservationCancelCompleteContentProps) {
+export function ReservationCancelCompleteContent({ title }: ReservationCancelCompleteContentProps) {
   return (
     <div className="space-y-7">
       <div

@@ -41,9 +41,7 @@ function InvalidCompleteParams() {
 
 export default async function BorrowCompletePage({ searchParams }: BorrowCompletePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const resultType = getResultType(
-    getSingleSearchParam(resolvedSearchParams.resultType),
-  );
+  const resultType = getResultType(getSingleSearchParam(resolvedSearchParams.resultType));
   const resultId = getSingleSearchParam(resolvedSearchParams.resultId);
   const title = resultType === "reservation" ? "予約情報" : "貸出情報";
 

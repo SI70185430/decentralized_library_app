@@ -34,7 +34,10 @@ function renderActionLabel(label: string, uiId: BookActionLinkProps["uiId"]) {
   );
 }
 
-function getRenderableAction(action: BookAction | null, book: BookDetail): RenderableBookAction | null {
+function getRenderableAction(
+  action: BookAction | null,
+  book: BookDetail,
+): RenderableBookAction | null {
   if (!action || action.type === "extend") {
     return null;
   }

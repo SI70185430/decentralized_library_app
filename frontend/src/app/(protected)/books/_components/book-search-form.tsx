@@ -1,7 +1,7 @@
 "use client";
 
-import { type SubmitEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { type SubmitEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -40,7 +40,11 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
   { code: "9", name: "文学" },
 ];
 
-function setQueryIfPresent(query: URLSearchParams, key: string, value: FormDataEntryValue | null): void {
+function setQueryIfPresent(
+  query: URLSearchParams,
+  key: string,
+  value: FormDataEntryValue | null,
+): void {
   if (typeof value !== "string") {
     return;
   }
@@ -94,8 +98,18 @@ export function BookSearchForm({ genres, initialValues }: BookSearchFormProps) {
         placeholder="キーワード"
         defaultValue={initialValues.keyword}
       />
-      <Input id="input_title" name="title" placeholder="タイトル" defaultValue={initialValues.title} />
-      <Input id="input_author" name="author" placeholder="著者" defaultValue={initialValues.author} />
+      <Input
+        id="input_title"
+        name="title"
+        placeholder="タイトル"
+        defaultValue={initialValues.title}
+      />
+      <Input
+        id="input_author"
+        name="author"
+        placeholder="著者"
+        defaultValue={initialValues.author}
+      />
       <Input
         id="input_publisher"
         name="publisher"

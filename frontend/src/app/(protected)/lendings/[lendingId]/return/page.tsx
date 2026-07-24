@@ -39,8 +39,7 @@ export default async function ReturnReceptionPage({
   }
 
   const isReturnable =
-    book.availability.status_code === "using" &&
-    book.availability.current_lending_id === lendingId;
+    book.availability.status_code === "using" && book.availability.current_lending_id === lendingId;
 
   return (
     <PageFrame
