@@ -32,9 +32,13 @@
 
 ## ER図
 
+![ER図](assets/readme/ER図.png)
+
 <br />
 
 ## 画面遷移図
+
+![画面遷移図](assets/readme/画面遷移図.png)
 
 <br />
 
