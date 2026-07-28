@@ -59,7 +59,7 @@
 | Database | PostgreSQL |
 | Design | Figma |
 | AI Model | gpt5.5, gpt5.6 luna, gpt5.6 terra |
-| AI Agent | PI, Hermes Agent |
+| AI Agent | Pi Coding Agent, Hermes Agent |
 | etc. | Biome, Ruff, shadcn/ui, Swagger UI, Git, GitHub, docker |
 
 ## ER図
