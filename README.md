@@ -56,13 +56,13 @@
 
 | Category | Technology Stack |
 | --- | --- |
-| Frontend | TypeScript, Next.js, Tailwind CSS |
-| Backend | Python, Django, Django REST Framework |
-| Database | PostgreSQL |
+| Frontend | TypeScript 5.9.3, Next.js 16.2.2, Tailwind CSS 4.2.2 |
+| Backend | Python 3.14, Django 6.0.3, Django REST Framework 3.17.1 |
+| Database | PostgreSQL 18.3 |
 | Design | Figma |
 | AI Model | GPT-5.5, GPT-5.6 Luna, GPT-5.6 Terra |
 | AI Agent | Pi Coding Agent, Hermes Agent |
-| etc. | Biome, Ruff, shadcn/ui, Swagger UI, Git, GitHub, Docker |
+| etc. | Biome 2.4.15, Ruff 0.15.13, shadcn/ui 4.7.0, drf-spectacular 0.29.0（Swagger UI）, Git 2.43.0, GitHub, Docker |
 
 ## ER図
 
